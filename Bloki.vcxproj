@@ -1,0 +1,235 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{48898906-c34c-40b6-b6e7-3198ed1ea3f0}</ProjectGuid>
+    <RootNamespace>Bloki</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Program Files (x86)\freetype\include\freetype2\;./src;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;GLEW_STATIC;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\MinGW\lib;C:\Program Files (x86)\freetype\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>winmm.lib;dbghelp.lib;shlwapi.lib;glew32s.lib;opengl32.lib;glu32.lib;glm_static.lib;freetyped.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>.\src;.\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>./lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glu32.lib;opengl32.lib;libglew32d.lib;glm_static.lib;freetyped.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\core\GameState.cpp" />
+    <ClCompile Include="src\physics\AABB.cpp" />
+    <ClCompile Include="src\core\Application.cpp" />
+    <ClCompile Include="src\world\DroppedItem.cpp" />
+    <ClCompile Include="src\physics\BlockRay.cpp" />
+    <ClCompile Include="src\physics\Rigidbody.cpp" />
+    <ClCompile Include="src\world\ChunkRenderer.cpp" />
+    <ClCompile Include="src\graphics\ResourceManager.cpp" />
+    <ClCompile Include="src\graphics\RenderingContext.cpp" />
+    <ClCompile Include="src\world\ChunkBlockData.cpp" />
+    <ClCompile Include="src\world\ChunkMesh.cpp" />
+    <ClCompile Include="IUpdateListener.hpp" />
+    <ClCompile Include="src\Bloki.cpp" />
+    <ClCompile Include="src\graphics\AtlasTexture.cpp" />
+    <ClCompile Include="src\graphics\Camera2D.cpp" />
+    <ClCompile Include="src\graphics\Camera3D.cpp" />
+    <ClCompile Include="src\graphics\ImageTexture.cpp" />
+    <ClCompile Include="src\graphics\ShaderProgram.cpp" />
+    <ClCompile Include="src\graphics\stb_image.cpp" />
+    <ClCompile Include="src\graphics\Texture.cpp" />
+    <ClCompile Include="src\graphics\VertexBuffer.cpp" />
+    <ClCompile Include="src\player.cpp" />
+    <ClCompile Include="src\core\Renderer.cpp" />
+    <ClCompile Include="src\ui\Button.cpp" />
+    <ClCompile Include="src\ui\DebugBox.cpp" />
+    <ClCompile Include="src\ui\Element.cpp" />
+    <ClCompile Include="src\ui\Font.cpp" />
+    <ClCompile Include="src\ui\FontCharacter.cpp" />
+    <ClCompile Include="src\ui\Text.cpp" />
+    <ClCompile Include="src\ui\UIManager.cpp" />
+    <ClCompile Include="src\util\db_perlin.cpp" />
+    <ClCompile Include="src\util\Debug.cpp" />
+    <ClCompile Include="src\util\Math.cpp" />
+    <ClCompile Include="src\window\window.cpp" />
+    <ClCompile Include="src\world\Block.cpp" />
+    <ClCompile Include="src\world\Chunk.cpp" />
+    <ClCompile Include="src\world\World.cpp" />
+    <ClCompile Include="src\world\WorldGenerator.cpp" />
+    <ClCompile Include="Vertex.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\core\GameState.hpp" />
+    <ClInclude Include="src\core\Application.hpp" />
+    <ClInclude Include="src\world\BlockArray.hpp" />
+    <ClInclude Include="src\world\DroppedItem.hpp" />
+    <ClInclude Include="src\physics\BlockRay.hpp" />
+    <ClInclude Include="src\physics\AABB.hpp" />
+    <ClInclude Include="src\physics\Rigidbody.hpp" />
+    <ClInclude Include="src\world\ChunkArray.hpp" />
+    <ClInclude Include="src\world\ChunkRenderer.hpp" />
+    <ClInclude Include="src\graphics\ResourceManager.hpp" />
+    <ClInclude Include="src\graphics\RenderingContext.hpp" />
+    <ClInclude Include="src\world\ChunkBlockData.hpp" />
+    <ClInclude Include="src\world\ChunkMesh.hpp" />
+    <ClInclude Include="src\graphics\AtlasTexture.hpp" />
+    <ClInclude Include="src\graphics\Camera.hpp" />
+    <ClInclude Include="src\graphics\Camera2D.hpp" />
+    <ClInclude Include="src\graphics\Camera3D.hpp" />
+    <ClInclude Include="src\graphics\ImageTexture.hpp" />
+    <ClInclude Include="src\graphics\RenderPass.hpp" />
+    <ClInclude Include="src\graphics\ShaderProgram.hpp" />
+    <ClInclude Include="src\graphics\stb_image.h" />
+    <ClInclude Include="src\graphics\Texture.hpp" />
+    <ClInclude Include="src\graphics\Vertex.hpp" />
+    <ClInclude Include="src\graphics\VertexBuffer.hpp" />
+    <ClInclude Include="src\player.hpp" />
+    <ClInclude Include="src\core\Renderer.hpp" />
+    <ClInclude Include="src\ui\Button.hpp" />
+    <ClInclude Include="src\ui\DebugBox.hpp" />
+    <ClInclude Include="src\ui\Element.hpp" />
+    <ClInclude Include="src\ui\Font.hpp" />
+    <ClInclude Include="src\ui\FontCharacter.hpp" />
+    <ClInclude Include="src\ui\Text.hpp" />
+    <ClInclude Include="src\ui\UIManager.hpp" />
+    <ClInclude Include="src\util\db_perlin.h" />
+    <ClInclude Include="src\util\Debug.hpp" />
+    <ClInclude Include="src\util\Math.hpp" />
+    <ClInclude Include="src\window\window.h" />
+    <ClInclude Include="src\world\Block.hpp" />
+    <ClInclude Include="src\world\Chunk.hpp" />
+    <ClInclude Include="src\world\ChunkManager.hpp" />
+    <ClInclude Include="src\world\World.hpp" />
+    <ClInclude Include="src\world\WorldGenerator.hpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

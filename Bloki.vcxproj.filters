@@ -1,0 +1,306 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Pliki źródłowe">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Pliki nagłówkowe">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Pliki zasobów">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Pliki źródłowe\graphics">
+      <UniqueIdentifier>{e9ab4965-d373-4700-97b2-fd7cf6cf2bb5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pliki źródłowe\ui">
+      <UniqueIdentifier>{52d07b3a-a89a-4aeb-8eca-d8124812ea46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pliki źródłowe\util">
+      <UniqueIdentifier>{c9bb12d7-f2c0-4921-a936-c6f07c8eb53d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pliki źródłowe\window">
+      <UniqueIdentifier>{7e10a3c5-56f6-45f8-b78a-502c091a108d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pliki źródłowe\world">
+      <UniqueIdentifier>{8b02b720-c2c5-406d-8943-a348aa22a937}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pliki nagłówkowe\graphics">
+      <UniqueIdentifier>{dc309a51-71da-4c90-a0d4-425acdd52f83}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pliki nagłówkowe\window">
+      <UniqueIdentifier>{9a022fef-59ea-4951-95de-d4a2a50c4824}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pliki nagłówkowe\util">
+      <UniqueIdentifier>{125699b5-d25d-434c-a937-7d3872597139}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pliki nagłówkowe\ui">
+      <UniqueIdentifier>{c36a96f2-5d21-4eea-9711-488ef8e7c579}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pliki nagłówkowe\world">
+      <UniqueIdentifier>{4ce77580-4b87-410c-8eea-45b2e2765c39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pliki nagłówkowe\physics">
+      <UniqueIdentifier>{0f95b96e-2a97-4f73-bc75-79b66f548f12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pliki źródłowe\physics">
+      <UniqueIdentifier>{3b56c536-ae67-45df-9325-2c63b58cd970}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pliki nagłówkowe\core">
+      <UniqueIdentifier>{d0c9123f-9b8f-4c3a-83ec-f167d5e7d2e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pliki źródłowe\core">
+      <UniqueIdentifier>{834ca06c-9f5c-4981-802d-7d8b809b751c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Bloki.cpp">
+      <Filter>Pliki źródłowe</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\Camera2D.cpp">
+      <Filter>Pliki źródłowe\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\Camera3D.cpp">
+      <Filter>Pliki źródłowe\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\ShaderProgram.cpp">
+      <Filter>Pliki źródłowe\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\stb_image.cpp">
+      <Filter>Pliki źródłowe\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\Texture.cpp">
+      <Filter>Pliki źródłowe\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\VertexBuffer.cpp">
+      <Filter>Pliki źródłowe\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\window\window.cpp">
+      <Filter>Pliki źródłowe\window</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\db_perlin.cpp">
+      <Filter>Pliki źródłowe\util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\Debug.cpp">
+      <Filter>Pliki źródłowe\util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\Math.cpp">
+      <Filter>Pliki źródłowe\util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\Font.cpp">
+      <Filter>Pliki źródłowe\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\FontCharacter.cpp">
+      <Filter>Pliki źródłowe\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\AtlasTexture.cpp">
+      <Filter>Pliki źródłowe\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\ImageTexture.cpp">
+      <Filter>Pliki źródłowe\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\Button.cpp">
+      <Filter>Pliki źródłowe\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\Text.cpp">
+      <Filter>Pliki źródłowe\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\Element.cpp">
+      <Filter>Pliki źródłowe\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\UIManager.cpp">
+      <Filter>Pliki źródłowe\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\DebugBox.cpp">
+      <Filter>Pliki źródłowe\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\world\Block.cpp">
+      <Filter>Pliki źródłowe\world</Filter>
+    </ClCompile>
+    <ClCompile Include="src\world\Chunk.cpp">
+      <Filter>Pliki źródłowe\world</Filter>
+    </ClCompile>
+    <ClCompile Include="src\player.cpp">
+      <Filter>Pliki źródłowe</Filter>
+    </ClCompile>
+    <ClCompile Include="IUpdateListener.hpp">
+      <Filter>Pliki nagłówkowe</Filter>
+    </ClCompile>
+    <ClCompile Include="src\world\ChunkMesh.cpp">
+      <Filter>Pliki źródłowe\world</Filter>
+    </ClCompile>
+    <ClCompile Include="src\world\ChunkBlockData.cpp">
+      <Filter>Pliki źródłowe\world</Filter>
+    </ClCompile>
+    <ClCompile Include="src\world\World.cpp">
+      <Filter>Pliki źródłowe\world</Filter>
+    </ClCompile>
+    <ClCompile Include="src\world\WorldGenerator.cpp">
+      <Filter>Pliki źródłowe\world</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\RenderingContext.cpp">
+      <Filter>Pliki źródłowe\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\ResourceManager.cpp">
+      <Filter>Pliki źródłowe\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\world\ChunkRenderer.cpp">
+      <Filter>Pliki źródłowe\world</Filter>
+    </ClCompile>
+    <ClCompile Include="src\physics\Rigidbody.cpp">
+      <Filter>Pliki źródłowe\physics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\physics\AABB.cpp">
+      <Filter>Pliki źródłowe\physics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\physics\BlockRay.cpp">
+      <Filter>Pliki źródłowe\physics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\world\DroppedItem.cpp">
+      <Filter>Pliki źródłowe\world</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\Application.cpp">
+      <Filter>Pliki źródłowe\core</Filter>
+    </ClCompile>
+    <ClCompile Include="Vertex.cpp">
+      <Filter>Pliki źródłowe\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\GameState.cpp">
+      <Filter>Pliki źródłowe\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\Renderer.cpp">
+      <Filter>Pliki źródłowe\core</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\graphics\Camera.hpp">
+      <Filter>Pliki nagłówkowe\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\Camera2D.hpp">
+      <Filter>Pliki nagłówkowe\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\Camera3D.hpp">
+      <Filter>Pliki nagłówkowe\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\ShaderProgram.hpp">
+      <Filter>Pliki nagłówkowe\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\stb_image.h">
+      <Filter>Pliki nagłówkowe\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\Texture.hpp">
+      <Filter>Pliki nagłówkowe\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\VertexBuffer.hpp">
+      <Filter>Pliki nagłówkowe\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\util\db_perlin.h">
+      <Filter>Pliki nagłówkowe\util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\util\Debug.hpp">
+      <Filter>Pliki nagłówkowe\util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\util\Math.hpp">
+      <Filter>Pliki nagłówkowe\util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\window\window.h">
+      <Filter>Pliki nagłówkowe\window</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\FontCharacter.hpp">
+      <Filter>Pliki nagłówkowe\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\Font.hpp">
+      <Filter>Pliki nagłówkowe\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\ImageTexture.hpp">
+      <Filter>Pliki nagłówkowe\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\AtlasTexture.hpp">
+      <Filter>Pliki nagłówkowe\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\Vertex.hpp">
+      <Filter>Pliki nagłówkowe\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\Element.hpp">
+      <Filter>Pliki nagłówkowe\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\Text.hpp">
+      <Filter>Pliki nagłówkowe\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\Button.hpp">
+      <Filter>Pliki nagłówkowe\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\UIManager.hpp">
+      <Filter>Pliki nagłówkowe\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\DebugBox.hpp">
+      <Filter>Pliki nagłówkowe\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\world\Block.hpp">
+      <Filter>Pliki nagłówkowe\world</Filter>
+    </ClInclude>
+    <ClInclude Include="src\world\World.hpp">
+      <Filter>Pliki nagłówkowe\world</Filter>
+    </ClInclude>
+    <ClInclude Include="src\world\ChunkManager.hpp">
+      <Filter>Pliki nagłówkowe\world</Filter>
+    </ClInclude>
+    <ClInclude Include="src\world\Chunk.hpp">
+      <Filter>Pliki nagłówkowe\world</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\RenderPass.hpp">
+      <Filter>Pliki nagłówkowe\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\player.hpp">
+      <Filter>Pliki nagłówkowe</Filter>
+    </ClInclude>
+    <ClInclude Include="src\world\ChunkMesh.hpp">
+      <Filter>Pliki nagłówkowe\world</Filter>
+    </ClInclude>
+    <ClInclude Include="src\world\ChunkBlockData.hpp">
+      <Filter>Pliki nagłówkowe\world</Filter>
+    </ClInclude>
+    <ClInclude Include="src\world\WorldGenerator.hpp">
+      <Filter>Pliki nagłówkowe\world</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\RenderingContext.hpp">
+      <Filter>Pliki nagłówkowe\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\ResourceManager.hpp">
+      <Filter>Pliki nagłówkowe\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\world\ChunkRenderer.hpp">
+      <Filter>Pliki nagłówkowe\world</Filter>
+    </ClInclude>
+    <ClInclude Include="src\world\ChunkArray.hpp">
+      <Filter>Pliki nagłówkowe\world</Filter>
+    </ClInclude>
+    <ClInclude Include="src\physics\Rigidbody.hpp">
+      <Filter>Pliki nagłówkowe\physics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\physics\AABB.hpp">
+      <Filter>Pliki nagłówkowe\physics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\physics\BlockRay.hpp">
+      <Filter>Pliki nagłówkowe\physics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\world\DroppedItem.hpp">
+      <Filter>Pliki nagłówkowe\world</Filter>
+    </ClInclude>
+    <ClInclude Include="src\world\BlockArray.hpp">
+      <Filter>Pliki nagłówkowe\world</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\Application.hpp">
+      <Filter>Pliki nagłówkowe\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\GameState.hpp">
+      <Filter>Pliki nagłówkowe\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\Renderer.hpp">
+      <Filter>Pliki nagłówkowe\core</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
