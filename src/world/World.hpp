@@ -9,8 +9,9 @@
 #include <world/ChunkArray.hpp>
 #include <world/ChunkRenderer.hpp>
 #include <world/BlockArray.hpp>
+#include <core/GameState.hpp>
 
-class World : public BlockArray
+class World : public BlockArray, public Renderable
 {
 private:
 	friend class WorldGenerator;
@@ -50,8 +51,8 @@ public:
 	void LoadWorld();
 	void Update();
 	void UpdateChunks();
-	void Render(RenderingContext &context);
-	
+	void Render(const RenderingContext &context) override;
+
 	Chunk* GetChunk(glm::ivec3 position); //TODO: Delete
 
 	const Block* GetBlock(glm::ivec3 position) override;

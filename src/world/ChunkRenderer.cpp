@@ -11,7 +11,7 @@ ChunkRenderer::ChunkRenderer(ChunkArray& chunkArray, GameState& gameState) :
 	setupBlockTextures();
 }
 
-void ChunkRenderer::RenderChunks(RenderingContext& context, glm::vec3 position)
+void ChunkRenderer::RenderChunks(const RenderingContext& context, glm::vec3 position)
 {
 	static float time = 0;
 

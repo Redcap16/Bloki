@@ -147,8 +147,10 @@ void World::LoadWorld()
 World::World(GameState& gameState) :
 	m_Generator(*this),
 	m_GameState(gameState),
-	m_ChunkRenderer(m_ChunkArray, resourceManager)
+	m_ChunkRenderer(m_ChunkArray, gameState)
 {
+	RenderableParameters params(false, )
+	m_GameState.GetRenderer().RegisterRenderable(*this, )
 }
 
 World::~World()
@@ -173,7 +175,7 @@ void World::Update()
 				m_ChunkArray.Chunks[x][y][z]->UpdateMeshBuffers();*/
 }
 
-void World::Render(RenderingContext &context)
+void World::Render(const RenderingContext &context)
 {
 	m_ChunkRenderer.RenderChunks(context, (glm::vec3)(currentCenterPosition * (glm::ivec3)ChunkBlockData::ChunkSize));
 }

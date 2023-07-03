@@ -9,9 +9,10 @@
 #include <string>
 #include <vector>
 #include <graphics/RenderPass.hpp>
-#include <world/World.hpp>
-#include <player.hpp>
 #include <ui/UIManager.hpp>
+
+class World;
+class Player;
 
 class NotInitializedEx : public std::logic_error
 {
@@ -32,7 +33,7 @@ struct RenderableParameters
 class Renderable
 {
 public:
-	virtual glm::mat4 GetModelMatrix() const = 0;
+	//virtual glm::mat4 GetModelMatrix() const = 0;
 	virtual void Render(const RenderingContext& context) = 0;
 };
 
@@ -48,7 +49,7 @@ private:
 	};
 	struct RenderableCompare
 	{
-		bool operator()(const RenderableRecord& a, const RenderableRecord& b) const;
+		bool operator()(const std::unique_ptr<RenderableRecord>& a, const std::unique_ptr<RenderableRecord>& b) const;
 	};
 
 	static Renderer* instance;
@@ -59,7 +60,7 @@ private:
 	Camera2D camera2d;
 	RenderingContext context;
 
-	std::vector<RenderableRecord> m_Renderables;
+	std::vector<std::unique_ptr<RenderableRecord>> m_Renderables;
 	bool m_ListUpdated = false;
 
 	void initGL();

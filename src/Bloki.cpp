@@ -152,7 +152,7 @@ private:
 		DebugBox::GetInstance().SetResourceManager(&m_ResourceManager);
 		Block::SetupBlockData();
 
-		m_World = std::make_unique<World>(m_ResourceManager);
+		m_World = std::make_unique<World>(*m_GameState);
 		m_World->LoadWorld();
 
 		m_Player = std::make_unique<Player>(*m_World);

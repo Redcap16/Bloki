@@ -4,13 +4,14 @@
 #include <world/Chunk.hpp>
 #include <world/ChunkArray.hpp>
 #include <core/GameState.hpp>
+#include <core/Renderer.hpp>
 
 class ChunkRenderer
 {
 public:
 	ChunkRenderer(ChunkArray& chunkArray, GameState& gameState);
 
-	void RenderChunks(RenderingContext& context, glm::vec3 position);
+	void RenderChunks(const RenderingContext& context, glm::vec3 position);
 	inline const BlockSubtextures& GetBlockSubtextures() const;
 private:
 	GameState& m_GameState;

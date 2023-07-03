@@ -1,5 +1,10 @@
 #include <core/Renderer.hpp>
 
+#include <world/World.hpp>
+#include <player.hpp>
+
+//TODO REMOVE THIS SHIT ^
+
 RenderableParameters::RenderableParameters(bool transparent, ShaderProgram& usedShader, Texture& texture) :
 	Transparent(transparent),
 	UsedShader(usedShader),
@@ -21,15 +26,15 @@ Renderer::RenderableRecord::RenderableRecord(Renderable& object, RenderableParam
 	
 }
 
-bool Renderer::RenderableCompare::operator()(const RenderableRecord& a, const RenderableRecord& b) const
+bool Renderer::RenderableCompare::operator()(const std::unique_ptr<RenderableRecord>& a, const std::unique_ptr<RenderableRecord>& b) const
 {
-	if (!a.Params.Transparent && b.Params.Transparent)
+	if (!a->Params.Transparent && b->Params.Transparent)
 		return true;
-	else if (a.Params.Transparent && !b.Params.Transparent)
+	else if (a->Params.Transparent && !b->Params.Transparent)
 		return false;
 	else
 	{
-		return a.Params.UsedShader.GetProgramID() < a.Params.UsedShader.GetProgramID();
+		return a->Params.UsedShader.GetProgramID() < a->Params.UsedShader.GetProgramID();
 	}
 }
 
@@ -90,14 +95,14 @@ void Renderer::Close()
 
 void Renderer::RegisterRenderable(Renderable& renderable, const RenderableParameters& params)
 {
-	m_Renderables.push_back(RenderableRecord(renderable, params));
+	m_Renderables.push_back(std::make_unique<RenderableRecord>(renderable, params));
 	m_ListUpdated = true;
 }
 
 bool Renderer::RemoveRenderable(Renderable& renderable)
 {
-	for (std::vector<RenderableRecord>::iterator it = m_Renderables.begin(); it != m_Renderables.end(); ++it)
-		if (&it->Object == &renderable)
+	for (std::vector<std::unique_ptr<RenderableRecord>>::iterator it = m_Renderables.begin(); it != m_Renderables.end(); ++it)
+		if (&(*it)->Object == &renderable)
 		{
 			m_Renderables.erase(it);
 			m_ListUpdated = true;
@@ -150,21 +155,20 @@ void Renderer::RenderScene(World& world, Player& player)
 		//player.Render(*currentCamera3d);
 
 		RenderableRecord* lastRecord = nullptr;
-		for (RenderableRecord& record : m_Renderables)
+		for (std::unique_ptr<RenderableRecord>& record : m_Renderables)
 		{
 			if (lastRecord == nullptr ||
-				lastRecord->Params.UsedShader.GetProgramID() != record.Params.UsedShader.GetProgramID())
+				lastRecord->Params.UsedShader.GetProgramID() != record->Params.UsedShader.GetProgramID())
 			{
-				record.Params.UsedShader.UseProgram();
+				record->Params.UsedShader.UseProgram();
 
-				record.Params.UsedShader.SetUniform("texture", 0);
+				record->Params.UsedShader.SetUniform("texture", 0);
 			}
 			if (lastRecord == nullptr ||
-				lastRecord->Params.UsedTexture.GetTextureID() != record.Params.UsedTexture.GetTextureID())
-				record.Params.UsedTexture.BindTexture(0);
+				lastRecord->Params.UsedTexture.GetTextureID() != record->Params.UsedTexture.GetTextureID())
+				record->Params.UsedTexture.BindTexture(0);
 
-			record.Params.UsedShader.SetUniform("mvpMatrix", currentCamera3d->GetCameraMatrix() * record.Object.GetModelMatrix());
-			record.Object.Render(context);
+			record->Object.Render(context);
 		}
 
 		glDepthMask(GL_FALSE);
