@@ -165,7 +165,7 @@
     <ClCompile Include="src\core\Application.cpp">
       <Filter>Pliki źródłowe\core</Filter>
     </ClCompile>
-    <ClCompile Include="Vertex.cpp">
+    <ClCompile Include="src\graphics\Vertex.cpp">
       <Filter>Pliki źródłowe\graphics</Filter>
     </ClCompile>
     <ClCompile Include="src\core\GameState.cpp">
@@ -174,21 +174,27 @@
     <ClCompile Include="src\core\Renderer.cpp">
       <Filter>Pliki źródłowe\core</Filter>
     </ClCompile>
+    <ClCompile Include="src\graphics\ErrorCheck.cpp">
+      <Filter>Pliki źródłowe\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\ElementBuffer.cpp">
+      <Filter>Pliki źródłowe\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\VertexArray.cpp">
+      <Filter>Pliki źródłowe\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\CubemapTexture.cpp">
+      <Filter>Pliki źródłowe\graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\graphics\Camera.hpp">
-      <Filter>Pliki nagłówkowe\graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="src\graphics\Camera2D.hpp">
       <Filter>Pliki nagłówkowe\graphics</Filter>
     </ClInclude>
     <ClInclude Include="src\graphics\Camera3D.hpp">
       <Filter>Pliki nagłówkowe\graphics</Filter>
     </ClInclude>
     <ClInclude Include="src\graphics\ShaderProgram.hpp">
-      <Filter>Pliki nagłówkowe\graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="src\graphics\stb_image.h">
       <Filter>Pliki nagłówkowe\graphics</Filter>
     </ClInclude>
     <ClInclude Include="src\graphics\Texture.hpp">
@@ -251,9 +257,6 @@
     <ClInclude Include="src\world\Chunk.hpp">
       <Filter>Pliki nagłówkowe\world</Filter>
     </ClInclude>
-    <ClInclude Include="src\graphics\RenderPass.hpp">
-      <Filter>Pliki nagłówkowe\graphics</Filter>
-    </ClInclude>
     <ClInclude Include="src\player.hpp">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
@@ -301,6 +304,21 @@
     </ClInclude>
     <ClInclude Include="src\core\Renderer.hpp">
       <Filter>Pliki nagłówkowe\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\ElementBuffer.hpp">
+      <Filter>Pliki nagłówkowe\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\VertexArray.hpp">
+      <Filter>Pliki nagłówkowe\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\Buffer.hpp">
+      <Filter>Pliki nagłówkowe\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\ErrorCheck.hpp">
+      <Filter>Pliki nagłówkowe\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\CubemapTexture.hpp">
+      <Filter>Pliki nagłówkowe\graphics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -2,9 +2,7 @@
 
 #include <inttypes.h>
 #include <glm/glm.hpp>
-#include <GL/glew.h>
-#include <GL/GL.h>
-#include <GL/GLU.h>
+
 #include <graphics/VertexBuffer.hpp>
 
 struct Vertex2D
@@ -12,8 +10,7 @@ struct Vertex2D
 	glm::vec2 Position;
 	glm::vec2 TextureCoords;
 
-	static constexpr int s_AttributeCount = 2;
-	static const VertexAttribute s_Attributes[s_AttributeCount];
+	static const std::vector<VertexAttribute> Attributes;
 };
 
 struct Vertex3D
@@ -22,18 +19,16 @@ struct Vertex3D
 	glm::vec2 TextureCoords;
 	glm::vec3 Normal;
 	char state;
-	
-	static constexpr int s_AttributeCount = 4;
-	static const VertexAttribute s_Attributes[s_AttributeCount];
+
+	static const std::vector<VertexAttribute> Attributes;
 }; 
 
-struct Vertex3DShort
+struct Vertex3DS
 {
-	float x, y, z;
-	float u, v;
-};
+	glm::vec<3, uint8_t> Position;
+	glm::vec2 TextureCoords;
+	glm::vec<3, uint8_t> Normal;
+	uint8_t state;
 
-struct Vertex3DT : public Vertex3D
-{
-	float transparency;
+	static const std::vector<VertexAttribute> Attributes;
 };

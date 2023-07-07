@@ -5,21 +5,19 @@
 #include <GL/GLU.h>
 
 #include <string>
+#include <util/Debug.hpp>
+#include <graphics/ErrorCheck.hpp>
 
-#include <graphics/ShaderProgram.hpp>
+typedef GLuint TextureHandle;
 
 class Texture
 {
-private:
-	static const short maxTextureIndex = 16;
-protected:
-	const std::string texturePath = "assets/textures/";
-	unsigned int texture = 0;
-	Texture();
 public:
-	void BindTexture(unsigned short index);
-	inline unsigned int GetTextureID()
-	{
-		return texture;
-	}
+	static constexpr GLenum GetFormatFromChannelCount(unsigned short channelCount);
+	virtual void Bind(GLuint textureUnit) const = 0;
+	virtual TextureHandle GetHandle() const = 0;
+
+protected:
+	static constexpr short c_MaxTextureIndex = 16;
+	static constexpr const char* c_TexturePath = "assets/textures/";
 };

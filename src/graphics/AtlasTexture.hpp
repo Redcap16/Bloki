@@ -1,6 +1,8 @@
 #pragma once
 
 #include <string>
+#include <map>
+#include <fstream>
 
 #include <GL/glew.h>
 #include <GL/GL.h>
@@ -22,25 +24,36 @@ public:
 		SubTexture(glm::vec2 uv, glm::vec2 size);
 		SubTexture();
 	};
-private:
-	struct TextureData
-	{
-		glm::ivec2 Size;
-		unsigned char* Data;
-		bool AlphaChannel;
-		SubTexture& TextureBounds;
 
-		TextureData(SubTexture& textureBounds);
+	AtlasTexture(const std::string& filename);
+	~AtlasTexture();
+	AtlasTexture(const AtlasTexture&) = delete;
+	AtlasTexture& operator=(const AtlasTexture&) = delete;
+
+	const SubTexture* GetSubTexture(const std::string& name) const;
+	void Bind(GLuint textureUnit) const override;
+	inline TextureHandle GetHandle() const override;
+
+private:
+	struct DescriptionFileContents
+	{
+		std::string ImageFilepath;
+		glm::ivec2 DefaultSize;
+		std::map<std::string, glm::ivec2> SubTextureCoords;
 	};
 
-	std::vector<TextureData> m_TextureData;
+	TextureHandle m_Handle;
+	std::string m_Filename;
+	std::map<std::string, SubTexture> m_SubTextures;
 
-	void setup();
-	void unloadTextures();
-public:
-	AtlasTexture();
-	~AtlasTexture();
-
-	bool Load(const std::string filename, SubTexture& result);
-	void Bake();
+	void getNextToken(const std::string& contents, size_t start, size_t &end, std::string& result);
+	bool readCoords(const std::string& firstVal, const std::string& secondVal, const std::string& errorMessage, glm::ivec2& result);
+	bool readDescFile(DescriptionFileContents& contents);
+	void load();
+	void unload();
 };
+
+TextureHandle AtlasTexture::GetHandle() const
+{
+	return m_Handle;
+}

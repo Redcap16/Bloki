@@ -3,12 +3,10 @@
 #include <GL/glew.h>
 #include <GL/GL.h>
 #include <GL/GLU.h>
-#include <windows.h>
-#include <graphics/RenderingContext.hpp>
-
 #include <vector>
 
-#include <util/Debug.hpp>
+#include <graphics/Buffer.hpp>
+#include <graphics/ErrorCheck.hpp>
 
 struct VertexAttribute
 {
@@ -17,166 +15,155 @@ struct VertexAttribute
 	VertexAttribute(GLint size, GLenum type);
 };
 
-template <typename TVertex>
-class VertexBuffer
+class AbstractVertexBuffer
 {
+public:
+	virtual BufferHandle GetHandle() const = 0;
+	virtual void GetVertexAttributes(std::vector<VertexAttribute>&) const = 0;
+	virtual void Bind() = 0;
+	virtual size_t GetVertexSize() = 0;
+};
+
+template <typename TVertex>
+class VertexBuffer : public AbstractVertexBuffer
+{
+public:
+	VertexBuffer(bool dynamic);
+	~VertexBuffer();
+	VertexBuffer(const VertexBuffer&) = delete;
+	VertexBuffer& operator=(const VertexBuffer&) = delete;
+	VertexBuffer(VertexBuffer&& other) noexcept;
+	VertexBuffer& operator=(VertexBuffer&& other) noexcept;
+
+	inline BufferHandle GetHandle() const override;
+	inline void GetVertexAttributes(std::vector<VertexAttribute> &attributes) const override;
+
+	inline void AddVertex(const TVertex &vertex);
+	inline void AddVertices(const std::vector<TVertex>& vertices);
+	inline void ClearData();
+	void UpdateBuffer();
+	size_t GetCurrentIndex();
+	inline void Bind() const override;
+	inline size_t GetVertexSize() const override;
 private:
-	GLuint vao = 0, vbo, ebo;
-	unsigned int indicesCount;
+	BufferHandle m_Handle;
 
-	bool dynamic;
+	bool m_Dynamic;
 
-	std::vector<TVertex> vertices;
-	std::vector<unsigned int> indices;
+	std::vector<TVertex> m_Vertices;
 
-	void setupBuffers()
+	void setup();
+};
+
+template <typename TVertex>
+VertexBuffer<TVertex>::VertexBuffer(bool dynamic) :
+	m_Dynamic(dynamic)
+	m_Handle(0),
+	m_IndicesCount(0)
+{
+	setup();
+}
+
+template <typename TVertex>
+VertexBuffer<TVertex>::~VertexBuffer()
+{
+	if (m_Handle)
 	{
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
+		glDeleteBuffers(1, &m_Handle);
+		CHECK_GL_ERROR();
+	}
+}
 
-		glGenBuffers(1, &vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+template <typename TVertex>
+VertexBuffer<TVertex>::VertexBuffer(VertexBuffer&& other) noexcept
+{
+	*this = std::move(other);
+}
 
-		size_t stride = 0;
-		for (unsigned int i = 0; i < TVertex::s_AttributeCount; i++)
+template <typename TVertex>
+VertexBuffer<TVertex>& VertexBuffer<TVertex>::operator=(VertexBuffer&& other) noexcept
+{
+	if (&other != this)
+	{
+		m_Dynamic = other.m_Dynamic;
+
+		if (m_Handle)
 		{
-			const VertexAttribute& attrib = TVertex::s_Attributes[i];
-
-			if(attrib.type == GL_BYTE)
-				glVertexAttribIPointer(i, attrib.size, attrib.type, sizeof(TVertex), (const void*)stride); //TODO
-			else
-				glVertexAttribPointer(i, attrib.size, attrib.type, GL_FALSE, sizeof(TVertex), (const void*)stride);
-
-			glEnableVertexAttribArray(i);
-
-			switch (attrib.type)
-			{
-			case GL_BYTE:
-			case GL_UNSIGNED_BYTE:
-				stride += 1 * attrib.size;
-				break;
-			case GL_SHORT:
-			case GL_UNSIGNED_SHORT:
-			case GL_HALF_FLOAT:
-				stride += 2 * attrib.size;
-				break;
-			case GL_INT:
-			case GL_UNSIGNED_INT:
-			case GL_FIXED:
-			case GL_FLOAT:
-				stride += 4 * attrib.size;
-				break;
-			case GL_DOUBLE:
-				stride += 8 * attrib.size;
-				break;
-			default:
-				Debug::GetInstance().Log("Error: Bad type enum");
-				return;
-			}
+			glDeleteBuffers(1, &m_Handle);
+			CHECK_GL_ERROR();
 		}
 
-		glGenBuffers(1, &ebo);
+		m_Handle = other.m_Handle;
+		other.m_Handle = 0;
 
-		glBindVertexArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		m_Vertices.swap(other.m_Vertices);
 	}
 
-	void clearBuffers()
-	{
-		if (!vao)
-			return;
+	return *this;
+}
 
-		glDeleteBuffers(1, &vbo);
-		glDeleteBuffers(1, &ebo);
+template <typename TVertex>
+BufferHandle VertexBuffer<TVertex>::GetHandle() const
+{
+	return m_Handle);
+}
 
-		glDeleteVertexArrays(1, &vao);
+template <typename TVertex>
+void VertexBuffer<TVertex>::GetVertexAttributes(std::vector<VertexAttribute> &attributes) const
+{
+	attributes = TVertex::Attributes;
+}
 
-		vao = 0;
-	}
-public:
-	VertexBuffer(bool dynamic = false) :
-		dynamic(dynamic)
-	{
-		setupBuffers();
-	}
+template <typename TVertex>
+void VertexBuffer<TVertex>::AddVertex(const TVertex &vertex)
+{
+	m_Vertices.push_back(vertex)
+}
 
-	~VertexBuffer()
-	{
-		clearBuffers();
-		ClearVertices();
-	}
+template <typename TVertex>
+void VertexBuffer<TVertex>::AddVertices(const std::vector<TVertex>& vertices)
+{
+	m_Vertices.insert(m_Vertices.end(), vertices.begin(), vertices.end());
+}
 
-	void AddVertices(TVertex* vertex, unsigned int size)
-	{
-		if (vertex == nullptr)
-			return;
+template <typename TVertex>
+void VertexBuffer<TVertex>::ClearData()
+{
+	std::vector<TVertex>().swap(m_Vertices);
+}
 
-		for (unsigned int i = 0; i < size; i++)
-			vertices.push_back(vertex[i]);
-	}
+template <typename TVertex>
+void VertexBuffer<TVertex>::UpdateBuffer()
+{
+	glBindBuffer(GL_VERTEX_BUFFER, m_Handle);
+	glBufferData(GL_VERTEX_BUFFER, m_Vertices.size() * sizeof(Vertex), m_Vertices.data(), dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+	CHECK_GL_ERROR();
+}
 
-	void AddIndices(unsigned int* index, unsigned int size)
-	{
-		if (index == nullptr)
-			return;
+template <typename TVertex>
+size_t VertexBuffer<TVertex>::GetCurrentIndex()
+{
+	const size_t size = m_Vertices.size();
+	if (size) size--; //To return an index of the last element
+	return size;
+}
 
-		for (unsigned int i = 0; i < size; i++)
-			indices.push_back(index[i]);
-	}
+template <typename TVertex>
+void VertexBuffer<TVertex>::Bind() const
+{
+	glBindBuffer(GL_VERTEX_BUFFER, m_Handle);
+	CHECK_GL_ERROR();
+}
 
-	void UpdateBuffers()
-	{
-		if (!vao)
-			return;
+template <typename TVertex>
+size_t VertexBuffer<TVertex>::GetVertexSize() const
+{
+	return sizeof(TVertex);
+}
 
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER,
-			vertices.size() * sizeof(TVertex),
-			vertices.data(),
-			dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-			indices.size() * sizeof(unsigned int),
-			indices.data(),
-			dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
-
-		indicesCount = (unsigned int)indices.size(); //In case of vector clear
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	}
-
-	void ClearVertices()
-	{
-		vertices.clear();
-		indices.clear();
-
-		std::vector<TVertex>().swap(vertices);
-		std::vector<unsigned int>().swap(indices);
-	}
-
-	void Render() const
-	{
-		if (!indicesCount || !vao)
-			return;
-
-		glBindVertexArray(vao);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-
-		glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, 0);
-	}
-
-	inline void AddVertex(TVertex& vertex)
-	{
-		vertices.push_back(vertex);
-	}
-	inline void AddIndex(unsigned int index)
-	{
-		indices.push_back(index);
-	}
-	inline unsigned int GetCurrentIndex()
-	{
-		return (unsigned int)vertices.size();
-	}
-};
+template <typename TVertex>
+void VertexBuffer<TVertex>::setup()
+{
+	glGenBuffers(1, &m_Handle);
+	CHECK_GL_ERROR();
+}

@@ -13,10 +13,23 @@
 
 class ImageTexture : public Texture
 {
-private:
-	bool load(const std::string path);
 public:
-	ImageTexture(const std::string path);
-
+	ImageTexture(const std::string& filename, bool transparency);
 	~ImageTexture();
+	ImageTexture(const ImageTexture&) = delete;
+	ImageTexture& operator=(const ImageTexture&) = delete;
+
+	void Bind(GLuint textureUnit) const override;
+	inline TextureHandle GetHandle() const override;
+private:
+	TextureHandle m_Handle;
+	std::string m_Filename;
+
+	void load(bool transparency);
+	void unload();
 };
+
+TextureHandle ImageTexture::GetHandle() const
+{
+	return m_Handle;
+}

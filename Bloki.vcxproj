@@ -145,6 +145,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\graphics\CubemapTexture.cpp" />
+    <ClCompile Include="src\graphics\ElementBuffer.cpp" />
+    <ClCompile Include="src\graphics\ErrorCheck.cpp" />
     <ClCompile Include="src\core\GameState.cpp" />
     <ClCompile Include="src\physics\AABB.cpp" />
     <ClCompile Include="src\core\Application.cpp" />
@@ -183,9 +186,14 @@
     <ClCompile Include="src\world\Chunk.cpp" />
     <ClCompile Include="src\world\World.cpp" />
     <ClCompile Include="src\world\WorldGenerator.cpp" />
-    <ClCompile Include="Vertex.cpp" />
+    <ClCompile Include="src\graphics\Vertex.cpp" />
+    <ClCompile Include="src\graphics\VertexArray.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\graphics\CubemapTexture.hpp" />
+    <ClInclude Include="src\graphics\ErrorCheck.hpp" />
+    <ClInclude Include="src\graphics\Buffer.hpp" />
+    <ClInclude Include="src\graphics\ElementBuffer.hpp" />
     <ClInclude Include="src\core\GameState.hpp" />
     <ClInclude Include="src\core\Application.hpp" />
     <ClInclude Include="src\world\BlockArray.hpp" />
@@ -201,12 +209,9 @@
     <ClInclude Include="src\world\ChunkMesh.hpp" />
     <ClInclude Include="src\graphics\AtlasTexture.hpp" />
     <ClInclude Include="src\graphics\Camera.hpp" />
-    <ClInclude Include="src\graphics\Camera2D.hpp" />
     <ClInclude Include="src\graphics\Camera3D.hpp" />
     <ClInclude Include="src\graphics\ImageTexture.hpp" />
-    <ClInclude Include="src\graphics\RenderPass.hpp" />
     <ClInclude Include="src\graphics\ShaderProgram.hpp" />
-    <ClInclude Include="src\graphics\stb_image.h" />
     <ClInclude Include="src\graphics\Texture.hpp" />
     <ClInclude Include="src\graphics\Vertex.hpp" />
     <ClInclude Include="src\graphics\VertexBuffer.hpp" />
@@ -228,6 +233,7 @@
     <ClInclude Include="src\world\ChunkManager.hpp" />
     <ClInclude Include="src\world\World.hpp" />
     <ClInclude Include="src\world\WorldGenerator.hpp" />
+    <ClInclude Include="src\graphics\VertexArray.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,14 +1,18 @@
 #include <graphics/Texture.hpp>
 
-Texture::Texture()
+static constexpr GLenum GetFormatFromChannelCount(unsigned short channelCount)
 {
-}
+	switch (channelCount)
+	{
+	case 1:
+		return GL_RED;
+	case 2:
+		return GL_RG;
+	case 3:
+		return GL_RGB;
+	case 4:
+		return GL_RGBA;
+	}
 
-void Texture::BindTexture(unsigned short index)
-{
-	if (index > maxTextureIndex)
-		return;
-
-	glActiveTexture(GL_TEXTURE0 + index);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	return 0;
 }

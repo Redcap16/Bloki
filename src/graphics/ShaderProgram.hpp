@@ -12,46 +12,55 @@
 #include <GL/GLU.h>
 
 #include <util/Debug.hpp>
+#include <graphics/ErrorCheck.hpp>
 #include <stdexcept>
+
+#define INVALID_UNIFORM_LOCATION -1
+
+typedef GLint UniformLocation;
+typedef GLuint ProgramHandle;
+typedef GLuint ShaderHandle;
 
 class ShaderProgram
 {
 public:
 	enum class ShaderType
 	{
-		VERTEX,
-		FRAGMENT
+		Vertex,
+		Fragment
 	};
-private:
-	const std::string shaderPath = "shaders/";
 
-	unsigned int programID = 0,
-		vertexShader = 0,
-		fragmentShader = 0;
-	std::map<std::string, unsigned int> uniformLocations;
+	ShaderProgram(const std::string& filename);
+	~ShaderProgram();
+	ShaderProgram(const ShaderProgram&) = delete;
+	ShaderProgram& operator=(const ShaderProgram&) = delete;
+	ShaderProgram(ShaderProgram&& other);
+	ShaderProgram& operator=(ShaderProgram&& other);
 
-	void uniformDoesntExist();
-	bool loadShader(std::string content, ShaderType type);
-	bool loadShaders(const std::string filename);
-	bool setup();
+	void UseProgram() const;
 
-	unsigned int getUniformLocation(std::string name);
+	void SetMVPMatrix(const glm::mat4& matrix);
 
-public:
-	ShaderProgram(std::string filename);
-
-	void UseProgram();
-
-	virtual void SetMVPMatrix(glm::mat4 matrix);
-
-	inline unsigned int GetProgramID()
-	{
-		return programID;
-	}
+	inline ProgramHandle GetHandle() const;
+	UniformLocation GetUniformLocation(const char* name) const;
 
 	//Uniform setters
-	void SetUniform(std::string name, glm::mat4 value);
-	void SetUniform(std::string name, glm::vec3 value);
-	void SetUniform(std::string name, int value);
-	void SetUniform(std::string name, float value);
+	void SetUniform(UniformLocation location, const glm::mat4& value);
+	void SetUniform(UniformLocation location, const glm::vec3& value);
+	void SetUniform(UniformLocation location, int value);
+	void SetUniform(UniformLocation location, float value);
+
+private:
+	static constexpr const char* s_ShaderFolderPath = "shaders/";
+	ProgramHandle m_ProgramHandle;
+
+	UniformLocation m_MVPLocation;
+
+	std::string m_Filename;
+
+	ShaderHandle loadShader(const std::string& contents, ShaderType type);
+	void unloadShader(ShaderHandle handle);
+	bool loadShaders(ShaderHandle &vertex, ShaderHandle &fragment);
+
+	void destroyProgram();
 };
