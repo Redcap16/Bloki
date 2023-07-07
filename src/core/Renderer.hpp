@@ -2,86 +2,73 @@
 
 #include <glm/glm.hpp>
 
-#include <graphics/Camera3D.hpp>
-#include <graphics/Camera2D.hpp>
-
-#include <exception>
 #include <string>
 #include <vector>
-#include <graphics/RenderPass.hpp>
-#include <ui/UIManager.hpp>
 
-class World;
-class Player;
-
-class NotInitializedEx : public std::logic_error
-{
-protected:
-public:
-	NotInitializedEx(const std::string message);
-};
+#include <graphics/Camera3D.hpp>
+#include <graphics/ShaderProgram.hpp>
+#include <graphics/Texture.hpp>
+#include <graphics/RenderingContext.hpp>
+#include <graphics/ErrorCheck.hpp>
+#include <algorithm>
 
 struct RenderableParameters
 {
 	bool Transparent;
-	ShaderProgram& UsedShader;
-	Texture& UsedTexture;
+	ShaderProgram* UsedShader;
+	Texture* UsedTexture;
 
-	RenderableParameters(bool transparent, ShaderProgram& usedShader, Texture& texture);
+	RenderableParameters(bool transparent, ShaderProgram* usedShader, Texture* texture);
 };
 
 class Renderable
 {
 public:
-	//virtual glm::mat4 GetModelMatrix() const = 0;
+	virtual glm::mat4 GetModelMatrix() const = 0;
 	virtual void Render(const RenderingContext& context) = 0;
 };
 
-class Renderer
+class Renderer3D
 {
+public:
+	Renderer3D(glm::ivec2 windowSize);
+	~Renderer3D();
+	Renderer3D(const Renderer3D&) = delete;
+	Renderer3D& operator=(const Renderer3D&) = delete;
+
+	void RegisterRenderable(Renderable* renderable, const RenderableParameters& params);
+	bool RemoveRenderable(Renderable* renderable);
+
+	void Resize(glm::ivec2 windowSize);
+	inline void SetCamera(Camera3D* camera);
+
+	void RenderScene();
 private:
 	struct RenderableRecord
 	{
-		Renderable& Object;
+		Renderable* Object;
 		RenderableParameters Params;
 
-		RenderableRecord(Renderable& object, RenderableParameters params);
+		RenderableRecord(Renderable* object, RenderableParameters params);
 	};
+
 	struct RenderableCompare
 	{
 		bool operator()(const std::unique_ptr<RenderableRecord>& a, const std::unique_ptr<RenderableRecord>& b) const;
 	};
 
-	static Renderer* instance;
+	glm::ivec2 m_WindowSize;
+	Camera3D* m_CurrentCamera3D;
+	RenderingContext m_Context;
 
-	glm::ivec2 windowSize;
-	std::vector<Camera3D> cameras;
-	Camera3D* currentCamera3d = nullptr;
-	Camera2D camera2d;
-	RenderingContext context;
+	std::vector<RenderableRecord> m_Renderables;
+	bool m_ListSorted;
 
-	std::vector<std::unique_ptr<RenderableRecord>> m_Renderables;
-	bool m_ListUpdated = false;
-
-	void initGL();
+	void setupGL();
 	void sortRenderList();
-
-	Renderer(glm::ivec2 windowSize);
-public:
-	static Renderer& GetInstance();
-	static void Init(glm::ivec2 windowSize);
-	static void Close();
-	static inline bool IsInitialized()
-	{
-		return instance != nullptr;
-	}
-
-	void RegisterRenderable(Renderable& renderable, const RenderableParameters& params);
-	bool RemoveRenderable(Renderable& renderable);
-
-	void Resize(glm::ivec2 windowSize);
-	Camera3D* CreateCamera3D();
-	void SetCamera3D(Camera3D* camera);
-
-	void RenderScene(World& world, Player& player);
 };
+
+void Renderer3D::SetCamera(Camera3D* camera)
+{
+	m_CurrentCamera3D = camera;
+}

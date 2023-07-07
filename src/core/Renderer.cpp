@@ -1,11 +1,6 @@
 #include <core/Renderer.hpp>
 
-#include <world/World.hpp>
-#include <player.hpp>
-
-//TODO REMOVE THIS SHIT ^
-
-RenderableParameters::RenderableParameters(bool transparent, ShaderProgram& usedShader, Texture& texture) :
+RenderableParameters::RenderableParameters(bool transparent, ShaderProgram* usedShader, Texture* texture) :
 	Transparent(transparent),
 	UsedShader(usedShader),
 	UsedTexture(texture)
@@ -13,20 +8,14 @@ RenderableParameters::RenderableParameters(bool transparent, ShaderProgram& used
 
 }
 
-NotInitializedEx::NotInitializedEx(const std::string message) :
-	std::logic_error(message)
-{
-
-}
-
-Renderer::RenderableRecord::RenderableRecord(Renderable& object, RenderableParameters params) :
+Renderer3D::RenderableRecord::RenderableRecord(Renderable* object, RenderableParameters params) :
 	Object(object),
 	Params(params)
 {
-	
+
 }
 
-bool Renderer::RenderableCompare::operator()(const std::unique_ptr<RenderableRecord>& a, const std::unique_ptr<RenderableRecord>& b) const
+bool Renderer3D::RenderableCompare::operator()(const std::unique_ptr<RenderableRecord>& a, const std::unique_ptr<RenderableRecord>& b) const
 {
 	if (!a->Params.Transparent && b->Params.Transparent)
 		return true;
@@ -34,12 +23,77 @@ bool Renderer::RenderableCompare::operator()(const std::unique_ptr<RenderableRec
 		return false;
 	else
 	{
-		return a->Params.UsedShader.GetProgramID() < a->Params.UsedShader.GetProgramID();
+		return a->Params.UsedShader->GetHandle() < a->Params.UsedShader->GetHandle();
 	}
 }
 
-Renderer* Renderer::instance = nullptr;
-void Renderer::initGL()
+Renderer3D::Renderer3D(glm::ivec2 windowSize) :
+	m_WindowSize(windowSize),
+	m_ListSorted(true),
+	m_CurrentCamera3D(nullptr)
+{
+	setupGL();
+}
+
+Renderer3D::~Renderer3D()
+{
+
+}
+
+void Renderer3D::RegisterRenderable(Renderable* renderable, const RenderableParameters& params)
+{
+	if (renderable == nullptr)
+		return;
+
+	m_Renderables.push_back(RenderableRecord(renderable, params));
+	m_ListSorted = false;
+}
+
+bool Renderer3D::RemoveRenderable(Renderable* renderable)
+{
+	for (std::vector<RenderableRecord>::const_iterator it = m_Renderables.begin(); it != m_Renderables.end(); ++it)
+		if (it->Object == renderable)
+		{
+			m_Renderables.erase(it);
+			return true;
+		}
+	
+	return false;
+}
+
+void Renderer3D::Resize(glm::ivec2 windowSize)
+{
+	glViewport(0, 0, (GLsizei)windowSize.x, (GLsizei)windowSize.y);
+	CHECK_GL_ERROR();
+	m_WindowSize = windowSize;
+}
+
+void Renderer3D::RenderScene()
+{
+	if (m_CurrentCamera3D == nullptr)
+		return;
+
+	if (!m_ListSorted)
+		sortRenderList();
+		
+	RenderableParameters* lastParams = nullptr;
+	for (RenderableRecord record : m_Renderables)
+	{
+		if (lastParams == nullptr ||
+			lastParams->UsedShader->GetHandle() != record.Params.UsedShader->GetHandle())
+			record.Params.UsedShader->UseProgram();
+		if (lastParams == nullptr ||
+			lastParams->UsedTexture->GetHandle() != record.Params.UsedTexture->GetHandle())
+			record.Params.UsedTexture->Bind(0);
+
+		record.Params.UsedShader->SetMVPMatrix(m_CurrentCamera3D->GetCameraMatrix() * record.Object->GetModelMatrix());
+		record.Object->Render(m_Context);
+
+		lastParams = &record.Params;
+	}
+}
+
+void Renderer3D::setupGL()
 {
 	glShadeModel(GL_SMOOTH);
 	glClearColor(0.0f, 1.0f, 1.0f, 0.0f);
@@ -50,132 +104,19 @@ void Renderer::initGL()
 
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
-	//glDisable(GL_CULL_FACE);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_FRONT);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	CHECK_GL_ERROR();
 }
 
-void Renderer::sortRenderList()
+void Renderer3D::sortRenderList()
 {
+	if (m_ListSorted)
+		return;
+
 	std::sort(m_Renderables.begin(), m_Renderables.end(), RenderableCompare());
-	m_ListUpdated = false;
-}
-
-Renderer::Renderer(glm::ivec2 windowSize) :
-	windowSize(windowSize),
-	camera2d(windowSize)
-{
-	initGL();
-}
-
-Renderer& Renderer::GetInstance()
-{
-	if (!instance)
-		throw NotInitializedEx("Renderer not initialized yet. Please initialize it before use.");
-	return *instance;
-}
-
-void Renderer::Init(glm::ivec2 windowSize)
-{
-	if (instance)
-		return;
-	instance = new Renderer(windowSize);
-}
-
-void Renderer::Close()
-{
-	if (!instance)
-		return;
-	delete instance;
-	instance = nullptr;
-}
-
-void Renderer::RegisterRenderable(Renderable& renderable, const RenderableParameters& params)
-{
-	m_Renderables.push_back(std::make_unique<RenderableRecord>(renderable, params));
-	m_ListUpdated = true;
-}
-
-bool Renderer::RemoveRenderable(Renderable& renderable)
-{
-	for (std::vector<std::unique_ptr<RenderableRecord>>::iterator it = m_Renderables.begin(); it != m_Renderables.end(); ++it)
-		if (&(*it)->Object == &renderable)
-		{
-			m_Renderables.erase(it);
-			m_ListUpdated = true;
-			return true;
-		}
-
-	return false;
-}
-
-void Renderer::Resize(glm::ivec2 windowSize)
-{
-	glViewport(0, 0, windowSize.x, windowSize.y);
-
-	if (windowSize.y == 0)
-		windowSize.y = 1;
-
-	camera2d.SetWindowSize(windowSize);
-	for (auto cam = cameras.begin(); cam != cameras.end(); cam++)
-		(*cam).SetAspectRatio((float)windowSize.x / windowSize.y);
-}
-
-Camera3D* Renderer::CreateCamera3D()
-{
-	cameras.push_back(Camera3D((float)windowSize.x / windowSize.y));
-	return &cameras.back();
-}
-
-void Renderer::SetCamera3D(Camera3D* camera)
-{
-	currentCamera3d = camera;
-}
-
-void Renderer::RenderScene(World& world, Player& player)
-{
-	if (m_ListUpdated)
-		sortRenderList();
-	//TODO: REMOVE THIS SHIT
-	//context.SetCamera2D(&camera2d);
-	//context.SetCamera3D(currentCamera3d);
-	context.CurrentCamera2D = &camera2d;
-	context.CurrentCamera3D = currentCamera3d;
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	//Draw 3D
-	if (currentCamera3d)
-	{
-		glDepthMask(GL_TRUE);
-		//world.Render(context);
-
-		//player.Render(*currentCamera3d);
-
-		RenderableRecord* lastRecord = nullptr;
-		for (std::unique_ptr<RenderableRecord>& record : m_Renderables)
-		{
-			if (lastRecord == nullptr ||
-				lastRecord->Params.UsedShader.GetProgramID() != record->Params.UsedShader.GetProgramID())
-			{
-				record->Params.UsedShader.UseProgram();
-
-				record->Params.UsedShader.SetUniform("texture", 0);
-			}
-			if (lastRecord == nullptr ||
-				lastRecord->Params.UsedTexture.GetTextureID() != record->Params.UsedTexture.GetTextureID())
-				record->Params.UsedTexture.BindTexture(0);
-
-			record->Object.Render(context);
-		}
-
-		glDepthMask(GL_FALSE);
-		//World::GetInstance().Render(*currentCamera3d, RenderPass::Transparent);
-	}
-	glDepthMask(GL_TRUE);
-
-	//Draw 2D
-	UIManager::GetInstance().Render(context);
+	m_ListSorted = true;
 }
