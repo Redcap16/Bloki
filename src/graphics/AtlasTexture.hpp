@@ -35,20 +35,35 @@ public:
 	inline TextureHandle GetHandle() const override;
 
 private:
-	struct DescriptionFileContents
+	class DescriptionFile
 	{
-		std::string ImageFilepath;
-		glm::ivec2 DefaultSize;
-		std::map<std::string, glm::ivec2> SubTextureCoords;
+	public:
+		DescriptionFile(const std::string& filepath);
+		bool IsGood() const { return m_Good; }
+		const std::string& GetImageFilename() const { return m_ImageFilename; }
+		const glm::ivec2& GetDefaultSize() const { return m_DefaultSize; }
+		const std::map<std::string, glm::ivec2> GetTextureCoords() const { return m_TextureCoords; }
+	private:
+		std::string m_Filepath;
+
+		std::string m_ImageFilename;
+		glm::ivec2 m_DefaultSize;
+		std::map<std::string, glm::ivec2> m_TextureCoords;
+
+		size_t m_CurrentIndex;
+		std::string m_CurrentLine;
+
+		bool m_Good;
+
+		void getNextToken(std::string& result);
+		bool readCoords(const std::string& errorMessage, glm::ivec2& result);
+		bool readFile();
 	};
 
 	TextureHandle m_Handle;
 	std::string m_Filename;
 	std::map<std::string, SubTexture> m_SubTextures;
-
-	void getNextToken(const std::string& contents, size_t start, size_t &end, std::string& result);
-	bool readCoords(const std::string& firstVal, const std::string& secondVal, const std::string& errorMessage, glm::ivec2& result);
-	bool readDescFile(DescriptionFileContents& contents);
+	
 	void load();
 	void unload();
 };

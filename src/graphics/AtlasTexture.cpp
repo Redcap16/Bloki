@@ -41,20 +41,32 @@ void AtlasTexture::Bind(GLuint textureUnit) const
 	CHECK_GL_ERROR();
 }
 
-void AtlasTexture::getNextToken(const std::string& contents, size_t start, size_t &end, std::string& result)
+AtlasTexture::DescriptionFile::DescriptionFile(const std::string& filepath) :
+	m_Filepath(filepath),
+	m_CurrentIndex(0),
+	m_Good(false)
 {
-	while (start < contents.size() && std::isspace(contents[start])) start++;
-	size_t tokenBegin = start;
-	while (start < contents.size() && !std::isspace(contents[start])) start++;
-	result = contents.substr(tokenBegin, start - tokenBegin);
-	end = start + 1;
+	if (readFile())
+		m_Good = true;
 }
 
-bool AtlasTexture::readCoords(const std::string& firstVal, const std::string& secondVal, const std::string& errorMessage, glm::ivec2& result)
+void AtlasTexture::DescriptionFile::getNextToken(std::string& result)
 {
+	while (m_CurrentIndex < m_CurrentLine.size() && std::isspace(m_CurrentLine[m_CurrentIndex])) m_CurrentIndex++;
+	size_t beginIndex = m_CurrentIndex;
+	while (m_CurrentIndex < m_CurrentLine.size() && !std::isspace(m_CurrentLine[m_CurrentIndex])) m_CurrentIndex++;
+	result = m_CurrentLine.substr(beginIndex, m_CurrentIndex - beginIndex);
+	m_CurrentIndex++;
+}
+
+bool AtlasTexture::DescriptionFile::readCoords(const std::string& errorMessage, glm::ivec2& result)
+{
+	std::string token;
+
+	getNextToken(token);
 	try
 	{
-		result.x = std::stoi(firstVal);
+		result.x = std::stoi(token);
 	}
 	catch (std::invalid_argument e)
 	{
@@ -67,9 +79,10 @@ bool AtlasTexture::readCoords(const std::string& firstVal, const std::string& se
 		return false;
 	}
 
+	getNextToken(token);
 	try
 	{
-		result.y = std::stoi(secondVal);
+		result.y = std::stoi(token);
 	}
 	catch (std::invalid_argument e)
 	{
@@ -85,10 +98,9 @@ bool AtlasTexture::readCoords(const std::string& firstVal, const std::string& se
 	return true;
 }
 
-bool AtlasTexture::readDescFile(DescriptionFileContents& contents)
+bool AtlasTexture::DescriptionFile::readFile()
 {
-	std::string descPath = c_TexturePath + m_Filename;
-	std::ifstream descFile(descPath, std::ios::in);
+	std::ifstream descFile(m_Filepath, std::ios::in);
 
 	if (!descFile.is_open())
 	{
@@ -96,34 +108,28 @@ bool AtlasTexture::readDescFile(DescriptionFileContents& contents)
 		return false;
 	}
 
-	std::string line, imageFile;
-	glm::ivec2 defaultSize;
-	std::map<std::string, glm::ivec2> subCoords;
 	while (descFile.good())
 	{
-		std::getline(descFile, line);
+		std::getline(descFile, m_CurrentLine);
 
-		size_t index = 0;
+		m_CurrentIndex = 0;
 		std::string token;
-		getNextToken(line, 0, index, token);
+		getNextToken(token);
 
 		if (token == "#file")
 		{
-			getNextToken(line, index, index, imageFile);
-			if (imageFile.empty())
+			getNextToken(m_ImageFilename);
+			if (m_ImageFilename.empty())
 			{
-				DEBUG_LOG("Error: missing image path in " + m_Filename);
+				DEBUG_LOG("Error: missing image path in " + m_Filepath);
 				return false;
 			}
+
 			continue;
 		}
 		if (token == "#dsize")
 		{
-			std::string first, second;
-			getNextToken(line, index, index, first);
-			getNextToken(line, index, index, second);
-
-			if (!readCoords(first, second, "Error: invalid default size in " + m_Filename, defaultSize))
+			if (!readCoords("Error: invalid default size in " + m_Filepath, m_DefaultSize))
 				return false;
 
 			continue;
@@ -132,30 +138,23 @@ bool AtlasTexture::readDescFile(DescriptionFileContents& contents)
 		const std::string& name = token;
 		glm::ivec2 coords;
 
-		std::string first, second;
-		getNextToken(line, index, index, first);
-		getNextToken(line, index, index, second);
-
-		if (!readCoords(first, second, "Error: invalid coords for " + name + " in " + m_Filename, coords))
+		if (!readCoords("Error: invalid coords for " + name + " in " + m_Filepath, coords))
 			return false;
 
-		subCoords[name] = coords;
+		m_TextureCoords[name] = coords;
 	}
 
-	if (imageFile.empty())
+	if (m_ImageFilename.empty())
 	{
-		DEBUG_LOG("Error: missing image file path in " + m_Filename);
-		return false;
-	}
-	if (defaultSize == glm::ivec2(0, 0))
-	{
-		DEBUG_LOG("Error: missing default sub texture size in " + m_Filename);
+		DEBUG_LOG("Error: missing image file path in " + m_Filepath);
 		return false;
 	}
 
-	contents.ImageFilepath = imageFile;
-	contents.DefaultSize = defaultSize;
-	contents.SubTextureCoords = subCoords;
+	if (m_DefaultSize == glm::ivec2(0, 0))
+	{
+		DEBUG_LOG("Error: missing default sub texture size in " + m_Filepath);
+		return false;
+	}
 
 	return true;
 }
@@ -165,8 +164,8 @@ void AtlasTexture::load()
 	if (m_Handle)
 		return;
 
-	DescriptionFileContents descFileContents;
-	if (!readDescFile(descFileContents))
+	DescriptionFile descFile(c_TexturePath + m_Filename);
+	if (!descFile.IsGood())
 		return;
 
 	glGenTextures(1, &m_Handle);
@@ -186,7 +185,7 @@ void AtlasTexture::load()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	CHECK_GL_ERROR();
 
-	std::string filepath = c_TexturePath + descFileContents.ImageFilepath;
+	std::string filepath = c_TexturePath + descFile.GetImageFilename();
 	int width, height, channelCount;
 	unsigned char* data = stbi_load(filepath.c_str(), &width, &height, &channelCount, 0);
 
@@ -211,8 +210,8 @@ void AtlasTexture::load()
 
 	stbi_image_free(data);
 
-	glm::vec2 subSize = (glm::vec2)descFileContents.DefaultSize / glm::vec2(width, height);
-	for (std::pair<const std::string, glm::ivec2>& coords : descFileContents.SubTextureCoords)
+	glm::vec2 subSize = (glm::vec2)descFile.GetDefaultSize() / glm::vec2(width, height);
+	for (const std::pair<const std::string, glm::ivec2>& coords : descFile.GetTextureCoords())
 		m_SubTextures[coords.first] = SubTexture(glm::vec2((float)coords.second.x / width, (float)coords.second.y / height), subSize);
 }
 

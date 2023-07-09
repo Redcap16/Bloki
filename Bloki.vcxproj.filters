@@ -60,9 +60,6 @@
     <ClCompile Include="src\Bloki.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
-    <ClCompile Include="src\graphics\Camera2D.cpp">
-      <Filter>Pliki źródłowe\graphics</Filter>
-    </ClCompile>
     <ClCompile Include="src\graphics\Camera3D.cpp">
       <Filter>Pliki źródłowe\graphics</Filter>
     </ClCompile>
@@ -319,6 +316,9 @@
     </ClInclude>
     <ClInclude Include="src\graphics\CubemapTexture.hpp">
       <Filter>Pliki nagłówkowe\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform.hpp">
+      <Filter>Pliki nagłówkowe\physics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

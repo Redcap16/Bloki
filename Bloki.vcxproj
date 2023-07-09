@@ -162,7 +162,6 @@
     <ClCompile Include="IUpdateListener.hpp" />
     <ClCompile Include="src\Bloki.cpp" />
     <ClCompile Include="src\graphics\AtlasTexture.cpp" />
-    <ClCompile Include="src\graphics\Camera2D.cpp" />
     <ClCompile Include="src\graphics\Camera3D.cpp" />
     <ClCompile Include="src\graphics\ImageTexture.cpp" />
     <ClCompile Include="src\graphics\ShaderProgram.cpp" />
@@ -234,6 +233,7 @@
     <ClInclude Include="src\world\World.hpp" />
     <ClInclude Include="src\world\WorldGenerator.hpp" />
     <ClInclude Include="src\graphics\VertexArray.hpp" />
+    <ClInclude Include="Transform.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

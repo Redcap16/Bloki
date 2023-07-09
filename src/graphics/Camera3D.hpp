@@ -12,50 +12,40 @@
 
 class Camera3D : public Camera
 {
-private:
-	glm::vec3 position = glm::vec3(1.0);
-	float horizontalRotation = 0,
-		verticalRotation = 0;
-	float aspect;
-
-	const float fov = 45.0f,
-		nearVal = 0.1f,
-		farVal = 200.0f;
-
-	glm::mat4 projectionMatrix,
-		viewMatrix,
-		cameraMatrix;
-
-	void updateProjectionMatrix();
-	void updateViewMatrix();
 public:
-	Camera3D(float aspect);
+	Camera3D(glm::ivec2 windowSize);
 
-	void SetAspectRatio(float aspect);
+	void WindowResize(glm::ivec2 windowSize);
+
 	void Rotate(float horizontal, float vertical);
 	void SetRotation(float horizontal, float vertical);
-	glm::vec3 GetDirection();
+	void Move(const glm::vec3& move);
+	void SetPosition(const glm::vec3& position);
 
-	inline void Move(glm::vec3 move)
-	{
-		position += move;
-		updateViewMatrix();
-	}
-	inline void SetPosition(glm::vec3 position)
-	{
-		this->position = position;
-		updateViewMatrix();
-	}
-	inline glm::vec2 GetRotation()
-	{
-		return { horizontalRotation, verticalRotation };
-	}
-	inline glm::vec3 GetPosition()
-	{
-		return position;
-	}
-	inline const glm::mat4& GetCameraMatrix() const override
-	{
-		return cameraMatrix;
-	}
+	const glm::vec2& GetRotation() { return { m_HorizontalRotation, m_VerticalRotation }; }
+	const glm::vec3& GetPosition() { return m_Position; }
+
+	const glm::vec3& GetDirection() const { return m_Direction; }
+	const glm::mat4& GetCameraMatrix() const override { return m_CameraMatrix; }
+
+private:
+	static constexpr float c_FOV = 45.0f,
+		c_NearValue = 0.1f,
+		c_FarValue = 200.0f;
+
+	glm::vec3 m_Position = glm::vec3(0.0);
+	float m_HorizontalRotation = 0,
+		m_VerticalRotation = 0;
+	glm::vec3 m_Direction;
+
+	float m_AspectRatio;
+
+	glm::mat4 m_ProjectionMatrix,
+		m_ViewMatrix,
+		m_CameraMatrix;
+
+	void updateDirection();
+	void updateProjectionMatrix();
+	void updateViewMatrix();
 };
+
