@@ -2,6 +2,8 @@
 
 #include <string>
 #include <vector>
+#include <thread>
+#include <mutex>
 
 #include <glm/glm.hpp>
 
@@ -9,12 +11,16 @@
 #include <world/ChunkRenderer.hpp>
 #include <entity/DroppedItem.hpp>
 
+typedef glm::ivec3 ChunkPos;
+
 class Chunk
 {
 public:
-	Chunk(Renderer3D& renderer, const glm::vec3& position);
+	Chunk(Renderer3D& renderer, const ChunkPos& position);
 	Chunk(const Chunk&) = delete;
 	Chunk& operator=(const Chunk&) = delete;
+
+	const ChunkPos& GetPosition() const { return m_Position; }
 
 	void SetHighlight(InChunkPos position);
 	void ResetHighlight();
@@ -25,7 +31,7 @@ public:
 	void Update();
 	void UpdateNeighbors(Chunk* neighbors[6]);
 
-	inline bool DoesNeedUpdate() const { return m_UpdateNeeded; }
+	inline bool DoesNeedGeometryUpdate() const { return m_GeometryUpdateNeeded; }
 	void UpdateGeometry();
 
 	void AddDroppedItem(std::unique_ptr<DroppedItem> item);
@@ -34,7 +40,7 @@ public:
 private:
 	ChunkRenderer m_ChunkRenderer;
 	BlockArray m_BlockArray;
-	glm::vec3 m_Position;
+	ChunkPos m_Position;
 
 	Chunk* m_Neighbors[6];
 
@@ -43,62 +49,9 @@ private:
 	InChunkPos m_HighlightedPosition;
 	bool m_AnythingHighlighted;
 
-	bool m_UpdateNeeded;
+	bool m_GeometryUpdateNeeded;
+	std::mutex m_GeometryMutex;
 
 	void checkItemsBoundaries();
 	void moveItem(Chunk& destination, std::vector<std::unique_ptr<DroppedItem>>::iterator it);
 };
-
-
-/*
-class Chunk
-{
-public:
-	Chunk(const BlockSubtextures& blockSubtextures, glm::vec3 globalPosition);
-
-	void UpdateNeighbors(Chunk* neighbors[6]);
-	void UpdateMesh();
-	void Render(bool transparent);
-
-	const Block& GetBlock(glm::uvec3 position);
-	void SetBlock(glm::uvec3 position, const Block& block);
-
-	inline void AddDroppedItem(std::unique_ptr<DroppedItem>&& item);
-
-	void Update(float deltaTime);
-
-	void ResetHighlight();
-	void SetHighlight(glm::uvec3 position);
-
-private:
-	ChunkBlockData m_BlockData;
-	ChunkMesh m_ChunkMesh;
-
-	glm::vec3 m_GlobalPosition;
-
-	Chunk* m_Neighbors[6] = { nullptr };
-
-	bool m_MeshChanged = false;
-	bool m_BuffersChanged = false;
-
-	glm::uvec3 m_HighlightedPos = glm::uvec3(0);
-	bool m_IsHighlighted = false;
-
-	std::vector<std::unique_ptr<DroppedItem>> m_DroppedItems;
-
-	inline void changed();
-	void updateMeshBuffers();
-
-	void checkItemBoundaries(DroppedItem* item, int index);
-	void moveItemToNeighbor(int index, Chunk* chunk);
-};
-
-void Chunk::AddDroppedItem(std::unique_ptr<DroppedItem>&& item)
-{
-	m_DroppedItems.push_back(std::move(item));
-}
-
-void Chunk::changed()
-{
-	m_MeshChanged = true;
-}*/

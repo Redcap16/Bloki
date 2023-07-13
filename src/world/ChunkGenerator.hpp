@@ -5,17 +5,14 @@
 #include <util/db_perlin.h>
 #include <thread>
 
-class World;
-
-class WorldGenerator
+class ChunkGenerator
 {
 public:
-	WorldGenerator(World &world);
-	~WorldGenerator();
+	ChunkGenerator();
+	~ChunkGenerator();
 
-	void Generate(Chunk& chunk, glm::ivec3 position);
+	void GenerateChunk(ChunkPos position, Chunk& chunk);
 private:
-	World& m_World;
 
 	void generateTree(Chunk& chunk, glm::ivec3 givenChunkPosition, glm::ivec3 rootPosition);
 	void setStructureBlock(Chunk& chunk, glm::ivec3 givenChunkPosition, glm::ivec3 position, Block::BlockType type);

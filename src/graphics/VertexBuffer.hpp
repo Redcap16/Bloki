@@ -4,6 +4,7 @@
 #include <GL/GL.h>
 #include <GL/GLU.h>
 #include <vector>
+#include <deque>
 
 #include <graphics/Buffer.hpp>
 #include <graphics/ErrorCheck.hpp>
@@ -50,7 +51,7 @@ private:
 
 	bool m_Dynamic;
 
-	std::vector<TVertex> m_Vertices;
+	std::deque<TVertex> m_Vertices;
 
 	void setup();
 };

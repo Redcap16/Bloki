@@ -1,14 +1,15 @@
 #include <world/Chunk.hpp>
 
-Chunk::Chunk(Renderer3D& renderer, const glm::vec3& position) :
+Chunk::Chunk(Renderer3D& renderer, const ChunkPos& position) :
 	m_Position(position),
-	m_ChunkRenderer(renderer, m_BlockArray, m_Position)
+	m_ChunkRenderer(renderer, m_BlockArray, (glm::vec3)(m_Position * (glm::ivec3)BlockArray::ChunkSize))
 {
 
 }
 
 void Chunk::SetHighlight(InChunkPos position)
 {
+	std::lock_guard<std::mutex> lock(m_GeometryMutex);
 	m_HighlightedPosition = position;
 	m_AnythingHighlighted = true;
 	m_UpdateNeeded = true;
@@ -16,12 +17,14 @@ void Chunk::SetHighlight(InChunkPos position)
 
 void Chunk::ResetHighlight()
 {
+	std::lock_guard<std::mutex> lock(m_GeometryMutex);
 	m_AnythingHighlighted = false;
 	m_UpdateNeeded = true;
 }
 
 void Chunk::SetBlock(InChunkPos position, Block block)
 {
+	std::lock_guard<std::mutex> lock(m_GeometryMutex);
 	m_BlockArray.Set(position, block);
 	m_UpdateNeeded = true;
 }
@@ -45,6 +48,7 @@ void Chunk::UpdateNeighbors(Chunk* neighbors[6])
 		{
 			m_Neighbors[i] = neighbors[i];
 			m_Neighbors[i]->m_UpdateNeeded = true;
+			m_UpdateNeeded = true;
 		}
 		neighborsArrays[i] = &neighbors[i]->m_BlockArray;
 	}
@@ -54,10 +58,13 @@ void Chunk::UpdateNeighbors(Chunk* neighbors[6])
 
 void Chunk::UpdateGeometry()
 {
-	if(m_UpdateNeeded)
+	if (m_UpdateNeeded)
+	{
+		std::lock_guard<std::mutex> lock(m_GeometryMutex);
 		m_ChunkRenderer.UpdateGeometry();
 
-	m_UpdateNeeded = false;
+		m_UpdateNeeded = false;
+	}
 }
 
 void Chunk::AddDroppedItem(std::unique_ptr<DroppedItem> item)

@@ -145,7 +145,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Direction.cpp" />
+    <ClCompile Include="src\world\LoadedChunks.cpp" />
+    <ClCompile Include="src\util\Direction.cpp" />
     <ClCompile Include="src\graphics\CubemapTexture.cpp" />
     <ClCompile Include="src\graphics\ElementBuffer.cpp" />
     <ClCompile Include="src\graphics\ErrorCheck.cpp" />
@@ -188,6 +189,7 @@
     <ClCompile Include="src\graphics\VertexArray.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\world\ChunkFileLoader.hpp" />
     <ClInclude Include="src\entity\Entity.hpp" />
     <ClInclude Include="src\util\Direction.hpp" />
     <ClInclude Include="src\graphics\CubemapTexture.hpp" />
@@ -201,7 +203,6 @@
     <ClInclude Include="src\physics\BlockRay.hpp" />
     <ClInclude Include="src\physics\AABB.hpp" />
     <ClInclude Include="src\physics\Rigidbody.hpp" />
-    <ClInclude Include="src\world\ChunkArray.hpp" />
     <ClInclude Include="src\world\ChunkRenderer.hpp" />
     <ClInclude Include="src\graphics\ResourceManager.hpp" />
     <ClInclude Include="src\graphics\RenderingContext.hpp" />
@@ -230,9 +231,9 @@
     <ClInclude Include="src\window\window.h" />
     <ClInclude Include="src\world\Block.hpp" />
     <ClInclude Include="src\world\Chunk.hpp" />
-    <ClInclude Include="src\world\ChunkManager.hpp" />
+    <ClInclude Include="src\world\LoadedChunks.hpp" />
     <ClInclude Include="src\world\World.hpp" />
-    <ClInclude Include="src\world\WorldGenerator.hpp" />
+    <ClInclude Include="src\world\ChunkGenerator.hpp" />
     <ClInclude Include="src\graphics\VertexArray.hpp" />
     <ClInclude Include="src\physics\Transform.hpp" />
   </ItemGroup>

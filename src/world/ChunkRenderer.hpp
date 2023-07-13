@@ -29,7 +29,7 @@ private:
 class ChunkRenderer
 {
 public:
-	ChunkRenderer(Renderer3D& renderer, const BlockArray& blockArray, glm::vec3& position);
+	ChunkRenderer(Renderer3D& renderer, const BlockArray& blockArray, const glm::vec3& position);
 
 	void SetHighlight(InChunkPos position);
 	void ResetHighlight();
@@ -41,7 +41,7 @@ private:
 	ChunkMesh m_OpaqueMesh,
 		m_TransparentMesh;
 	const BlockArray& m_BlockArray;
-	glm::vec3& m_Position;
+	glm::vec3 m_Position;
 	const BlockArray* m_Neighbors[6];
 
 	InChunkPos m_HighlightedPosition;

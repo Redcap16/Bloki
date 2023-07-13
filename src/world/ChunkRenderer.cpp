@@ -43,10 +43,10 @@ bool ChunkResources::setupShaders()
 	return true;
 }
 
-ChunkRenderer::ChunkRenderer(Renderer3D& renderer, const BlockArray& blockArray, glm::vec3& position) :
+ChunkRenderer::ChunkRenderer(Renderer3D& renderer, const BlockArray& blockArray, const glm::vec3& position) :
 	m_BlockArray(blockArray),
-	m_OpaqueMesh(position),
-	m_TransparentMesh(position),
+	m_OpaqueMesh(m_Position, s_Resources->TextureCoords),
+	m_TransparentMesh(m_Position, s_Resources->TextureCoords),
 	m_Position(position)
 {
 	if (s_Resources.get() == nullptr)

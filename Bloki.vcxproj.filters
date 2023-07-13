@@ -180,11 +180,14 @@
     <ClCompile Include="src\graphics\CubemapTexture.cpp">
       <Filter>Pliki źródłowe\graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Direction.cpp">
+    <ClCompile Include="src\util\Direction.cpp">
       <Filter>Pliki źródłowe\util</Filter>
     </ClCompile>
     <ClCompile Include="src\entity\DroppedItem.cpp">
       <Filter>Pliki źródłowe\entity</Filter>
+    </ClCompile>
+    <ClCompile Include="src\world\LoadedChunks.cpp">
+      <Filter>Pliki źródłowe\world</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -248,7 +251,7 @@
     <ClInclude Include="src\world\Block.hpp">
       <Filter>Pliki nagłówkowe\world</Filter>
     </ClInclude>
-    <ClInclude Include="src\world\ChunkManager.hpp">
+    <ClInclude Include="src\world\LoadedChunks.hpp">
       <Filter>Pliki nagłówkowe\world</Filter>
     </ClInclude>
     <ClInclude Include="src\world\Chunk.hpp">
@@ -263,7 +266,7 @@
     <ClInclude Include="src\world\BlockArray.hpp">
       <Filter>Pliki nagłówkowe\world</Filter>
     </ClInclude>
-    <ClInclude Include="src\world\WorldGenerator.hpp">
+    <ClInclude Include="src\world\ChunkGenerator.hpp">
       <Filter>Pliki nagłówkowe\world</Filter>
     </ClInclude>
     <ClInclude Include="src\graphics\RenderingContext.hpp">
@@ -273,9 +276,6 @@
       <Filter>Pliki nagłówkowe\graphics</Filter>
     </ClInclude>
     <ClInclude Include="src\world\ChunkRenderer.hpp">
-      <Filter>Pliki nagłówkowe\world</Filter>
-    </ClInclude>
-    <ClInclude Include="src\world\ChunkArray.hpp">
       <Filter>Pliki nagłówkowe\world</Filter>
     </ClInclude>
     <ClInclude Include="src\physics\Rigidbody.hpp">
@@ -328,6 +328,9 @@
     </ClInclude>
     <ClInclude Include="src\entity\Entity.hpp">
       <Filter>Pliki nagłówkowe\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="src\world\ChunkFileLoader.hpp">
+      <Filter>Pliki nagłówkowe\world</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -3,7 +3,7 @@
 #include <GL/glew.h>
 #include <GL/GL.h>
 #include <GL/GLU.h>
-#include <vector>
+#include <deque>
 
 #include <graphics/Buffer.hpp>
 #include <graphics/ErrorCheck.hpp>
@@ -30,8 +30,8 @@ private:
 	BufferHandle m_Handle;
 	bool m_Dynamic;
 
-	std::vector<size_t> m_Indices;
-
+	std::deque<size_t> m_Indices;
+	
 	void setup();
 };
 
