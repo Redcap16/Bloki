@@ -55,6 +55,12 @@
     <Filter Include="Pliki źródłowe\core">
       <UniqueIdentifier>{834ca06c-9f5c-4981-802d-7d8b809b751c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Pliki nagłówkowe\entity">
+      <UniqueIdentifier>{1c865366-2d0c-48b1-ac03-896903a5f9d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pliki źródłowe\entity">
+      <UniqueIdentifier>{c4886f97-105c-4faa-a1be-c925de693006}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Bloki.cpp">
@@ -123,13 +129,7 @@
     <ClCompile Include="src\player.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
-    <ClCompile Include="IUpdateListener.hpp">
-      <Filter>Pliki nagłówkowe</Filter>
-    </ClCompile>
     <ClCompile Include="src\world\ChunkMesh.cpp">
-      <Filter>Pliki źródłowe\world</Filter>
-    </ClCompile>
-    <ClCompile Include="src\world\ChunkBlockData.cpp">
       <Filter>Pliki źródłowe\world</Filter>
     </ClCompile>
     <ClCompile Include="src\world\World.cpp">
@@ -156,9 +156,6 @@
     <ClCompile Include="src\physics\BlockRay.cpp">
       <Filter>Pliki źródłowe\physics</Filter>
     </ClCompile>
-    <ClCompile Include="src\world\DroppedItem.cpp">
-      <Filter>Pliki źródłowe\world</Filter>
-    </ClCompile>
     <ClCompile Include="src\core\Application.cpp">
       <Filter>Pliki źródłowe\core</Filter>
     </ClCompile>
@@ -182,6 +179,12 @@
     </ClCompile>
     <ClCompile Include="src\graphics\CubemapTexture.cpp">
       <Filter>Pliki źródłowe\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Direction.cpp">
+      <Filter>Pliki źródłowe\util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\entity\DroppedItem.cpp">
+      <Filter>Pliki źródłowe\entity</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -245,9 +248,6 @@
     <ClInclude Include="src\world\Block.hpp">
       <Filter>Pliki nagłówkowe\world</Filter>
     </ClInclude>
-    <ClInclude Include="src\world\World.hpp">
-      <Filter>Pliki nagłówkowe\world</Filter>
-    </ClInclude>
     <ClInclude Include="src\world\ChunkManager.hpp">
       <Filter>Pliki nagłówkowe\world</Filter>
     </ClInclude>
@@ -260,7 +260,7 @@
     <ClInclude Include="src\world\ChunkMesh.hpp">
       <Filter>Pliki nagłówkowe\world</Filter>
     </ClInclude>
-    <ClInclude Include="src\world\ChunkBlockData.hpp">
+    <ClInclude Include="src\world\BlockArray.hpp">
       <Filter>Pliki nagłówkowe\world</Filter>
     </ClInclude>
     <ClInclude Include="src\world\WorldGenerator.hpp">
@@ -287,10 +287,7 @@
     <ClInclude Include="src\physics\BlockRay.hpp">
       <Filter>Pliki nagłówkowe\physics</Filter>
     </ClInclude>
-    <ClInclude Include="src\world\DroppedItem.hpp">
-      <Filter>Pliki nagłówkowe\world</Filter>
-    </ClInclude>
-    <ClInclude Include="src\world\BlockArray.hpp">
+    <ClInclude Include="src\world\BlockManager.hpp">
       <Filter>Pliki nagłówkowe\world</Filter>
     </ClInclude>
     <ClInclude Include="src\core\Application.hpp">
@@ -317,8 +314,20 @@
     <ClInclude Include="src\graphics\CubemapTexture.hpp">
       <Filter>Pliki nagłówkowe\graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Transform.hpp">
+    <ClInclude Include="src\physics\Transform.hpp">
       <Filter>Pliki nagłówkowe\physics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\entity\DroppedItem.hpp">
+      <Filter>Pliki nagłówkowe\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="src\world\World.hpp">
+      <Filter>Pliki nagłówkowe\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\util\Direction.hpp">
+      <Filter>Pliki nagłówkowe\util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\entity\Entity.hpp">
+      <Filter>Pliki nagłówkowe\entity</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

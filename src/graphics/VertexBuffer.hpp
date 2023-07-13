@@ -20,8 +20,8 @@ class AbstractVertexBuffer
 public:
 	virtual BufferHandle GetHandle() const = 0;
 	virtual void GetVertexAttributes(std::vector<VertexAttribute>&) const = 0;
-	virtual void Bind() = 0;
-	virtual size_t GetVertexSize() = 0;
+	virtual void Bind() const = 0;
+	virtual size_t GetVertexSize() const = 0;
 };
 
 template <typename TVertex>

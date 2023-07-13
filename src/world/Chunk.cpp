@@ -1,165 +1,118 @@
 #include <world/Chunk.hpp>
 
-Chunk::Chunk(const BlockSubtextures& blockSubtextures, glm::vec3 globalPosition) :
-	m_ChunkMesh(m_BlockData, blockSubtextures),
-	m_GlobalPosition(globalPosition)
+Chunk::Chunk(Renderer3D& renderer, const glm::vec3& position) :
+	m_Position(position),
+	m_ChunkRenderer(renderer, m_BlockArray, m_Position)
 {
+
 }
 
-void Chunk::UpdateMesh()
+void Chunk::SetHighlight(InChunkPos position)
 {
-	if (m_MeshChanged)
-	{
-		m_BuffersChanged = false;
-		m_ChunkMesh.CreateMesh();
-
-		m_MeshChanged = false;
-		m_BuffersChanged = true;
-	}
+	m_HighlightedPosition = position;
+	m_AnythingHighlighted = true;
+	m_UpdateNeeded = true;
 }
-
 
 void Chunk::ResetHighlight()
 {
-	if (!m_IsHighlighted)
-		return;
-	m_IsHighlighted = false;
-	m_ChunkMesh.UnsetHighlight();
-	
-	changed();
+	m_AnythingHighlighted = false;
+	m_UpdateNeeded = true;
 }
 
-void Chunk::SetHighlight(glm::uvec3 position)
+void Chunk::SetBlock(InChunkPos position, Block block)
 {
-	if (m_IsHighlighted && m_HighlightedPos == position)
-		return;
+	m_BlockArray.Set(position, block);
+	m_UpdateNeeded = true;
+}
 
-	m_HighlightedPos = position;
-	m_IsHighlighted = true;
-	m_ChunkMesh.SetHighlighted(position);
+const Block& Chunk::GetBlock(InChunkPos position) const
+{
+	return m_BlockArray.Get(position);
+}
 
-	changed();
+void Chunk::Update()
+{
+	checkItemsBoundaries();
 }
 
 void Chunk::UpdateNeighbors(Chunk* neighbors[6])
 {
-	ChunkNeighbors newNeighbors;
-
-	for (int i = 0; i < 6; ++i)
+	BlockArray *neighborsArrays[6];
+	for (int i = 0; i < 6; i++)
 	{
 		if (m_Neighbors[i] != neighbors[i])
 		{
 			m_Neighbors[i] = neighbors[i];
-			m_MeshChanged = true;
+			m_Neighbors[i]->m_UpdateNeeded = true;
 		}
+		neighborsArrays[i] = &neighbors[i]->m_BlockArray;
 	}
 
+	m_ChunkRenderer.UpdateNeighbors(neighborsArrays);
+}
 
-	/*for (int i = 0; i < 6; ++i)
-	{
-		Chunk* chunk = container.GetChunk(position + (glm::ivec3)GetDirectionVector((FaceDirection)i));
+void Chunk::UpdateGeometry()
+{
+	if(m_UpdateNeeded)
+		m_ChunkRenderer.UpdateGeometry();
 
-		if (this->neighbors[i] != chunk)
+	m_UpdateNeeded = false;
+}
+
+void Chunk::AddDroppedItem(std::unique_ptr<DroppedItem> item)
+{
+	m_DroppedItems.push_back(std::move(item));
+}
+
+void Chunk::RemoveDroppedItem(const DroppedItem* item)
+{
+	for (std::vector<std::unique_ptr<DroppedItem>>::const_iterator it = m_DroppedItems.begin(); it != m_DroppedItems.end(); ++it)
+		if (it->get() == item)
 		{
-			this->neighbors[i] = chunk;
-			m_MeshChanged = true;
+			m_DroppedItems.erase(it);
+			return;
 		}
-
-		if (chunk)
-			neighbors.XPlus = &chunk->blockData;
-	}*/
-	
-	if (m_Neighbors[0] != nullptr)
-		newNeighbors.YPlus = &m_Neighbors[0]->m_BlockData;
-	if (m_Neighbors[1] != nullptr)
-		newNeighbors.YMinus = &m_Neighbors[1]->m_BlockData;
-	if (m_Neighbors[2] != nullptr)
-		newNeighbors.XPlus = &m_Neighbors[2]->m_BlockData;
-	if (m_Neighbors[3] != nullptr)
-		newNeighbors.XMinus = &m_Neighbors[3]->m_BlockData;
-	if (m_Neighbors[4] != nullptr)
-		newNeighbors.ZPlus = &m_Neighbors[4]->m_BlockData;
-	if (m_Neighbors[5] != nullptr)
-		newNeighbors.ZMinus = &m_Neighbors[5]->m_BlockData;
-
-
-	m_ChunkMesh.UpdateNeighbors(newNeighbors);
 }
 
-void Chunk::Render(bool transparent)
+void Chunk::GetDroppedItems(std::vector<DroppedItem*>& items)
 {
-	updateMeshBuffers();
-	m_ChunkMesh.Render(transparent);
-
-	if(!transparent)
-		for (std::unique_ptr<DroppedItem>& item : m_DroppedItems)
-			item->Render(); //THATS NOT WORKING BECAUSE ALL SETTINGS NEEDED TO PROPERLY DRAW THIS SHIT ARE SET IN CHUNK RENDERER, FOR CHUNK NOT FOR ITEM
+	std::vector<DroppedItem*>().swap(items);
+	for (std::unique_ptr<DroppedItem>& item : m_DroppedItems)
+		items.push_back(item.get());
 }
 
-const Block& Chunk::GetBlock(glm::uvec3 position)
+void Chunk::checkItemsBoundaries()
 {
-	return m_BlockData.GetBlock(position);
-}
-
-void Chunk::SetBlock(glm::uvec3 position, const Block& block)
-{
-	if (m_BlockData.GetBlock(position).type == block.type)
-		return;
-
-	m_BlockData.SetBlock(position, block);
-	m_MeshChanged = true;
-
-	if (m_BlockData.PositionOnBorder(position))
-		for (int i = 0; i < 6; ++i)
-			if (m_Neighbors[i])
-				m_Neighbors[i]->changed();
-}
-
-void Chunk::Update(float deltaTime)
-{
-	for (int index = 0; index < m_DroppedItems.size(); ++index)
+	for (int i = 0; i < m_DroppedItems.size();)
 	{
-		std::unique_ptr<DroppedItem>& item = m_DroppedItems[index];
-		item->Update(deltaTime);
-		checkItemBoundaries(item.get(), index);
+		const glm::vec3& itemPosition = m_DroppedItems[i]->GetTransform().GetPosition();
+
+		if (itemPosition.x < m_Position.x
+			&& m_Neighbors[(unsigned int)Direction::Left] != nullptr)
+			moveItem(*(m_Neighbors[(unsigned int)Direction::Left]), m_DroppedItems.begin() + i);
+		else if (itemPosition.x > m_Position.x + BlockArray::ChunkSize.x 
+			&& m_Neighbors[(unsigned int)Direction::Right] != nullptr)
+			moveItem(*(m_Neighbors[(unsigned int)Direction::Right]), m_DroppedItems.begin() + i);
+		else if (itemPosition.y < m_Position.y
+			&& m_Neighbors[(unsigned int)Direction::Bottom] != nullptr)
+			moveItem(*(m_Neighbors[(unsigned int)Direction::Bottom]), m_DroppedItems.begin() + i);
+		else if (itemPosition.y > m_Position.y + BlockArray::ChunkSize.y
+			&& m_Neighbors[(unsigned int)Direction::Top] != nullptr)
+			moveItem(*(m_Neighbors[(unsigned int)Direction::Top]), m_DroppedItems.begin() + i);
+		else if (itemPosition.z < m_Position.z
+			&& m_Neighbors[(unsigned int)Direction::Back] != nullptr)
+			moveItem(*(m_Neighbors[(unsigned int)Direction::Back]), m_DroppedItems.begin() + i);
+		else if (itemPosition.z > m_Position.z + BlockArray::ChunkSize.z
+			&& m_Neighbors[(unsigned int)Direction::Front] != nullptr)
+			moveItem(*(m_Neighbors[(unsigned int)Direction::Front]), m_DroppedItems.begin() + i);
+		else
+			i++;
 	}
 }
 
-void Chunk::checkItemBoundaries(DroppedItem* item, int index)
+void Chunk::moveItem(Chunk& destination, std::vector<std::unique_ptr<DroppedItem>>::iterator it)
 {
-	if (item == nullptr)
-		return;
-
-	const glm::vec3& itemPosition = item->GetPosition();
-
-	if (itemPosition.x < m_GlobalPosition.x)
-		moveItemToNeighbor(index, m_Neighbors[(int)FaceDirection::Left]);
-	else if (itemPosition.x > m_GlobalPosition.x + ChunkBlockData::ChunkSize.x)
-		moveItemToNeighbor(index, m_Neighbors[(int)FaceDirection::Right]);
-	else if (itemPosition.y < m_GlobalPosition.y)
-		moveItemToNeighbor(index, m_Neighbors[(int)FaceDirection::Bottom]);
-	else if (itemPosition.y > m_GlobalPosition.y + ChunkBlockData::ChunkSize.y)
-		moveItemToNeighbor(index, m_Neighbors[(int)FaceDirection::Top]);
-	else if (itemPosition.z < m_GlobalPosition.z)
-		moveItemToNeighbor(index, m_Neighbors[(int)FaceDirection::Back]);
-	else if (itemPosition.z > m_GlobalPosition.z + ChunkBlockData::ChunkSize.z)
-		moveItemToNeighbor(index, m_Neighbors[(int)FaceDirection::Front]);
-}
-
-void Chunk::moveItemToNeighbor(int index, Chunk* chunk)
-{
-	if (chunk == nullptr)
-		return;
-
-	chunk->m_DroppedItems.push_back(std::move(m_DroppedItems[index]));
-	m_DroppedItems.erase(m_DroppedItems.begin() + index);
-}
-
-void Chunk::updateMeshBuffers()
-{
-	if (m_BuffersChanged)
-	{
-		m_ChunkMesh.UpdateBuffers();
-		m_BuffersChanged = false;
-	}
+	destination.m_DroppedItems.push_back(std::move(*it));
+	m_DroppedItems.erase(it);
 }

@@ -5,19 +5,6 @@
 
 #include <graphics/AtlasTexture.hpp>
 
-/// <summary>
-/// Where Y+ is considered top, X+ right and Z+ front
-/// </summary>
-enum class FaceDirection
-{
-	Top,
-	Bottom,
-	Right,
-	Left,
-	Front,
-	Back
-};
-
 enum class TransparencyType
 {
 	Opaque,
@@ -25,20 +12,15 @@ enum class TransparencyType
 	PartialTransparency
 };
 
-glm::vec3 GetDirectionVector(FaceDirection dir);
+struct BlockState
+{
+	bool HighLighted;
+};
 
 struct Block
 {
-	struct BlockData
-	{
-		std::string	TextureName;
-		TransparencyType TransType;
-
-		BlockData();
-		BlockData(const std::string& textureName, TransparencyType transparencyType = TransparencyType::Opaque);
-	};
-
-	enum class BlockType
+public:
+	enum BlockType
 	{
 		Air,
 		Mud,
@@ -48,34 +30,30 @@ struct Block
 		Wood,
 		Leaves
 	};
+	static constexpr unsigned int c_BlockCount = 7;
 
-	BlockType type;
+	BlockType Type;
 
-	static constexpr unsigned int blockCount = 7;
-	static BlockData blockData[blockCount];
-
-	/*class TextureManager
-	{
-	public:
-		AtlasTexture texture;
-	private:
-		static const glm::ivec2 textureSize;
-
-		std::vector<AtlasTexture::SubTexture> subTextures;
-
-		void setupTextures();
-		TextureManager();
-	public:
-		~TextureManager();
-
-		static TextureManager& GetInstance();
-		AtlasTexture::SubTexture& GetSubTexture(BlockType id);
-	};*/
 
 	Block();
 	Block(BlockType type);
+	
+	const std::string& GetBlockName() const { return c_BlockData[(unsigned int)Type].Name; };
+	TransparencyType GetTransparencyType() const { return c_BlockData[(unsigned int)Type].TransType; };
 
-	//static AtlasTexture::SubTexture& GetSubTexture(BlockType type);
-	//static BlockType GetIdByName(const std::string name); //Warning slow function
 	static void SetupBlockData();
+	static const std::string& GetBlockName(BlockType type) { return c_BlockData[(unsigned int)type].Name; };
+	static TransparencyType GetTransparencyType(BlockType type) { return c_BlockData[(unsigned int)type].TransType; };
+
+private:
+	struct BlockData
+	{
+		std::string	Name;
+		TransparencyType TransType;
+
+		BlockData();
+		BlockData(const std::string& name, TransparencyType transparencyType = TransparencyType::Opaque);
+	};
+
+	static BlockData c_BlockData[c_BlockCount];
 };

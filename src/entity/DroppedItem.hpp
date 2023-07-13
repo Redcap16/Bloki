@@ -1,10 +1,9 @@
 #pragma once
 
 #include <physics/Rigidbody.hpp>
-#include <graphics/VertexBuffer.hpp>
-#include <graphics/Vertex.hpp>
+#include <entity/Entity.hpp>
 
-class DroppedItem
+class DroppedItem : public Entity
 {
 public:
 	DroppedItem(BlockArray& world, glm::vec3 position);

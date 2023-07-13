@@ -6,31 +6,14 @@ Block::BlockData::BlockData() :
 
 }
 
-Block::BlockData::BlockData(const std::string& textureName, TransparencyType transparencyType) :
-	TextureName(textureName),
+Block::BlockData::BlockData(const std::string& name, TransparencyType transparencyType) :
+	Name(name),
 	TransType(transparencyType)
 {
 
 }
 
-glm::vec3 GetDirectionVector(FaceDirection dir)
-{
-	switch (dir)
-	{
-	case FaceDirection::Top:
-		return glm::vec3(0, 1, 0);
-	case FaceDirection::Bottom:
-		return glm::vec3(0, -1, 0);
-	case FaceDirection::Right:
-		return glm::vec3(1, 0, 0);
-	case FaceDirection::Left:
-		return glm::vec3(-1, 0, 0);
-	case FaceDirection::Front:
-		return glm::vec3(0, 0, 1);
-	case FaceDirection::Back:
-		return glm::vec3(0, 0, -1);
-	}
-}
+
 
 Block::BlockData Block::blockData[blockCount];
 
@@ -116,10 +99,10 @@ Block::Block(BlockType type) :
 void Block::SetupBlockData()
 {
 	blockData[(int)Block::BlockType::Air] = BlockData("", TransparencyType::FullTransparency);
-	blockData[(int)Block::BlockType::Grass] = BlockData("grass.png");
-	blockData[(int)Block::BlockType::Mud] = BlockData("mud.png");
-	blockData[(int)Block::BlockType::Stone] = BlockData("stone.png");
-	blockData[(int)Block::BlockType::Water] = BlockData("water.png", TransparencyType::PartialTransparency);
-	blockData[(int)Block::BlockType::Wood] = BlockData("wood.png");
-	blockData[(int)Block::BlockType::Leaves] = BlockData("leaves.png", TransparencyType::FullTransparency);
+	blockData[(int)Block::BlockType::Grass] = BlockData("Grass");
+	blockData[(int)Block::BlockType::Mud] = BlockData("Mud");
+	blockData[(int)Block::BlockType::Stone] = BlockData("Stone");
+	blockData[(int)Block::BlockType::Water] = BlockData("Water", TransparencyType::PartialTransparency);
+	blockData[(int)Block::BlockType::Wood] = BlockData("Wood");
+	blockData[(int)Block::BlockType::Leaves] = BlockData("Leaves", TransparencyType::FullTransparency);
 }

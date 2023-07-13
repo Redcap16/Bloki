@@ -1,5 +1,23 @@
 #include <graphics/ResourceManager.hpp>
 
+ResourceManager* ResourceManager::s_Instance = nullptr;
+
+ResourceManager::ResourceManager()
+{
+	s_Instance = this;
+}
+
+ResourceManager::~ResourceManager()
+{
+	s_Instance = nullptr;
+}
+
+ResourceManager& ResourceManager::GetInstance()
+{
+	assert(s_Instance != nullptr);
+	return *s_Instance;
+}
+
 ShaderProgram* ResourceManager::GetShaderProgram(std::string sourceFile)
 {
 	if (m_ShaderPrograms.find(sourceFile) == m_ShaderPrograms.end())

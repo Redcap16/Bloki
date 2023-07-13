@@ -1,49 +1,35 @@
 #pragma once
 
 #include <graphics/Vertex.hpp>
-#include <graphics/VertexBuffer.hpp>
+#include <graphics/VertexArray.hpp>
 #include <graphics/ShaderProgram.hpp>
-#include <world/ChunkBlockData.hpp>
+#include <core/Renderer.hpp>
+#include <world/BlockArray.hpp>
 #include <world/Block.hpp>
-#include <graphics/Camera3D.hpp>
 #include <graphics/ResourceManager.hpp>
+#include <util/Direction.hpp>
 #include <string>
+#include <thread>
 
-struct BlockSubtextures
-{
-	AtlasTexture::SubTexture TextureCoords[Block::blockCount];
-};
-
-class ChunkMesh
+class ChunkMesh : public Renderable
 {
 public:
-	ChunkMesh(ChunkBlockData &blockData, const BlockSubtextures& blockSubtextures);
-	~ChunkMesh();
+	ChunkMesh(glm::vec3& position, const AtlasTexture::SubTexture (&textureCoords)[Block::c_BlockCount]);
 
-	void SetHighlighted(glm::uvec3 position);
-	void UnsetHighlight();
-	void CreateMesh();
-
-	void UpdateNeighbors(const ChunkNeighbors& neighbors);
-
-	void UpdateBuffers();
-	void Render(bool transparent);
-
+	void AddFace(Direction dir, InChunkPos position, Block block, BlockState state);
+	void FinishGeometry();
+	
+	glm::mat4 GetModelMatrix() const override;
+	void Render(const RenderingContext& context) override;
 private:
-	VertexBuffer<Vertex3D> m_OpaqueMesh;
-	VertexBuffer<Vertex3D> m_TransparentMesh;
+	VertexArray m_MeshVAO;
+	VertexBuffer<Vertex3DS> m_MeshVBO;
+	ElementBuffer m_MeshEBO;
 
-	ChunkBlockData& blockData;
-	ChunkNeighbors neighborArray;
+	std::atomic<bool> m_GeometryFinished;
 
-	AtlasTexture* m_BlockTexture;
-	const BlockSubtextures& m_BlockSubtextures;
+	glm::vec3& m_Position;
+	const AtlasTexture::SubTexture(&m_TextureCoords)[Block::c_BlockCount];
 
-	bool isHighlighted = false;
-	glm::uvec3 highlightedPos = glm::uvec3(0);
-
-	bool isBlockVisible(const Block& block, const Block& itsNeighbor);
-	bool isBlockOnBorderVisible(ChunkBlockData* neighboringChunk, glm::uvec3 neighborBlockPosition, const Block& block);
-	void processFace(FaceDirection direction, glm::uvec3 position, const Block& block, bool highlighted);
-	void processBlock(glm::uvec3 position);
+	void updateBuffers();
 };

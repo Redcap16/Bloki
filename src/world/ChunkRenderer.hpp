@@ -2,38 +2,52 @@
 
 #include <glm/glm.hpp>
 #include <world/Chunk.hpp>
-#include <world/ChunkArray.hpp>
-#include <core/GameState.hpp>
+#include <world/ChunkMesh.hpp>
 #include <core/Renderer.hpp>
+
+struct ChunkResources
+{
+public:
+	AtlasTexture* BlockTexture;
+	AtlasTexture::SubTexture TextureCoords[Block::c_BlockCount];
+	ShaderProgram* OpaqueShader;
+	ShaderProgram* TransparentShader;
+
+	ChunkResources();
+	bool IsOpen() const { return m_IsOpen; }
+private:
+	const char* c_TextureFilename = "Block.td";
+	const char* c_OpaqueShaderFilename = "ChunkOpaque.glsl";
+	const char* c_TransparentShaderFilename = "ChunkTransparent.glsl";
+
+	bool m_IsOpen;
+
+	bool setupTexture();
+	bool setupShaders();
+};
 
 class ChunkRenderer
 {
 public:
-	ChunkRenderer(ChunkArray& chunkArray, GameState& gameState);
+	ChunkRenderer(Renderer3D& renderer, const BlockArray& blockArray, glm::vec3& position);
 
-	void RenderChunks(const RenderingContext& context, glm::vec3 position);
-	inline const BlockSubtextures& GetBlockSubtextures() const;
+	void SetHighlight(InChunkPos position);
+	void ResetHighlight();
+	void UpdateNeighbors(const BlockArray* neighbors[6]);
+	void UpdateGeometry();
 private:
-	GameState& m_GameState;
+	static std::unique_ptr<ChunkResources> s_Resources;
 
-	ChunkArray& m_ChunkArray;
-	ShaderProgram* m_ShaderProgram;
+	ChunkMesh m_OpaqueMesh,
+		m_TransparentMesh;
+	const BlockArray& m_BlockArray;
+	glm::vec3& m_Position;
+	const BlockArray* m_Neighbors[6];
 
-	static BlockSubtextures m_BlockSubtextures;
-	static bool m_TextureSetup;
+	InChunkPos m_HighlightedPosition;
+	bool m_AnythingHighlighted;
 
-	AtlasTexture* m_BlockTexture;
-
-	void setupBlockTextures();
-	inline glm::vec3 calculateChunkPosition(glm::ivec3 chunkPosition, glm::vec3 centerPosition);
+	void processBlock(InChunkPos position);
+	bool isBlockVisible(InChunkPos position, Direction direction);
+	const BlockArray* getNeighbor(glm::ivec3 position);
 };
-
-glm::vec3 ChunkRenderer::calculateChunkPosition(glm::ivec3 chunkPosition, glm::vec3 centerPosition)
-{
-	return (glm::vec3)((chunkPosition - (glm::ivec3)ChunkArray::Size / 2) * (glm::ivec3)ChunkBlockData::ChunkSize) + centerPosition;
-}
-
-const BlockSubtextures& ChunkRenderer::GetBlockSubtextures() const
-{
-	return m_BlockSubtextures;
-}

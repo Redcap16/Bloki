@@ -5,15 +5,52 @@
 
 #include <glm/glm.hpp>
 
-#include <graphics/RenderPass.hpp>
-#include <graphics/Vertex.hpp>
-#include <graphics/VertexBuffer.hpp>
-#include <world/Block.hpp>
-#include <world/ChunkMesh.hpp>
-#include <world/DroppedItem.hpp>
+#include <world/BlockArray.hpp>
+#include <world/ChunkRenderer.hpp>
+#include <entity/DroppedItem.hpp>
 
-#include <algorithm>
+class Chunk
+{
+public:
+	Chunk(Renderer3D& renderer, const glm::vec3& position);
+	Chunk(const Chunk&) = delete;
+	Chunk& operator=(const Chunk&) = delete;
 
+	void SetHighlight(InChunkPos position);
+	void ResetHighlight();
+
+	void SetBlock(InChunkPos position, Block block);
+	const Block& GetBlock(InChunkPos position) const;
+
+	void Update();
+	void UpdateNeighbors(Chunk* neighbors[6]);
+
+	inline bool DoesNeedUpdate() const { return m_UpdateNeeded; }
+	void UpdateGeometry();
+
+	void AddDroppedItem(std::unique_ptr<DroppedItem> item);
+	void RemoveDroppedItem(const DroppedItem* item);
+	void GetDroppedItems(std::vector<DroppedItem*>& items);
+private:
+	ChunkRenderer m_ChunkRenderer;
+	BlockArray m_BlockArray;
+	glm::vec3 m_Position;
+
+	Chunk* m_Neighbors[6];
+
+	std::vector<std::unique_ptr<DroppedItem>> m_DroppedItems;
+
+	InChunkPos m_HighlightedPosition;
+	bool m_AnythingHighlighted;
+
+	bool m_UpdateNeeded;
+
+	void checkItemsBoundaries();
+	void moveItem(Chunk& destination, std::vector<std::unique_ptr<DroppedItem>>::iterator it);
+};
+
+
+/*
 class Chunk
 {
 public:
@@ -64,4 +101,4 @@ void Chunk::AddDroppedItem(std::unique_ptr<DroppedItem>&& item)
 void Chunk::changed()
 {
 	m_MeshChanged = true;
-}
+}*/

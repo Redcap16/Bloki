@@ -145,21 +145,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Direction.cpp" />
     <ClCompile Include="src\graphics\CubemapTexture.cpp" />
     <ClCompile Include="src\graphics\ElementBuffer.cpp" />
     <ClCompile Include="src\graphics\ErrorCheck.cpp" />
     <ClCompile Include="src\core\GameState.cpp" />
     <ClCompile Include="src\physics\AABB.cpp" />
     <ClCompile Include="src\core\Application.cpp" />
-    <ClCompile Include="src\world\DroppedItem.cpp" />
+    <ClCompile Include="src\entity\DroppedItem.cpp" />
     <ClCompile Include="src\physics\BlockRay.cpp" />
     <ClCompile Include="src\physics\Rigidbody.cpp" />
     <ClCompile Include="src\world\ChunkRenderer.cpp" />
     <ClCompile Include="src\graphics\ResourceManager.cpp" />
     <ClCompile Include="src\graphics\RenderingContext.cpp" />
-    <ClCompile Include="src\world\ChunkBlockData.cpp" />
     <ClCompile Include="src\world\ChunkMesh.cpp" />
-    <ClCompile Include="IUpdateListener.hpp" />
     <ClCompile Include="src\Bloki.cpp" />
     <ClCompile Include="src\graphics\AtlasTexture.cpp" />
     <ClCompile Include="src\graphics\Camera3D.cpp" />
@@ -189,14 +188,16 @@
     <ClCompile Include="src\graphics\VertexArray.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\entity\Entity.hpp" />
+    <ClInclude Include="src\util\Direction.hpp" />
     <ClInclude Include="src\graphics\CubemapTexture.hpp" />
     <ClInclude Include="src\graphics\ErrorCheck.hpp" />
     <ClInclude Include="src\graphics\Buffer.hpp" />
     <ClInclude Include="src\graphics\ElementBuffer.hpp" />
     <ClInclude Include="src\core\GameState.hpp" />
     <ClInclude Include="src\core\Application.hpp" />
-    <ClInclude Include="src\world\BlockArray.hpp" />
-    <ClInclude Include="src\world\DroppedItem.hpp" />
+    <ClInclude Include="src\world\BlockManager.hpp" />
+    <ClInclude Include="src\entity\DroppedItem.hpp" />
     <ClInclude Include="src\physics\BlockRay.hpp" />
     <ClInclude Include="src\physics\AABB.hpp" />
     <ClInclude Include="src\physics\Rigidbody.hpp" />
@@ -204,7 +205,7 @@
     <ClInclude Include="src\world\ChunkRenderer.hpp" />
     <ClInclude Include="src\graphics\ResourceManager.hpp" />
     <ClInclude Include="src\graphics\RenderingContext.hpp" />
-    <ClInclude Include="src\world\ChunkBlockData.hpp" />
+    <ClInclude Include="src\world\BlockArray.hpp" />
     <ClInclude Include="src\world\ChunkMesh.hpp" />
     <ClInclude Include="src\graphics\AtlasTexture.hpp" />
     <ClInclude Include="src\graphics\Camera.hpp" />
@@ -233,7 +234,7 @@
     <ClInclude Include="src\world\World.hpp" />
     <ClInclude Include="src\world\WorldGenerator.hpp" />
     <ClInclude Include="src\graphics\VertexArray.hpp" />
-    <ClInclude Include="Transform.hpp" />
+    <ClInclude Include="src\physics\Transform.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
