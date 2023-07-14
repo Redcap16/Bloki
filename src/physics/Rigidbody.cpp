@@ -1,129 +1,110 @@
 #include <physics/Rigidbody.hpp>
 
-Rigidbody::Rigidbody(BlockArray& world, AABB collider) :
+Rigidbody::Rigidbody(const BlockManager& world, AABB collider) :
 	m_World(world),
 	m_Collider(collider),
 	m_OnGround(false),
-	m_Velocity(0)
+	m_Velocity(0),
+	m_GravityEnabled(true),
+	m_CollisionEnabled(true),
+	m_DragEnabled(true)
 {
 
 }
 
 void Rigidbody::Update(float deltaTime)
 {
-	m_Velocity.y -= 0.7f * deltaTime;
-
-	m_Velocity -= m_Velocity * 0.3f * deltaTime; //Drag
-
-	if (m_OnGround)
+	if(m_GravityEnabled) m_Velocity.y -= c_Gravity * deltaTime; //Gravity
+	if (m_DragEnabled)
 	{
-		m_Velocity.x -= m_Velocity.x * 1.0f * deltaTime;
-		m_Velocity.z -= m_Velocity.z * 1.0f * deltaTime;
+		m_Velocity -= m_Velocity * c_Drag * deltaTime; //Drag
+		if (m_OnGround)
+		{
+			m_Velocity.x -= m_Velocity.x * c_GroundFriction * deltaTime;
+			m_Velocity.z -= m_Velocity.z * c_GroundFriction * deltaTime;
+		}
 	}
 
 	m_Collider.Position += m_Velocity * deltaTime;
-
-	DebugBox::GetInstance().ChangeDebugValue("VelocityB", std::to_string(m_Velocity.x) + " " + std::to_string(m_Velocity.y) + " " + std::to_string(m_Velocity.z));
-	checkCollisions();
-
-	DebugBox::GetInstance().ChangeDebugValue("VelocityA", std::to_string(m_Velocity.x) + " " + std::to_string(m_Velocity.y) + " " + std::to_string(m_Velocity.z));
+	if(m_CollisionEnabled) checkCollisions();
 }
 
 void Rigidbody::checkCollisions()
 {
-	bool collided = true;
-
+	bool collided;
 	m_OnGround = false;
-	while (collided)
+
+	do
 	{
-		glm::vec3 pCorner = m_Collider.GetMaxCorner(),
-			mCorner = m_Collider.GetMinCorner();
+		collided = false;
+
+		glm::vec3 maxCorner = m_Collider.GetMaxCorner(),
+			minCorner = m_Collider.GetMinCorner();
 
 		float maxStep = 0;
 		glm::vec3 maxDirection = glm::vec3(0);
 
-		collided = false;
-		for (int x = floor(mCorner.x); x <= floor(pCorner.x); x++)
-		{
-			for (int y = floor(mCorner.y); y <= floor(pCorner.y); y++)
-			{
-				for (int z = floor(mCorner.z); z <= floor(pCorner.z); z++)
+		for (int x = floor(minCorner.x); x <= floor(maxCorner.x); x++)
+			for (int y = floor(minCorner.y); y <= floor(maxCorner.y); y++)
+				for (int z = floor(minCorner.z); z <= floor(maxCorner.z); z++)
 				{
-					if (mCorner.x < x + 1 &&
-						pCorner.x > x &&
-						mCorner.y < y + 1 &&
-						pCorner.y > y &&
-						mCorner.z < z + 1 &&
-						pCorner.z > z)
+					AABB block({ x, y, z }, { 1, 1, 1 });
+					if (m_Collider.Intersects(block))
 					{
 						const glm::vec3 actualBlockPosition = glm::ivec3(x, y, z);
-						const Block* block = m_World.GetBlock(actualBlockPosition);
+						const Block block = m_World.GetBlock(actualBlockPosition);
 
-						if (block == nullptr)
+						if (block.Type == Block::BlockType::Air)
 							continue;
 
-						if (block->type != Block::BlockType::Air)
-						{
-							glm::vec3 intersection = glm::vec3(0), 
-								step = glm::vec3(0);
+						glm::vec3 intersection,
+							step;
 
-							if (m_Velocity.x > 0)
-								intersection.x = pCorner.x - actualBlockPosition.x;
-							else
-								intersection.x = actualBlockPosition.x + 1 - mCorner.x;
+						if (m_Velocity.x > 0)
+							intersection.x = maxCorner.x - actualBlockPosition.x;
+						else
+							intersection.x = actualBlockPosition.x + 1 - minCorner.x;
 
-							if (m_Velocity.y > 0)
-								intersection.y = pCorner.y - actualBlockPosition.y;
-							else
-								intersection.y = actualBlockPosition.y + 1 - mCorner.y;
+						if (m_Velocity.y > 0)
+							intersection.y = maxCorner.y - actualBlockPosition.y;
+						else
+							intersection.y = actualBlockPosition.y + 1 - minCorner.y;
 
-							if (m_Velocity.z > 0)
-								intersection.z = pCorner.z - actualBlockPosition.z;
-							else
-								intersection.z = actualBlockPosition.z + 1 - mCorner.z;
+						if (m_Velocity.z > 0)
+							intersection.z = maxCorner.z - actualBlockPosition.z;
+						else
+							intersection.z = actualBlockPosition.z + 1 - minCorner.z;
 
-							step = intersection / glm::abs(m_Velocity);
+						step = intersection / glm::abs(m_Velocity);
 
-							if (m_Velocity.x && step.x < step.z && step.x < step.y)
+
+						collided = true;
+						if (m_Velocity.x && step.x < std::min(step.y, step.z))
+							if (maxStep < step.x)
 							{
-								if (maxStep < step.x)
-								{
-									maxStep = step.x;
-									maxDirection = glm::vec3(1, 0, 0);
-								}
-								collided = true;
+								maxStep = step.x;
+								maxDirection = glm::vec3(1, 0, 0);
 							}
-							else if (m_Velocity.y && step.y < step.z && step.y < step.x)
+						else if (m_Velocity.y && step.y < std::min(step.x, step.z))
+							if (maxStep < step.y)
 							{
-								if (maxStep < step.y)
-								{
-									maxStep = step.y;
-									maxDirection = glm::vec3(0, 1, 0);
-								}
-							
-								collided = true;
+								maxStep = step.y;
+								maxDirection = glm::vec3(0, 1, 0);
 							}
-							else if (m_Velocity.z)
+						else if (m_Velocity.z && step.z < std::min(step.x, step.y)) //Experimental
+							if (maxStep < step.z)
 							{
- 								if (maxStep < step.z)
-								{
-									maxStep = step.z;
-									maxDirection = glm::vec3(0, 0, 1);
-								}
-								collided = true;
+								maxStep = step.z;
+								maxDirection = glm::vec3(0, 0, 1);
 							}
-						}
+						else
+							collided = false;
 					}
 				}
-			}
-		}
-
 		if (maxDirection == glm::vec3(0, 1, 0) && m_Velocity.y < 0)
 			m_OnGround = true;
 
 		m_Collider.Position -= m_Velocity * maxStep * maxDirection;
 		m_Velocity -= m_Velocity * maxDirection;
-	}
-
-	DebugBox::GetInstance().ChangeDebugValue("onGround ", m_OnGround ? "true" : "false");
+	} while (collided);
 }

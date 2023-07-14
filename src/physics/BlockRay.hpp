@@ -1,17 +1,20 @@
 #pragma once
 
-#include <world/BlockArray.hpp>
+#include <world/BlockManager.hpp>
 
 class BlockRay
 {
 public:
-	BlockRay(BlockArray& world, glm::vec3 origin, glm::vec3 direction);
-	bool Raycast(float length, glm::ivec3& result);
-	bool RaycastAhead(float length, glm::ivec3& result);
+	BlockRay(const BlockManager& world, const glm::vec3& origin, const glm::vec3& direction);
+
+	bool Raycast(float length, glm::ivec3& result) const;
+	bool RaycastAhead(float length, glm::ivec3& result) const;
 
 private:
-	BlockArray& m_World;
+	const BlockManager& m_World;
 	glm::vec3 m_Origin, m_Direction;
+	
+	glm::vec3 m_Step, m_Max, m_Delta;
 
-	void prepare(glm::vec3& step, glm::vec3& max, glm::vec3& delta);
+	void setup();
 };

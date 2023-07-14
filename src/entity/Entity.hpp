@@ -15,10 +15,5 @@ protected:
 	Transform m_Transform;
 	Rigidbody m_Rigidbody;
 
-	bool m_Gravity,
-		m_Collision;
-
 	void update(float deltaTime);
-	void setGravity(bool gravity);
-	void setCollision(bool collision);
 };

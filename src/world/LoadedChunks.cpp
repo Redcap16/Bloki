@@ -197,7 +197,7 @@ void LoadedChunks::updateNeighbors(Chunk* chunk)
 		return;
 
 	ChunkPos chunkPos = chunk->GetPosition();
-	Chunk* neighbors[6];
+	Chunk* neighbors[6] = { nullptr };
 	for (int side = 0; side < 6; ++side)
 		neighbors[side] = getChunk(chunkPos + (ChunkPos)GetDirectionVector((Direction)side));
 

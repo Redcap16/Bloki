@@ -1,5 +1,19 @@
 #include <physics/AABB.hpp>
 
+AABB::AABB() :
+	Position(0),
+	Size(0)
+{
+
+}
+
+AABB::AABB(const glm::vec3& position, const glm::vec3& size) :
+	Position(position),
+	Size(size)
+{
+
+}
+
 bool AABB::Intersects(const AABB& aabb) const
 {
 	const glm::vec3 mCorner1 = GetMinCorner(),
