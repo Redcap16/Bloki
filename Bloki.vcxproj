@@ -184,7 +184,7 @@
     <ClCompile Include="src\world\Block.cpp" />
     <ClCompile Include="src\world\Chunk.cpp" />
     <ClCompile Include="src\world\World.cpp" />
-    <ClCompile Include="src\world\WorldGenerator.cpp" />
+    <ClCompile Include="src\world\ChunkGenerator.cpp" />
     <ClCompile Include="src\graphics\Vertex.cpp" />
     <ClCompile Include="src\graphics\VertexArray.cpp" />
   </ItemGroup>

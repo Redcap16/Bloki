@@ -135,7 +135,7 @@
     <ClCompile Include="src\world\World.cpp">
       <Filter>Pliki źródłowe\world</Filter>
     </ClCompile>
-    <ClCompile Include="src\world\WorldGenerator.cpp">
+    <ClCompile Include="src\world\ChunkGenerator.cpp">
       <Filter>Pliki źródłowe\world</Filter>
     </ClCompile>
     <ClCompile Include="src\graphics\RenderingContext.cpp">

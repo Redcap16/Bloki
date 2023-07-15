@@ -27,6 +27,7 @@ public:
 
 	void SetBlock(InChunkPos position, Block block);
 	const Block& GetBlock(InChunkPos position) const;
+	void SwapBlockArray(BlockArray&& blockArray);
 
 	void Update();
 	void UpdateNeighbors(Chunk* neighbors[6]);
@@ -37,6 +38,15 @@ public:
 	void AddDroppedItem(std::unique_ptr<DroppedItem> item);
 	void RemoveDroppedItem(const DroppedItem* item);
 	void GetDroppedItems(std::vector<DroppedItem*>& items);
+
+	inline static InChunkPos GetInChunkPosition(glm::ivec3 position);
+	inline static ChunkPos GetChunkPosition(glm::ivec3 position);
+
+	void Deserialize(const std::vector<char>& data);
+	void Serialize(std::vector<char>& result) const;
+
+	void SetGenerated() { m_Generated = true; }
+	bool IsGenerated() const { return m_Generated; }
 private:
 	ChunkRenderer m_ChunkRenderer;
 	BlockArray m_BlockArray;
@@ -49,9 +59,20 @@ private:
 	InChunkPos m_HighlightedPosition;
 	bool m_AnythingHighlighted;
 
+	bool m_Generated;
 	bool m_GeometryUpdateNeeded;
-	std::mutex m_GeometryMutex;
+	mutable std::mutex m_GeometryMutex;
 
 	void checkItemsBoundaries();
 	void moveItem(Chunk& destination, std::vector<std::unique_ptr<DroppedItem>>::iterator it);
 };
+
+InChunkPos Chunk::GetInChunkPosition(glm::ivec3 position)
+{
+	return (InChunkPos)glm::mod(position, (glm::ivec3)BlockArray::ChunkSize);
+}
+
+ChunkPos Chunk::GetChunkPosition(glm::ivec3 position)
+{
+	return (ChunkPos)glm::floor((glm::vec3)position / (glm::vec3)BlockArray::ChunkSize);
+}

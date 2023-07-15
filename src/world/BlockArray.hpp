@@ -8,14 +8,20 @@ typedef glm::uvec3 InChunkPos;
 struct BlockArray
 {
 	static constexpr glm::uvec3 ChunkSize = { 16, 64, 16 };
-	
-	const Block& Get(InChunkPos position) const { return data[position.x][position.y][position.z]; };
-	void Set(InChunkPos position, Block block) { data[position.x][position.y][position.z] = block; };
+
+	BlockArray(const BlockArray&) = delete;
+	BlockArray& operator=(const BlockArray&) = delete;
+	BlockArray(BlockArray&& other) : data(std::move(other.data)) {}
+	BlockArray& operator=(BlockArray&& other) { if (this != &other) data = std::move(other.data); return *this; }
+
+	const Block& Get(InChunkPos position) const { return (*data)[position.x][position.y][position.z]; };
+	void Set(InChunkPos position, Block block) { (*data)[position.x][position.y][position.z] = block; };
+
 	static inline constexpr bool PositionOnBorder(InChunkPos position);
 	static inline constexpr bool PositionInBounds(InChunkPos position);
 
 private:
-	Block data[ChunkSize.x][ChunkSize.y][ChunkSize.z];
+	std::unique_ptr<Block[ChunkSize.x][ChunkSize.y][ChunkSize.z]> data;
 };
 
 constexpr bool BlockArray::PositionOnBorder(InChunkPos position)

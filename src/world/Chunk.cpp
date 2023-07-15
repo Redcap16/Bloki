@@ -12,26 +12,34 @@ void Chunk::SetHighlight(InChunkPos position)
 	std::lock_guard<std::mutex> lock(m_GeometryMutex);
 	m_HighlightedPosition = position;
 	m_AnythingHighlighted = true;
-	m_UpdateNeeded = true;
+	m_GeometryUpdateNeeded = true;
 }
 
 void Chunk::ResetHighlight()
 {
 	std::lock_guard<std::mutex> lock(m_GeometryMutex);
 	m_AnythingHighlighted = false;
-	m_UpdateNeeded = true;
+	m_GeometryUpdateNeeded = true;
 }
 
 void Chunk::SetBlock(InChunkPos position, Block block)
 {
 	std::lock_guard<std::mutex> lock(m_GeometryMutex);
 	m_BlockArray.Set(position, block);
-	m_UpdateNeeded = true;
+	m_GeometryUpdateNeeded = true;
 }
 
 const Block& Chunk::GetBlock(InChunkPos position) const
 {
+	std::lock_guard<std::mutex> lock(m_GeometryMutex);
 	return m_BlockArray.Get(position);
+}
+
+void Chunk::SwapBlockArray(BlockArray&& blockArray)
+{
+	std::lock_guard<std::mutex> lock(m_GeometryMutex);
+	m_BlockArray = std::move(blockArray);
+	m_GeometryUpdateNeeded = true;
 }
 
 void Chunk::Update()
@@ -47,8 +55,8 @@ void Chunk::UpdateNeighbors(Chunk* neighbors[6])
 		if (m_Neighbors[i] != neighbors[i])
 		{
 			m_Neighbors[i] = neighbors[i];
-			m_Neighbors[i]->m_UpdateNeeded = true;
-			m_UpdateNeeded = true;
+			m_Neighbors[i]->m_GeometryUpdateNeeded = true;
+			m_GeometryUpdateNeeded = true;
 		}
 		neighborsArrays[i] = &neighbors[i]->m_BlockArray;
 	}
@@ -58,12 +66,12 @@ void Chunk::UpdateNeighbors(Chunk* neighbors[6])
 
 void Chunk::UpdateGeometry()
 {
-	if (m_UpdateNeeded)
+	if (m_GeometryUpdateNeeded)
 	{
 		std::lock_guard<std::mutex> lock(m_GeometryMutex);
 		m_ChunkRenderer.UpdateGeometry();
 
-		m_UpdateNeeded = false;
+		m_GeometryUpdateNeeded = false;
 	}
 }
 
@@ -122,4 +130,16 @@ void Chunk::moveItem(Chunk& destination, std::vector<std::unique_ptr<DroppedItem
 {
 	destination.m_DroppedItems.push_back(std::move(*it));
 	m_DroppedItems.erase(it);
+}
+
+void Chunk::Deserialize(const std::vector<char>& data)
+{
+	//Remember locking mutex
+	//TODO
+}
+
+void Chunk::Serialize(std::vector<char>& result) const
+{
+	//Remember locking mutex
+	//TODO
 }
