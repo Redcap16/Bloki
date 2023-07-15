@@ -119,13 +119,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\src;.\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\src;.\include\zlib;.\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>./lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glu32.lib;opengl32.lib;libglew32d.lib;glm_static.lib;freetyped.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glu32.lib;opengl32.lib;libglew32d.lib;glm_static.lib;freetyped.lib;zlibstaticd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -145,12 +145,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\world\ChunkFileLoader.cpp" />
+    <ClCompile Include="src\entity\Entity.cpp" />
     <ClCompile Include="src\world\LoadedChunks.cpp" />
     <ClCompile Include="src\util\Direction.cpp" />
     <ClCompile Include="src\graphics\CubemapTexture.cpp" />
     <ClCompile Include="src\graphics\ElementBuffer.cpp" />
     <ClCompile Include="src\graphics\ErrorCheck.cpp" />
-    <ClCompile Include="src\core\GameState.cpp" />
     <ClCompile Include="src\physics\AABB.cpp" />
     <ClCompile Include="src\core\Application.cpp" />
     <ClCompile Include="src\entity\DroppedItem.cpp" />
@@ -168,7 +169,7 @@
     <ClCompile Include="src\graphics\stb_image.cpp" />
     <ClCompile Include="src\graphics\Texture.cpp" />
     <ClCompile Include="src\graphics\VertexBuffer.cpp" />
-    <ClCompile Include="src\player.cpp" />
+    <ClCompile Include="src\core\Player.cpp" />
     <ClCompile Include="src\core\Renderer.cpp" />
     <ClCompile Include="src\ui\Button.cpp" />
     <ClCompile Include="src\ui\DebugBox.cpp" />
@@ -189,6 +190,7 @@
     <ClCompile Include="src\graphics\VertexArray.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\window\Input.hpp" />
     <ClInclude Include="src\world\ChunkFileLoader.hpp" />
     <ClInclude Include="src\entity\Entity.hpp" />
     <ClInclude Include="src\util\Direction.hpp" />
@@ -196,7 +198,6 @@
     <ClInclude Include="src\graphics\ErrorCheck.hpp" />
     <ClInclude Include="src\graphics\Buffer.hpp" />
     <ClInclude Include="src\graphics\ElementBuffer.hpp" />
-    <ClInclude Include="src\core\GameState.hpp" />
     <ClInclude Include="src\core\Application.hpp" />
     <ClInclude Include="src\world\BlockManager.hpp" />
     <ClInclude Include="src\entity\DroppedItem.hpp" />
@@ -216,7 +217,7 @@
     <ClInclude Include="src\graphics\Texture.hpp" />
     <ClInclude Include="src\graphics\Vertex.hpp" />
     <ClInclude Include="src\graphics\VertexBuffer.hpp" />
-    <ClInclude Include="src\player.hpp" />
+    <ClInclude Include="src\core\Player.hpp" />
     <ClInclude Include="src\core\Renderer.hpp" />
     <ClInclude Include="src\ui\Button.hpp" />
     <ClInclude Include="src\ui\DebugBox.hpp" />
@@ -225,7 +226,6 @@
     <ClInclude Include="src\ui\FontCharacter.hpp" />
     <ClInclude Include="src\ui\Text.hpp" />
     <ClInclude Include="src\ui\UIManager.hpp" />
-    <ClInclude Include="src\util\db_perlin.h" />
     <ClInclude Include="src\util\Debug.hpp" />
     <ClInclude Include="src\util\Math.hpp" />
     <ClInclude Include="src\window\window.h" />

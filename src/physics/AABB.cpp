@@ -7,8 +7,9 @@ AABB::AABB() :
 
 }
 
-AABB::AABB(const glm::vec3& position, const glm::vec3& size) :
+AABB::AABB(const glm::vec3& position, const glm::vec3& centerPosition, const glm::vec3& size) :
 	Position(position),
+	CenterPosition(centerPosition),
 	Size(size)
 {
 

@@ -126,9 +126,6 @@
     <ClCompile Include="src\world\Chunk.cpp">
       <Filter>Pliki źródłowe\world</Filter>
     </ClCompile>
-    <ClCompile Include="src\player.cpp">
-      <Filter>Pliki źródłowe</Filter>
-    </ClCompile>
     <ClCompile Include="src\world\ChunkMesh.cpp">
       <Filter>Pliki źródłowe\world</Filter>
     </ClCompile>
@@ -162,9 +159,6 @@
     <ClCompile Include="src\graphics\Vertex.cpp">
       <Filter>Pliki źródłowe\graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\core\GameState.cpp">
-      <Filter>Pliki źródłowe\core</Filter>
-    </ClCompile>
     <ClCompile Include="src\core\Renderer.cpp">
       <Filter>Pliki źródłowe\core</Filter>
     </ClCompile>
@@ -189,6 +183,15 @@
     <ClCompile Include="src\world\LoadedChunks.cpp">
       <Filter>Pliki źródłowe\world</Filter>
     </ClCompile>
+    <ClCompile Include="src\world\ChunkFileLoader.cpp">
+      <Filter>Pliki źródłowe\world</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\Player.cpp">
+      <Filter>Pliki źródłowe\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\entity\Entity.cpp">
+      <Filter>Pliki źródłowe\entity</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\graphics\Camera.hpp">
@@ -205,9 +208,6 @@
     </ClInclude>
     <ClInclude Include="src\graphics\VertexBuffer.hpp">
       <Filter>Pliki nagłówkowe\graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="src\util\db_perlin.h">
-      <Filter>Pliki nagłówkowe\util</Filter>
     </ClInclude>
     <ClInclude Include="src\util\Debug.hpp">
       <Filter>Pliki nagłówkowe\util</Filter>
@@ -257,9 +257,6 @@
     <ClInclude Include="src\world\Chunk.hpp">
       <Filter>Pliki nagłówkowe\world</Filter>
     </ClInclude>
-    <ClInclude Include="src\player.hpp">
-      <Filter>Pliki nagłówkowe</Filter>
-    </ClInclude>
     <ClInclude Include="src\world\ChunkMesh.hpp">
       <Filter>Pliki nagłówkowe\world</Filter>
     </ClInclude>
@@ -291,9 +288,6 @@
       <Filter>Pliki nagłówkowe\world</Filter>
     </ClInclude>
     <ClInclude Include="src\core\Application.hpp">
-      <Filter>Pliki nagłówkowe\core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\core\GameState.hpp">
       <Filter>Pliki nagłówkowe\core</Filter>
     </ClInclude>
     <ClInclude Include="src\core\Renderer.hpp">
@@ -331,6 +325,12 @@
     </ClInclude>
     <ClInclude Include="src\world\ChunkFileLoader.hpp">
       <Filter>Pliki nagłówkowe\world</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\Player.hpp">
+      <Filter>Pliki nagłówkowe\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\window\Input.hpp">
+      <Filter>Pliki nagłówkowe\window</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
