@@ -43,10 +43,10 @@ private:
 
 	std::deque<std::weak_ptr<Chunk>> m_UpdateQueue;
 	std::mutex m_UpdateQueueMutex;
-	std::unique_ptr<std::thread> m_UpdateThread;
+	std::thread m_UpdateThread;
 	std::condition_variable m_UpdateCondition;
 	std::mutex m_UpdateConditionMutex;
-	std::atomic<bool> m_UpdateThreadDone = false;
+	std::atomic<bool> m_UpdateThreadDone;
 
 	struct ManagementTask
 	{

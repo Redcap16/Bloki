@@ -1,6 +1,7 @@
 #include <world/ChunkFileLoader.hpp>
 
-ChunkFileLoader::ChunkFileLoader(const std::string& savePath)
+ChunkFileLoader::ChunkFileLoader(const std::string& savePath) :
+	m_SavePath(savePath)
 {
 
 }

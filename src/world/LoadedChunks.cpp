@@ -3,7 +3,9 @@
 LoadedChunks::LoadedChunks(Renderer3D& renderer, const std::string& savePath) :
 	m_Renderer(renderer),
 	m_FileLoader(savePath),
-	m_ChunkGenerator(*this)
+	m_ChunkGenerator(*this),
+	m_UpdateThreadDone(true),
+	m_ManagementThreadDone(true)
 {
 	assert(c_LoadedSize.x % 2 == 1);
 	assert(c_LoadedSize.y % 2 == 1);
@@ -143,20 +145,35 @@ Chunk* LoadedChunks::getChunk(glm::ivec3 position, bool force)
 
 void LoadedChunks::setupThreads()
 {
-	m_UpdateThreadDone = false;
-	m_UpdateThread = std::make_unique<std::thread>(updateThreadLoop);
+	if (m_UpdateThreadDone)
+	{
+		m_UpdateThreadDone = false;
+		m_UpdateThread = std::thread(updateThreadLoop);
+	}
+
+	if (m_ManagementThreadDone)
+	{
+		m_ManagementThreadDone = false;
+		m_ManagementThread = std::thread(managementThreadLoop);
+	}
 }
 
 void LoadedChunks::destroyThreads()
 {
-	if (!m_UpdateThread)
-		return;
-	
-	m_UpdateThreadDone = true;
-	m_UpdateCondition.notify_one(); //In case its waiting
+	if (m_UpdateThread.joinable())
+	{
+		m_UpdateThreadDone = true;
+		m_UpdateCondition.notify_one(); //In case its waiting
 
-	m_UpdateThread->join();
-	m_UpdateThread.reset();
+		m_UpdateThread.join();
+	}
+	if (m_ManagementThread.joinable())
+	{
+		m_ManagementThreadDone = true;
+		m_ManagementQueueEmpty.notify_one(); //In case its waiting
+
+		m_ManagementThread.join();
+	}
 }
 
 void LoadedChunks::reloadChunks(ChunkPos newCenter)
