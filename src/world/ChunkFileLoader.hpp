@@ -57,11 +57,11 @@ private:
 	};
 
 	std::mutex m_OpenedRegionsMutex;
-	std::unordered_map<RegionPosition, std::unique_ptr<RegionFile>> m_OpenedRegions;
+	std::unordered_map<RegionPosition, std::shared_ptr<RegionFile>> m_OpenedRegions;
 
 	std::string m_SavePath;
 
-	RegionFile& getRegion(const RegionPosition& position);
+	std::shared_ptr<RegionFile> getRegion(const RegionPosition& position);
 };
 
 ChunkFileLoader::InRegionPosition ChunkFileLoader::RegionFile::GetInRegionPosition(const ChunkPos& chunkPosition)

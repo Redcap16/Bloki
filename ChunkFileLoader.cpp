@@ -14,9 +14,9 @@ bool ChunkFileLoader::LoadChunk(Chunk& chunk)
 	RegionPosition regionPos = RegionFile::GetRegionPosition(chunk.GetPosition());
 	InRegionPosition inRegionPos = RegionFile::GetInRegionPosition(chunk.GetPosition());
 
-	RegionFile& region = getRegion(regionPos);
+	std::shared_ptr<RegionFile> region = getRegion(regionPos);
 	std::vector<char> data;
-	if (!region.LoadChunk(inRegionPos, data))
+	if (!region->LoadChunk(inRegionPos, data))
 		return false;
 
 	chunk.Deserialize(data);
@@ -29,9 +29,9 @@ bool ChunkFileLoader::IsPresent(const ChunkPos& position)
 	RegionPosition regionPos = RegionFile::GetRegionPosition(position);
 	InRegionPosition inRegionPos = RegionFile::GetInRegionPosition(position);
 
-	RegionFile& region = getRegion(regionPos);
+	std::shared_ptr<RegionFile> region = getRegion(regionPos);
 
-	return region.IsPresent(inRegionPos);
+	return region->IsPresent(inRegionPos);
 }
 
 void ChunkFileLoader::SaveChunk(const Chunk& chunk)
@@ -45,8 +45,8 @@ void ChunkFileLoader::SaveChunk(const Chunk& chunk)
 	RegionPosition regionPos = RegionFile::GetRegionPosition(chunk.GetPosition());
 	InRegionPosition inRegionPos = RegionFile::GetInRegionPosition(chunk.GetPosition());
 
-	RegionFile& region = getRegion(regionPos);
-	region.SaveChunk(inRegionPos, std::move(data));
+	std::shared_ptr<RegionFile> region = getRegion(regionPos);
+	region->SaveChunk(inRegionPos, std::move(data));
 }
 
 void ChunkFileLoader::Flush()
@@ -77,6 +77,8 @@ bool ChunkFileLoader::RegionFile::LoadChunk(const InRegionPosition position, std
 	//If there is, load it from headers and save it in cache
 	//If it's not, then
 	//Return false
+	std::lock_guard<std::mutex> lock(m_AccessMutex);
+
 	if (m_ChunkCache.find(position) != m_ChunkCache.end())
 	{
 		data = m_ChunkCache[position];
@@ -96,6 +98,8 @@ bool ChunkFileLoader::RegionFile::IsPresent(const InRegionPosition& position)
 	//Firstly check in cache
 	//If there's nothing
 	//Check in headers
+	std::lock_guard<std::mutex> lock(m_AccessMutex);
+
 	if (m_ChunkCache.find(position) != m_ChunkCache.end())
 		return true;
 	if (getHeaderData(position) != nullptr)
@@ -109,6 +113,8 @@ void ChunkFileLoader::RegionFile::SaveChunk(const InRegionPosition& position, st
 	//Save it to cache
 	//Dont create any headers
 	//Mark file as changed
+	std::lock_guard<std::mutex> lock(m_AccessMutex);
+
 	m_ChunkCache[position] = std::move(data);
 	m_Changed = true;
 }
@@ -119,6 +125,8 @@ void ChunkFileLoader::RegionFile::flush()
 	//For every header that dont have cache ready, load its contents into a cache
 	//For every cache load it into new, clear file and save its new header
 	//Save all new headers on the beggining of the file
+	std::lock_guard<std::mutex> lock(m_AccessMutex);
+
 	if (!m_Changed)
 		return;
 
@@ -234,14 +242,14 @@ bool ChunkFileLoader::RegionFile::loadIntoCache(const InRegionPosition& position
 	m_ChunkCache.erase(position);
 }
 
-ChunkFileLoader::RegionFile& ChunkFileLoader::getRegion(const RegionPosition& position)
+std::shared_ptr<ChunkFileLoader::RegionFile> ChunkFileLoader::getRegion(const RegionPosition& position)
 {
 	std::lock_guard<std::mutex> lock(m_OpenedRegionsMutex);
 	if (m_OpenedRegions.find(position) == m_OpenedRegions.end())
 	{
 		std::string filename = m_SavePath + "/" + std::to_string(position.x) + "-" + std::to_string(position.y) + "-" + std::to_string(position.z) + ".reg";
-		m_OpenedRegions[position] = std::make_unique<RegionFile>(m_SavePath);
+		m_OpenedRegions[position] = std::make_shared<RegionFile>(m_SavePath);
 	}
 
-	return *m_OpenedRegions.at(position);
+	return m_OpenedRegions.at(position);
 }
