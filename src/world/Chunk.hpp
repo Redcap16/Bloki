@@ -1,12 +1,15 @@
 #pragma once
 
+#include <array>
 #include <string>
 #include <vector>
 #include <thread>
 #include <mutex>
 
 #include <glm/glm.hpp>
+#include <glm/gtx/integer.hpp>
 
+#include <core/Renderer.hpp>
 #include <world/BlockArray.hpp>
 #include <world/ChunkRenderer.hpp>
 #include <entity/DroppedItem.hpp>
@@ -30,7 +33,7 @@ public:
 	void SwapBlockArray(BlockArray&& blockArray);
 
 	void Update();
-	void UpdateNeighbors(Chunk* neighbors[6]);
+	void UpdateNeighbors(const std::array<Chunk*, 6>& neighbors);
 
 	inline bool DoesNeedGeometryUpdate() const { return m_GeometryUpdateNeeded; }
 	void UpdateGeometry();
@@ -52,7 +55,7 @@ private:
 	BlockArray m_BlockArray;
 	ChunkPos m_Position;
 
-	Chunk* m_Neighbors[6];
+	std::array<Chunk*, 6> m_Neighbors;
 
 	std::vector<std::unique_ptr<DroppedItem>> m_DroppedItems;
 
@@ -69,7 +72,7 @@ private:
 
 InChunkPos Chunk::GetInChunkPosition(glm::ivec3 position)
 {
-	return (InChunkPos)glm::mod(position, (glm::ivec3)BlockArray::ChunkSize);
+	return (InChunkPos)Math::Mod(position, (glm::ivec3)BlockArray::ChunkSize);
 }
 
 ChunkPos Chunk::GetChunkPosition(glm::ivec3 position)

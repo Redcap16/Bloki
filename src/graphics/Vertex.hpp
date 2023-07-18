@@ -25,9 +25,9 @@ struct Vertex3D
 
 struct Vertex3DS
 {
-	glm::vec<3, uint8_t> Position;
+	glm::vec<3, int8_t> Position;
 	glm::vec2 TextureCoords;
-	glm::vec<3, uint8_t> Normal;
+	glm::vec<3, int8_t> Normal;
 	uint8_t state;
 
 	static const std::vector<VertexAttribute> Attributes;

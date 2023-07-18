@@ -15,7 +15,7 @@ Block::BlockData::BlockData(const std::string& name, TransparencyType transparen
 
 
 
-Block::BlockData Block::blockData[blockCount];
+Block::BlockData Block::c_BlockData[c_BlockCount];
 
 //const Block::BlockData Block::blockData[blockCount] = {
 //		[0] = {.textureName = "", .transparency = 1} };
@@ -73,12 +73,12 @@ Block::BlockData Block::blockData[blockCount];
 
 
 Block::Block() :
-	type(BlockType::Air)
+	Type(BlockType::Air)
 {
 }
 
 Block::Block(BlockType type) :
-	type(type)
+	Type(type)
 {
 }
 
@@ -98,11 +98,11 @@ Block::Block(BlockType type) :
 
 void Block::SetupBlockData()
 {
-	blockData[(int)Block::BlockType::Air] = BlockData("", TransparencyType::FullTransparency);
-	blockData[(int)Block::BlockType::Grass] = BlockData("Grass");
-	blockData[(int)Block::BlockType::Mud] = BlockData("Mud");
-	blockData[(int)Block::BlockType::Stone] = BlockData("Stone");
-	blockData[(int)Block::BlockType::Water] = BlockData("Water", TransparencyType::PartialTransparency);
-	blockData[(int)Block::BlockType::Wood] = BlockData("Wood");
-	blockData[(int)Block::BlockType::Leaves] = BlockData("Leaves", TransparencyType::FullTransparency);
+	c_BlockData[(int)Block::BlockType::Air] = BlockData("Air", TransparencyType::FullTransparency);
+	c_BlockData[(int)Block::BlockType::Grass] = BlockData("Grass");
+	c_BlockData[(int)Block::BlockType::Mud] = BlockData("Mud");
+	c_BlockData[(int)Block::BlockType::Stone] = BlockData("Stone");
+	c_BlockData[(int)Block::BlockType::Water] = BlockData("Water", TransparencyType::PartialTransparency);
+	c_BlockData[(int)Block::BlockType::Wood] = BlockData("Wood");
+	c_BlockData[(int)Block::BlockType::Leaves] = BlockData("Leaves", TransparencyType::FullTransparency);
 }

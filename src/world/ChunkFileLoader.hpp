@@ -66,7 +66,7 @@ private:
 
 ChunkFileLoader::InRegionPosition ChunkFileLoader::RegionFile::GetInRegionPosition(const ChunkPos& chunkPosition)
 {
-	return glm::mod(chunkPosition, c_RegionSize);
+	return Math::Mod(chunkPosition, c_RegionSize);
 }
 
 ChunkFileLoader::RegionPosition ChunkFileLoader::RegionFile::GetRegionPosition(const ChunkPos& chunkPosition)

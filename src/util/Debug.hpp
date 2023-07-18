@@ -2,6 +2,7 @@
 
 #include <string>
 #include <iostream>
+#include <mutex>
 
 class DebugHandler 
 {
@@ -13,8 +14,18 @@ private:
 
 class DummyDebugHandler : public DebugHandler
 {
-	inline void Log(const char* message) override;
-	inline void Log(std::string message) override;
+public:
+	void Log(const char* message) override {}; //Do nothing
+	void Log(std::string message) override {}; //Do nothing
+};
+
+class ConsoleDebugHandler : public DebugHandler
+{
+public:
+	void Log(const char* message) override;
+	void Log(std::string message) override;
+private:
+	std::mutex m_Mutex;
 };
 
 class DebugProvider
@@ -28,29 +39,3 @@ private:
 };
 
 #define DEBUG_LOG(message) DebugProvider::Get().Log(message);
-
-void DummyDebugHandler::Log(const char* message)
-{
-	//Do nothing
-}
-
-void DummyDebugHandler::Log(std::string message)
-{
-	//Do nothing
-}
-
-
-
-
-
-class Debug
-{
-private:
-	Debug();
-public:
-	static Debug& GetInstance();
-	inline void Log(std::string text)
-	{
-		std::cout << text << std::endl;
-	}
-};

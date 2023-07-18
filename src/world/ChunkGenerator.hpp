@@ -5,7 +5,7 @@
 
 #include <thread>
 #include <mutex>
-#include <util/db_perlin.h>
+#include <db_perlin/db_perlin.h>
 
 class ChunkGenerator
 {

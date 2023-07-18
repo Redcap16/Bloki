@@ -13,7 +13,7 @@
 #include <mutex>
 #include <chrono>
 
-class LoadedChunks : BlockManager
+class LoadedChunks : public BlockManager
 {
 public:
 	LoadedChunks(Renderer3D& renderer, const std::string& savePath);
@@ -34,7 +34,7 @@ public:
 
 private:
 	static const int c_LoadingRadius = 5;
-	static constexpr glm::uvec3 c_LoadedSize = { c_LoadingRadius * 2 + 1, 3, c_LoadingRadius * 2 + 1 };
+	static constexpr glm::ivec3 c_LoadedSize = { c_LoadingRadius * 2 + 1, 3, c_LoadingRadius * 2 + 1 };
 
 	std::shared_ptr<Chunk> m_LoadedChunks[c_LoadedSize.x][c_LoadedSize.y][c_LoadedSize.z] = { nullptr };
 	ChunkPos m_CenterChunkPos;
@@ -128,8 +128,8 @@ void LoadedChunks::forEveryChunk(Operation op)
 template <class Operation>
 void LoadedChunks::forEveryChunk(std::shared_ptr<Chunk>(&array)[c_LoadedSize.x][c_LoadedSize.y][c_LoadedSize.z], Operation op) const
 {
-	for (unsigned int x = 0; x < c_LoadedSize.x; x++)
-		for (unsigned int y = 0; y < c_LoadedSize.y; y++)
-			for (unsigned int z = 0; z < c_LoadedSize.z; z++)
+	for (int x = 0; x < c_LoadedSize.x; x++)
+		for (int y = 0; y < c_LoadedSize.y; y++)
+			for (int z = 0; z < c_LoadedSize.z; z++)
 				op(array[x][y][z], { x, y, z });
 }

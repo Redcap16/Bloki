@@ -73,4 +73,5 @@ void ImageTexture::load(bool transparency)
 void ImageTexture::unload()
 {
 	glDeleteTextures(1, &m_Handle);
+	CHECK_GL_ERROR();
 }

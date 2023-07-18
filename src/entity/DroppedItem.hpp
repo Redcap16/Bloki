@@ -2,11 +2,14 @@
 
 #include <physics/Rigidbody.hpp>
 #include <entity/Entity.hpp>
+#include <util/Direction.hpp>
+#include <graphics/VertexArray.hpp>
+#include <graphics/Vertex.hpp>
 
-class DroppedItem : public Entity
+class DroppedItem
 {
 public:
-	DroppedItem(BlockArray& world, glm::vec3 position);
+	DroppedItem(BlockManager& world, glm::vec3 position);
 
 	void Update(float deltaTime);
 	void Render();
@@ -17,7 +20,7 @@ private:
 	VertexBuffer<Vertex3D> m_Mesh;
 
 	void setupMesh();
-	void setupFace(FaceDirection direction);
+	void setupFace(Direction direction);
 };
 
 glm::vec3 DroppedItem::GetPosition() const

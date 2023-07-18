@@ -1,7 +1,14 @@
 #include <world/ChunkRenderer.hpp>
 
+ChunkResources& ChunkResources::GetInstance()
+{
+	static ChunkResources instance;
+	return instance;
+}
+
 ChunkResources::ChunkResources() :
-	m_IsOpen(true)
+	m_IsOpen(true),
+	BlockTexture(nullptr)
 {
 	if (!setupTexture())
 		m_IsOpen = false;
@@ -24,7 +31,18 @@ bool ChunkResources::setupTexture()
 	}
 
 	for (int i = 0; i < Block::c_BlockCount; ++i)
-		TextureCoords[i] = *BlockTexture->GetSubTexture(Block::GetBlockName((Block::BlockType)i));
+	{
+		if (i == Block::Air)
+			continue;
+		const std::string& blockName = Block::GetBlockName((Block::BlockType)i);
+		const AtlasTexture::SubTexture* subTexture = BlockTexture->GetSubTexture(blockName);
+		if (subTexture == nullptr)
+		{
+			DEBUG_LOG("Error: cant load sub textures");
+			return false;
+		}
+		TextureCoords[i] = *subTexture;
+	}
 
 	return true;
 }
@@ -45,17 +63,18 @@ bool ChunkResources::setupShaders()
 
 ChunkRenderer::ChunkRenderer(Renderer3D& renderer, const BlockArray& blockArray, const glm::vec3& position) :
 	m_BlockArray(blockArray),
-	m_OpaqueMesh(m_Position, s_Resources->TextureCoords),
-	m_TransparentMesh(m_Position, s_Resources->TextureCoords),
-	m_Position(position)
+	m_OpaqueMesh(m_Position, ChunkResources::GetInstance().TextureCoords),
+	m_TransparentMesh(m_Position, ChunkResources::GetInstance().TextureCoords),
+	m_Position(position),
+	m_AnythingHighlighted(false),
+	m_HighlightedPosition(glm::ivec3(0)),
+	m_Neighbors({nullptr})
 {
-	if (s_Resources.get() == nullptr)
-		s_Resources = std::make_unique<ChunkResources>();
-
-	if (s_Resources->IsOpen())
+	ChunkResources& resources = ChunkResources::GetInstance();
+	if (resources.IsOpen())
 	{
-		renderer.RegisterRenderable(&m_OpaqueMesh, RenderableParameters(false, s_Resources->OpaqueShader, s_Resources->BlockTexture));
-		renderer.RegisterRenderable(&m_TransparentMesh, RenderableParameters(true, s_Resources->TransparentShader, s_Resources->BlockTexture));
+		renderer.RegisterRenderable(&m_OpaqueMesh, RenderableParameters(false, resources.OpaqueShader, resources.BlockTexture));
+		renderer.RegisterRenderable(&m_TransparentMesh, RenderableParameters(true, resources.TransparentShader, resources.BlockTexture));
 	}
 }
 
@@ -70,7 +89,7 @@ void ChunkRenderer::ResetHighlight()
 	m_AnythingHighlighted = false;
 }
 
-void ChunkRenderer::UpdateNeighbors(const BlockArray* neighbors[6])
+void ChunkRenderer::UpdateNeighbors(const std::array<const BlockArray*, 6>& neighbors)
 {
 	for (int i = 0; i < 6; ++i)
 		m_Neighbors[i] = neighbors[i];
@@ -118,7 +137,7 @@ bool ChunkRenderer::isBlockVisible(InChunkPos position, Direction direction)
 		if (neighbor == nullptr)
 			return true; //Always visible on borders
 
-		neighborBlock = &neighbor->Get(glm::mod(neighborBlockPos, (glm::ivec3)BlockArray::ChunkSize));
+		neighborBlock = &neighbor->Get(Math::Mod(neighborBlockPos, (glm::ivec3)BlockArray::ChunkSize));
 	}
 
 	if (neighborBlock->GetTransparencyType() == TransparencyType::Opaque)

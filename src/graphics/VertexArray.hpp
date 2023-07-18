@@ -14,8 +14,8 @@ public:
 	~VertexArray();
 	VertexArray(const VertexArray&) = delete;
 	VertexArray& operator=(const VertexArray&) = delete;
-	VertexArray(VertexArray &&other);
-	VertexArray& operator=(VertexArray &&other);
+	VertexArray(VertexArray &&other) noexcept;
+	VertexArray& operator=(VertexArray &&other) noexcept;
 
 	void AddBuffer(AbstractVertexBuffer* buffer);
 	inline void SetElementBuffer(ElementBuffer* buffer);

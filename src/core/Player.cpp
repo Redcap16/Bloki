@@ -1,11 +1,12 @@
 #include <core/Player.hpp>
 
-Player::Player(BlockManager& world, Keyboard& keyboard, glm::ivec2 windowSize) :
-	m_Rigidbody(m_World, AABB(glm::vec3(0), c_BodyCenter, c_BodySize)),
+Player::Player(BlockManager& world, Keyboard& keyboard, Mouse& mouse, glm::ivec2 windowSize) :
+	m_Rigidbody(world, AABB(glm::vec3(0), c_BodyCenter, c_BodySize)),
 	m_World(world),
 	m_Keyboard(keyboard),
 	m_Flying(false),
-	m_WindowSize(windowSize)
+	m_WindowSize(windowSize),
+	m_Mouse(mouse)
 {
 
 }
@@ -78,6 +79,8 @@ void Player::KeyReleased(char key)
 
 void Player::MouseMoved(const glm::ivec2& position)
 {
+	m_Mouse.SetMousePosition(m_WindowSize / 2);
+
 	const glm::ivec2 delta = position - m_WindowSize / 2;
 	m_Rotation += (glm::vec2)delta * c_MouseSensitivity;
 	m_Rotation = { Math::Mod(m_Rotation.x, 360.0f), Math::Mod(m_Rotation.y + 90, 180.0f) - 90 };

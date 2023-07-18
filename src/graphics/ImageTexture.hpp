@@ -7,7 +7,7 @@
 #include <GL/GLU.h>
 #include <glm/glm.hpp>
 
-#include <graphics/stb_image.h>
+#include <stb_image/stb_image.h>
 #include <graphics/Texture.hpp>
 #include <util/Debug.hpp>
 

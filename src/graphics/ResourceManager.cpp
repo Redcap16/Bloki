@@ -29,7 +29,7 @@ ShaderProgram* ResourceManager::GetShaderProgram(std::string sourceFile)
 AtlasTexture* ResourceManager::GetAtlasTexture(std::string name)
 {
 	if (m_AtlasTextures.find(name) == m_AtlasTextures.end())
-		m_AtlasTextures[name] = std::make_unique<AtlasTexture>();
+		m_AtlasTextures[name] = std::make_unique<AtlasTexture>(name);
 
 	return m_AtlasTextures[name].get();
 }
@@ -37,7 +37,7 @@ AtlasTexture* ResourceManager::GetAtlasTexture(std::string name)
 ImageTexture* ResourceManager::GetImageTexture(std::string fileName)
 {
 	if (m_ImageTextures.find(fileName) == m_ImageTextures.end())
-		m_ImageTextures[fileName] = std::make_unique<ImageTexture>(fileName);
+		m_ImageTextures[fileName] = std::make_unique<ImageTexture>(fileName, true);
 
 	return m_ImageTextures[fileName].get();
 }

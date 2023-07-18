@@ -93,32 +93,11 @@
     <ClCompile Include="src\util\Math.cpp">
       <Filter>Pliki źródłowe\util</Filter>
     </ClCompile>
-    <ClCompile Include="src\ui\Font.cpp">
-      <Filter>Pliki źródłowe\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ui\FontCharacter.cpp">
-      <Filter>Pliki źródłowe\ui</Filter>
-    </ClCompile>
     <ClCompile Include="src\graphics\AtlasTexture.cpp">
       <Filter>Pliki źródłowe\graphics</Filter>
     </ClCompile>
     <ClCompile Include="src\graphics\ImageTexture.cpp">
       <Filter>Pliki źródłowe\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ui\Button.cpp">
-      <Filter>Pliki źródłowe\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ui\Text.cpp">
-      <Filter>Pliki źródłowe\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ui\Element.cpp">
-      <Filter>Pliki źródłowe\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ui\UIManager.cpp">
-      <Filter>Pliki źródłowe\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ui\DebugBox.cpp">
-      <Filter>Pliki źródłowe\ui</Filter>
     </ClCompile>
     <ClCompile Include="src\world\Block.cpp">
       <Filter>Pliki źródłowe\world</Filter>
@@ -127,9 +106,6 @@
       <Filter>Pliki źródłowe\world</Filter>
     </ClCompile>
     <ClCompile Include="src\world\ChunkMesh.cpp">
-      <Filter>Pliki źródłowe\world</Filter>
-    </ClCompile>
-    <ClCompile Include="src\world\World.cpp">
       <Filter>Pliki źródłowe\world</Filter>
     </ClCompile>
     <ClCompile Include="src\world\ChunkGenerator.cpp">
@@ -218,12 +194,6 @@
     <ClInclude Include="src\window\window.h">
       <Filter>Pliki nagłówkowe\window</Filter>
     </ClInclude>
-    <ClInclude Include="src\ui\FontCharacter.hpp">
-      <Filter>Pliki nagłówkowe\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ui\Font.hpp">
-      <Filter>Pliki nagłówkowe\ui</Filter>
-    </ClInclude>
     <ClInclude Include="src\graphics\ImageTexture.hpp">
       <Filter>Pliki nagłówkowe\graphics</Filter>
     </ClInclude>
@@ -232,21 +202,6 @@
     </ClInclude>
     <ClInclude Include="src\graphics\Vertex.hpp">
       <Filter>Pliki nagłówkowe\graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ui\Element.hpp">
-      <Filter>Pliki nagłówkowe\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ui\Text.hpp">
-      <Filter>Pliki nagłówkowe\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ui\Button.hpp">
-      <Filter>Pliki nagłówkowe\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ui\UIManager.hpp">
-      <Filter>Pliki nagłówkowe\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ui\DebugBox.hpp">
-      <Filter>Pliki nagłówkowe\ui</Filter>
     </ClInclude>
     <ClInclude Include="src\world\Block.hpp">
       <Filter>Pliki nagłówkowe\world</Filter>
@@ -313,9 +268,6 @@
     </ClInclude>
     <ClInclude Include="src\entity\DroppedItem.hpp">
       <Filter>Pliki nagłówkowe\entity</Filter>
-    </ClInclude>
-    <ClInclude Include="src\world\World.hpp">
-      <Filter>Pliki nagłówkowe\core</Filter>
     </ClInclude>
     <ClInclude Include="src\util\Direction.hpp">
       <Filter>Pliki nagłówkowe\util</Filter>

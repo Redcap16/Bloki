@@ -4,6 +4,7 @@
 #include <GL/GL.h>
 #include <GL/GLU.h>
 #include <deque>
+#include <vector>
 
 #include <graphics/Buffer.hpp>
 #include <graphics/ErrorCheck.hpp>
@@ -29,8 +30,9 @@ public:
 private:
 	BufferHandle m_Handle;
 	bool m_Dynamic;
+	size_t m_IndicesCount;
 
-	std::deque<size_t> m_Indices;
+	std::vector<size_t> m_Indices;
 	
 	void setup();
 };
@@ -52,7 +54,7 @@ BufferHandle ElementBuffer::GetHandle() const
 
 size_t ElementBuffer::Count() const
 {
-	return m_Indices.size();
+	return m_IndicesCount;
 }
 
 void ElementBuffer::Bind() const

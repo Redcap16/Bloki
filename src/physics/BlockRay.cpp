@@ -18,17 +18,17 @@ bool BlockRay::Raycast(float length, glm::ivec3& result) const
 		if (glm::length(m_Origin - (glm::vec3)position) > length)
 			break;
 
-		if ((m_Direction.z == 0 || m_Max.x < m_Max.z) && (m_Direction.y == 0 || m_Max.x < m_Max.y))
+		if ((m_Direction.z == 0 || max.x <= max.z) && (m_Direction.y == 0 || max.x <= max.y))
 		{
 			max.x += m_Delta.x;
 			position.x += m_Step.x;
 		}
-		else if ((m_Direction.z == 0 || m_Max.y < m_Max.z) && (m_Direction.x == 0 || m_Max.y < m_Max.x))
+		else if ((m_Direction.z == 0 || max.y <= max.z) && (m_Direction.x == 0 || max.y <= max.x))
 		{
 			max.y += m_Delta.y;
 			position.y += m_Step.y;
 		}
-		else if ((m_Direction.x == 0 || m_Max.z < m_Max.x) && (m_Direction.y == 0 || m_Max.z < m_Max.y))
+		else if ((m_Direction.x == 0 || max.z <= max.x) && (m_Direction.y == 0 || max.z <= max.y))
 		{
 			max.z += m_Delta.z;
 			position.z += m_Step.z;
@@ -58,17 +58,17 @@ bool BlockRay::RaycastAhead(float length, glm::ivec3& result) const
 		if (glm::length(m_Origin - (glm::vec3)position) > length)
 			break;
 
-		if ((m_Direction.z == 0 || m_Max.x < m_Max.z) && (m_Direction.y == 0 || m_Max.x < m_Max.y))
+		if ((m_Direction.z == 0 || m_Max.x <= m_Max.z) && (m_Direction.y == 0 || m_Max.x <= m_Max.y))
 		{
 			max.x += m_Delta.x;
 			position.x += m_Step.x;
 		}
-		else if ((m_Direction.z == 0 || m_Max.y < m_Max.z) && (m_Direction.x == 0 || m_Max.y < m_Max.x))
+		else if ((m_Direction.z == 0 || m_Max.y <= m_Max.z) && (m_Direction.x == 0 || m_Max.y <= m_Max.x))
 		{
 			max.y += m_Delta.y;
 			position.y += m_Step.y;
 		}
-		else if ((m_Direction.x == 0 || m_Max.z < m_Max.x) && (m_Direction.y == 0 || m_Max.z < m_Max.y))
+		else if ((m_Direction.x == 0 || m_Max.z <= m_Max.x) && (m_Direction.y == 0 || m_Max.z <= m_Max.y))
 		{
 			max.z += m_Delta.z;
 			position.z += m_Step.z;

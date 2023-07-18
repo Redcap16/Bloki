@@ -29,19 +29,26 @@ Block LoadedChunks::GetBlock(glm::ivec3 position) const
 	return chunk->GetBlock(Chunk::GetInChunkPosition(position));
 }
 
-bool LoadedChunks::PlaceBlock(glm::ivec3 position, Block block, bool force = false)
+bool LoadedChunks::PlaceBlock(glm::ivec3 position, Block block, bool force)
 {
 	Chunk* const chunk = getChunk(position, true);
 	if (chunk == nullptr)
-		return;
+		return false;
 
 	if (force)
+	{
 		chunk->SetBlock(Chunk::GetInChunkPosition(position), block);
+		return true;
+	}
 	else
 	{
 		const InChunkPos inChunkPosition = Chunk::GetInChunkPosition(position);
 		if (chunk->GetBlock(inChunkPosition).Type == Block::Air)
+		{
 			chunk->SetBlock(inChunkPosition, block);
+			return true;
+		}
+		return false;
 	}
 }
 
@@ -148,13 +155,13 @@ void LoadedChunks::setupThreads()
 	if (m_UpdateThreadDone)
 	{
 		m_UpdateThreadDone = false;
-		m_UpdateThread = std::thread(updateThreadLoop);
+		m_UpdateThread = std::thread(&LoadedChunks::updateThreadLoop, this);
 	}
 
 	if (m_ManagementThreadDone)
 	{
 		m_ManagementThreadDone = false;
-		m_ManagementThread = std::thread(managementThreadLoop);
+		m_ManagementThread = std::thread(&LoadedChunks::managementThreadLoop, this);
 	}
 }
 
@@ -235,7 +242,7 @@ void LoadedChunks::updateNeighbors(Chunk* chunk)
 		return;
 
 	ChunkPos chunkPos = chunk->GetPosition();
-	Chunk* neighbors[6] = { nullptr };
+	std::array<Chunk*, 6> neighbors = { nullptr };
 	for (int side = 0; side < 6; ++side)
 		neighbors[side] = getChunk(chunkPos + (ChunkPos)GetDirectionVector((Direction)side));
 
@@ -294,7 +301,7 @@ void LoadedChunks::updateThreadLoop()
 
 void LoadedChunks::managementThreadLoop()
 {
-	while (m_ManagementThreadDone)
+	while (!m_ManagementThreadDone)
 	{
 		m_ManagementQueueMutex.lock();
 		if (m_ManagementTaskQueue.empty())

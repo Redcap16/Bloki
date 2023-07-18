@@ -54,7 +54,7 @@ private:
 
 	struct RenderableCompare
 	{
-		bool operator()(const std::unique_ptr<RenderableRecord>& a, const std::unique_ptr<RenderableRecord>& b) const;
+		bool operator()(const RenderableRecord& a, const RenderableRecord& b) const;
 	};
 
 	glm::ivec2 m_WindowSize;

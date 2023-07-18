@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include <graphics/stb_image.h>
+#include <stb_image/stb_image.h>
 #include <graphics/Texture.hpp>
 
 class CubemapTexture : public Texture

@@ -57,8 +57,10 @@ void ChunkFileLoader::Flush()
 
 ChunkFileLoader::RegionFile::RegionFile(const std::string filename) :
 	m_File(filename, std::ios_base::in | std::ios_base::out | std::ios_base::binary),
-	m_Filename(filename)
+	m_Filename(filename),
+	m_Changed(false)
 {
+	std::fill_n((ChunkHeaderData*)m_ChunkHeaderData, c_RegionSize.x * c_RegionSize.y * c_RegionSize.z, ChunkHeaderData{ 0, 0 });
 	if(m_File.peek() != std::fstream::traits_type::eof()) //File is not empty
 		readHeaders();
 }
@@ -130,7 +132,7 @@ void ChunkFileLoader::RegionFile::flush()
 	if (!m_Changed)
 		return;
 
-	size_t currentAddress = c_RegionSize.x * c_RegionSize.y * c_RegionSize.z * sizeof(ChunkHeaderData);
+	size_t currentAddress = sizeof(ChunkHeaderData) * c_RegionSize.x * c_RegionSize.y * c_RegionSize.z;
 	m_File.seekp(0, std::ios_base::beg);
 	{
 		std::vector<char> headerSection(currentAddress);
@@ -162,7 +164,7 @@ void ChunkFileLoader::RegionFile::flush()
 				m_File.write(m_ChunkCache[position].data(), m_ChunkCache.size());
 
 				//Write the header
-				const size_t currentHeaderAddress = x * c_RegionSize.y * c_RegionSize.z + y * c_RegionSize.z + z;
+				const size_t currentHeaderAddress = (size_t)x * c_RegionSize.y * c_RegionSize.z + (size_t)y * c_RegionSize.z + z;
 				m_File.seekp(currentHeaderAddress, std::ios_base::beg);
 				if (!m_File.good())
 				{
@@ -170,9 +172,7 @@ void ChunkFileLoader::RegionFile::flush()
 					return;
 				}
 
-				ChunkHeaderData buffer;
-				buffer.Address = currentAddress;
-				buffer.Size = m_ChunkCache[position].size();
+				ChunkHeaderData buffer = { (uint32_t)currentAddress, (uint32_t)m_ChunkCache[position].size() };
 
 				m_File.write((char*)&buffer, sizeof(buffer));
 				currentAddress += m_ChunkCache.size();
@@ -183,7 +183,7 @@ void ChunkFileLoader::RegionFile::readHeaders()
 {
 	m_File.seekg(0, std::ios_base::beg);
 
-	ChunkHeaderData buffer;
+	ChunkHeaderData buffer{ 0 };
 	for(int x = 0; x < c_RegionSize.x; ++x)
 		for(int y = 0; y < c_RegionSize.y; ++y)
 			for (int z = 0; z < c_RegionSize.z; ++z)
@@ -205,7 +205,9 @@ const ChunkFileLoader::RegionFile::ChunkHeaderData* ChunkFileLoader::RegionFile:
 		position.y >= c_RegionSize.y ||
 		position.z >= c_RegionSize.z)
 		return nullptr;
-	return &m_ChunkHeaderData[position.x][position.y][position.z];
+	if(m_ChunkHeaderData[position.x][position.y][position.z].Address != 0)
+		return &m_ChunkHeaderData[position.x][position.y][position.z];
+	return nullptr;
 }
 
 bool ChunkFileLoader::RegionFile::loadIntoCache(const InRegionPosition& position)

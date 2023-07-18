@@ -1,7 +1,7 @@
 #pragma once
 
-#define _USE_MATH_DEFINES
 #include <cmath>
+#include <glm/glm.hpp>
 
 #ifndef M_PI
 #define M_PI 3.1415F
@@ -10,9 +10,20 @@
 template <>
 class std::hash<glm::ivec3>
 {
-	size_t operator()(const ChunkPos& other) const noexcept
+public:
+	size_t operator()(const glm::ivec3& other) const noexcept
 	{
-		return (other.x * 42600713) ^ (other.y * 69498817) ^ (other.z * 54492923);
+		return (other.x * 42600713LL) ^ (other.y * 69498817LL) ^ (other.z * 54492923LL) % SIZE_MAX;
+	}
+};
+
+template <>
+class std::hash<glm::vec<3, uint8_t>>
+{
+public:
+	size_t operator()(const glm::vec<3, uint8_t>& other) const noexcept
+	{
+		return (other.x * 42600713LL) ^ (other.y * 69498817LL) ^ (other.z * 54492923LL) % SIZE_MAX;
 	}
 };
 
@@ -25,16 +36,17 @@ public:
 
 	static inline float Mod(float a, float b);
 	static inline int Mod(int a, int b);
+	static inline glm::ivec3 Mod(const glm::ivec3& a, const glm::ivec3& b);
 };
 
 float Math::ToRadian(float deg)
 {
-	return deg * (M_PI / 180.0f);
+	return deg * ((float)M_PI / 180.0f);
 }
 
 float Math::ToDegrees(float rad)
 {
-	return rad * (180.0f / M_PI);
+	return rad * (180.0f / (float)M_PI);
 }
 
 bool Math::IsBetween(float x, float min, float max)
@@ -49,5 +61,10 @@ float Math::Mod(float a, float b)
 
 int Math::Mod(int a, int b)
 {
-	return a - b * std::floor((float)a / b);
+	return a - b * (int)std::floor((float)a / b);
+}
+
+glm::ivec3 Math::Mod(const glm::ivec3& a, const glm::ivec3& b)
+{
+	return a - b * (glm::ivec3)glm::floor((glm::vec3)a / (glm::vec3)b);
 }

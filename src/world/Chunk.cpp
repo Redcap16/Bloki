@@ -2,7 +2,12 @@
 
 Chunk::Chunk(Renderer3D& renderer, const ChunkPos& position) :
 	m_Position(position),
-	m_ChunkRenderer(renderer, m_BlockArray, (glm::vec3)(m_Position * (glm::ivec3)BlockArray::ChunkSize))
+	m_ChunkRenderer(renderer, m_BlockArray, (glm::vec3)(position * (glm::ivec3)BlockArray::ChunkSize)),
+	m_AnythingHighlighted(false),
+	m_GeometryUpdateNeeded(false),
+	m_Generated(false),
+	m_HighlightedPosition(glm::ivec3()),
+	m_Neighbors()
 {
 
 }
@@ -47,9 +52,9 @@ void Chunk::Update()
 	checkItemsBoundaries();
 }
 
-void Chunk::UpdateNeighbors(Chunk* neighbors[6])
+void Chunk::UpdateNeighbors(const std::array<Chunk*, 6>& neighbors)
 {
-	BlockArray *neighborsArrays[6];
+	std::array<const BlockArray*, 6>neighborsArrays;
 	for (int i = 0; i < 6; i++)
 	{
 		if (m_Neighbors[i] != neighbors[i])
@@ -101,7 +106,7 @@ void Chunk::checkItemsBoundaries()
 {
 	for (int i = 0; i < m_DroppedItems.size();)
 	{
-		const glm::vec3& itemPosition = m_DroppedItems[i]->GetTransform().GetPosition();
+		const glm::vec3& itemPosition = m_DroppedItems[i]->GetPosition();
 
 		if (itemPosition.x < m_Position.x
 			&& m_Neighbors[(unsigned int)Direction::Left] != nullptr)

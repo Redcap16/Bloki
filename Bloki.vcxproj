@@ -117,7 +117,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;GLEW_STATIC;_USE_MATH_DEFINES;OGL_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>.\src;.\include\zlib;.\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -171,20 +171,12 @@
     <ClCompile Include="src\graphics\VertexBuffer.cpp" />
     <ClCompile Include="src\core\Player.cpp" />
     <ClCompile Include="src\core\Renderer.cpp" />
-    <ClCompile Include="src\ui\Button.cpp" />
-    <ClCompile Include="src\ui\DebugBox.cpp" />
-    <ClCompile Include="src\ui\Element.cpp" />
-    <ClCompile Include="src\ui\Font.cpp" />
-    <ClCompile Include="src\ui\FontCharacter.cpp" />
-    <ClCompile Include="src\ui\Text.cpp" />
-    <ClCompile Include="src\ui\UIManager.cpp" />
     <ClCompile Include="src\util\db_perlin.cpp" />
     <ClCompile Include="src\util\Debug.cpp" />
     <ClCompile Include="src\util\Math.cpp" />
     <ClCompile Include="src\window\window.cpp" />
     <ClCompile Include="src\world\Block.cpp" />
     <ClCompile Include="src\world\Chunk.cpp" />
-    <ClCompile Include="src\world\World.cpp" />
     <ClCompile Include="src\world\ChunkGenerator.cpp" />
     <ClCompile Include="src\graphics\Vertex.cpp" />
     <ClCompile Include="src\graphics\VertexArray.cpp" />
@@ -219,20 +211,12 @@
     <ClInclude Include="src\graphics\VertexBuffer.hpp" />
     <ClInclude Include="src\core\Player.hpp" />
     <ClInclude Include="src\core\Renderer.hpp" />
-    <ClInclude Include="src\ui\Button.hpp" />
-    <ClInclude Include="src\ui\DebugBox.hpp" />
-    <ClInclude Include="src\ui\Element.hpp" />
-    <ClInclude Include="src\ui\Font.hpp" />
-    <ClInclude Include="src\ui\FontCharacter.hpp" />
-    <ClInclude Include="src\ui\Text.hpp" />
-    <ClInclude Include="src\ui\UIManager.hpp" />
     <ClInclude Include="src\util\Debug.hpp" />
     <ClInclude Include="src\util\Math.hpp" />
     <ClInclude Include="src\window\window.h" />
     <ClInclude Include="src\world\Block.hpp" />
     <ClInclude Include="src\world\Chunk.hpp" />
     <ClInclude Include="src\world\LoadedChunks.hpp" />
-    <ClInclude Include="src\world\World.hpp" />
     <ClInclude Include="src\world\ChunkGenerator.hpp" />
     <ClInclude Include="src\graphics\VertexArray.hpp" />
     <ClInclude Include="src\physics\Transform.hpp" />

@@ -7,21 +7,27 @@ typedef glm::uvec3 InChunkPos;
 
 struct BlockArray
 {
-	static constexpr glm::uvec3 ChunkSize = { 16, 64, 16 };
+	static constexpr glm::ivec3 ChunkSize = { 16, 64, 16 };
 
+	BlockArray() : m_Data(std::make_unique<Array>()) { }
 	BlockArray(const BlockArray&) = delete;
 	BlockArray& operator=(const BlockArray&) = delete;
-	BlockArray(BlockArray&& other) : data(std::move(other.data)) {}
-	BlockArray& operator=(BlockArray&& other) { if (this != &other) data = std::move(other.data); return *this; }
+	BlockArray(BlockArray&& other) noexcept : m_Data(std::move(other.m_Data)) {}
+	BlockArray& operator=(BlockArray&& other) noexcept { if (this != &other) m_Data = std::move(other.m_Data); return *this; }
 
-	const Block& Get(InChunkPos position) const { return (*data)[position.x][position.y][position.z]; };
-	void Set(InChunkPos position, Block block) { (*data)[position.x][position.y][position.z] = block; };
+	const Block& Get(InChunkPos position) const { return m_Data->Data[position.x][position.y][position.z]; };
+	void Set(InChunkPos position, Block block) { m_Data->Data[position.x][position.y][position.z] = block; };
 
 	static inline constexpr bool PositionOnBorder(InChunkPos position);
 	static inline constexpr bool PositionInBounds(InChunkPos position);
 
 private:
-	std::unique_ptr<Block[ChunkSize.x][ChunkSize.y][ChunkSize.z]> data;
+	struct Array
+	{
+		Block Data[ChunkSize.x][ChunkSize.y][ChunkSize.z];
+	};
+
+	std::unique_ptr<Array> m_Data;
 };
 
 constexpr bool BlockArray::PositionOnBorder(InChunkPos position)

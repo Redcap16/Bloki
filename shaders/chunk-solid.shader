@@ -1,14 +1,14 @@
 #type vertex
 #version 330 compatibility
 
-layout (location = 0) in vec3 aPos;
+layout (location = 0) in ivec3 aPos;
 layout (location = 1) in vec2 aTexCoord;
 //layout (location = 2) in float aLightLevel;
-layout (location = 2) in vec3 aNormal;
+layout (location = 2) in ivec3 aNormal;
 layout (location = 3) in int aState;
 
 //uniform mat4 modelMatrix;
-uniform mat4 mvpMatrix;
+uniform mat4 mvp;
 
 out vec2 TexCoord;	
 out float cosTheta;
@@ -19,16 +19,16 @@ uniform vec3 lightDir;
 
 void main()
 {
-	gl_Position = mvpMatrix * vec4(aPos.x, aPos.y, aPos.z, 1.0);
+	gl_Position = mvp * vec4(aPos.x, aPos.y, aPos.z, 1.0);
 
 	TexCoord = aTexCoord;
 	State = aState;
 	
 	//angle = clamp(dot(normalize(cameraPos - vec3(modelMatrix * vec4(aPos, 1))), aNormal), 0, 1);
-	cosTheta = clamp(dot(normalize(lightDir), aNormal), 0, 0.8) + 0.2;
+	//cosTheta = clamp(dot(normalize(lightDir), aNormal), 0, 0.8) + 0.2;
 	
-	if(length(aNormal - vec3(0, -1, 0)) < 0.1)
-		cosTheta = 0.2;
+	//if(length(aNormal - vec3(0, -1, 0)) < 0.1)
+	//	cosTheta = 0.2;
 }
 
 #type fragment

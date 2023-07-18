@@ -34,14 +34,15 @@ public:
 	~ShaderProgram();
 	ShaderProgram(const ShaderProgram&) = delete;
 	ShaderProgram& operator=(const ShaderProgram&) = delete;
-	ShaderProgram(ShaderProgram&& other);
-	ShaderProgram& operator=(ShaderProgram&& other);
+	ShaderProgram(ShaderProgram&& other) noexcept;
+	ShaderProgram& operator=(ShaderProgram&& other) noexcept;
 
 	void UseProgram() const;
 
 	void SetMVPMatrix(const glm::mat4& matrix);
 
-	inline ProgramHandle GetHandle() const;
+	inline ProgramHandle GetHandle() const { return m_ProgramHandle; }
+
 	UniformLocation GetUniformLocation(const char* name) const;
 
 	//Uniform setters

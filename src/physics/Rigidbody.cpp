@@ -31,24 +31,22 @@ void Rigidbody::Update(float deltaTime)
 
 void Rigidbody::checkCollisions()
 {
-	bool collided;
 	m_OnGround = false;
 
+	glm::vec3 maxDirection;
 	do
 	{
-		collided = false;
-
 		glm::vec3 maxCorner = m_Collider.GetMaxCorner(),
 			minCorner = m_Collider.GetMinCorner();
 
 		float maxStep = 0;
-		glm::vec3 maxDirection = glm::vec3(0);
+		maxDirection = glm::vec3(0);
 
-		for (int x = floor(minCorner.x); x <= floor(maxCorner.x); x++)
-			for (int y = floor(minCorner.y); y <= floor(maxCorner.y); y++)
-				for (int z = floor(minCorner.z); z <= floor(maxCorner.z); z++)
+		for (int x = (int)floor(minCorner.x); x <= (int)floor(maxCorner.x); x++)
+			for (int y = (int)floor(minCorner.y); y <= (int)floor(maxCorner.y); y++)
+				for (int z = (int)floor(minCorner.z); z <= (int)floor(maxCorner.z); z++)
 				{
-					AABB block({ x, y, z }, { 1, 1, 1 });
+					AABB block({ x, y, z }, { 0.5f, 0.5, 0.5f }, { 1, 1, 1 });
 					if (m_Collider.Intersects(block))
 					{
 						const glm::vec3 actualBlockPosition = glm::ivec3(x, y, z);
@@ -78,7 +76,6 @@ void Rigidbody::checkCollisions()
 						step = intersection / glm::abs(m_Velocity);
 
 
-						collided = true;
 						if (m_Velocity.x && step.x < std::min(step.y, step.z))
 							if (maxStep < step.x)
 							{
@@ -97,8 +94,6 @@ void Rigidbody::checkCollisions()
 								maxStep = step.z;
 								maxDirection = glm::vec3(0, 0, 1);
 							}
-						else
-							collided = false;
 					}
 				}
 		if (maxDirection == glm::vec3(0, 1, 0) && m_Velocity.y < 0)
@@ -106,5 +101,5 @@ void Rigidbody::checkCollisions()
 
 		m_Collider.Position -= m_Velocity * maxStep * maxDirection;
 		m_Velocity -= m_Velocity * maxDirection;
-	} while (collided);
+	} while (maxDirection != glm::vec3(0));
 }

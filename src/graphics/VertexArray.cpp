@@ -18,12 +18,12 @@ VertexArray::~VertexArray()
 	}
 }
 
-VertexArray::VertexArray(VertexArray &&other)
+VertexArray::VertexArray(VertexArray &&other) noexcept
 {
 	*this = std::move(other);
 }
 
-VertexArray& VertexArray::operator=(VertexArray &&other)
+VertexArray& VertexArray::operator=(VertexArray &&other) noexcept
 {
 	if (this != &other)
 	{
@@ -60,12 +60,13 @@ void VertexArray::Draw()
 
 	glBindVertexArray(m_Handle);
 	m_CurrentElementBuffer->Bind();
-	glDrawElements(GL_TRIANGLES, m_CurrentElementBuffer->Count() * 3, sizeof(size_t) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, m_CurrentElementBuffer->Count() * 3, sizeof(size_t) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, 0); //TODO: size_t is probably 8 bytes long, so it shouldnt be used here
 	CHECK_GL_ERROR();
 }
 
 void VertexArray::setup() 
 {
+	CHECK_GL_ERROR();
 	glGenVertexArrays(1, &m_Handle);
 	CHECK_GL_ERROR();
 }

@@ -1,9 +1,10 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include <world/Chunk.hpp>
 #include <world/ChunkMesh.hpp>
 #include <core/Renderer.hpp>
+
+#include <array>
 
 struct ChunkResources
 {
@@ -13,14 +14,15 @@ public:
 	ShaderProgram* OpaqueShader;
 	ShaderProgram* TransparentShader;
 
-	ChunkResources();
+	static ChunkResources& GetInstance();
 	bool IsOpen() const { return m_IsOpen; }
 private:
-	const char* c_TextureFilename = "Block.td";
-	const char* c_OpaqueShaderFilename = "ChunkOpaque.glsl";
-	const char* c_TransparentShaderFilename = "ChunkTransparent.glsl";
+	const char* c_TextureFilename = "block.td";
+	const char* c_OpaqueShaderFilename = "chunk-solid.shader";
+	const char* c_TransparentShaderFilename = "chunk-transparent.shader";
 
 	bool m_IsOpen;
+	ChunkResources();
 
 	bool setupTexture();
 	bool setupShaders();
@@ -33,16 +35,14 @@ public:
 
 	void SetHighlight(InChunkPos position);
 	void ResetHighlight();
-	void UpdateNeighbors(const BlockArray* neighbors[6]);
+	void UpdateNeighbors(const std::array<const BlockArray*, 6>& neighbors);
 	void UpdateGeometry();
 private:
-	static std::unique_ptr<ChunkResources> s_Resources;
-
+	glm::vec3 m_Position;
 	ChunkMesh m_OpaqueMesh,
 		m_TransparentMesh;
 	const BlockArray& m_BlockArray;
-	glm::vec3 m_Position;
-	const BlockArray* m_Neighbors[6];
+	std::array<const BlockArray*, 6> m_Neighbors;
 
 	InChunkPos m_HighlightedPosition;
 	bool m_AnythingHighlighted;

@@ -5,10 +5,10 @@
 #include <GL/GLU.h>
 #include <iostream>
 
-bool CheckGLError(GLenum code, const char* file, unsigned int line);
+bool CheckGLError(const char* file, unsigned int line);
 
 #ifdef OGL_DEBUG
-#define CHECK_GL_ERROR() CheckGLError(GLGetError(), __FILE__, __LINE__)
+#define CHECK_GL_ERROR() CheckGLError(__FILE__, __LINE__)
 #else
 #define CHECK_GL_ERROR() false
 #endif

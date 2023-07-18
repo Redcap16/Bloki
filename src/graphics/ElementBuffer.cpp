@@ -2,7 +2,8 @@
 
 ElementBuffer::ElementBuffer(bool dynamic) : 
 	m_Dynamic(dynamic),
-	m_Handle(0)
+	m_Handle(0),
+	m_IndicesCount(0)
 {
 	setup();
 }
@@ -45,6 +46,7 @@ void ElementBuffer::UpdateBuffer()
 {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Handle);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_Indices.size() * sizeof(size_t), m_Indices.data(), m_Dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+	m_IndicesCount = m_Indices.size();
 	CHECK_GL_ERROR();
 }
 

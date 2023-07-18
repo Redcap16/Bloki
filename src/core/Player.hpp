@@ -12,7 +12,7 @@
 class Player
 {
 public:
-	Player(BlockManager& world, Keyboard& keyboard, glm::ivec2 windowSize);
+	Player(BlockManager& world, Keyboard& keyboard, Mouse& mouse, glm::ivec2 windowSize);
 	Player(const Player&) = delete;
 	Player& operator=(const Player&) = delete;
 
@@ -26,7 +26,7 @@ public:
 	void MouseMoved(const glm::ivec2& position);
 	void MouseClicked(const glm::ivec2& position, bool leftButton);
 
-	void SetEyeCamera(std::shared_ptr<Camera3D> camera) { m_Camera = camera; };
+	void SetEyeCamera(Camera3D* camera) { m_Camera = camera; };
 
 private:
 	static constexpr glm::vec3 c_BodySize = {0.8f, 1.8f, 0.8f};
@@ -45,9 +45,10 @@ private:
 	glm::ivec2 m_WindowSize;
 
 	BlockManager& m_World;
-	std::shared_ptr<Camera3D> m_Camera;
+	Camera3D* m_Camera;
 
 	Keyboard& m_Keyboard;
+	Mouse& m_Mouse;
 
 	struct
 	{

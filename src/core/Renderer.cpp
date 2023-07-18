@@ -15,15 +15,15 @@ Renderer3D::RenderableRecord::RenderableRecord(Renderable* object, RenderablePar
 
 }
 
-bool Renderer3D::RenderableCompare::operator()(const std::unique_ptr<RenderableRecord>& a, const std::unique_ptr<RenderableRecord>& b) const
+bool Renderer3D::RenderableCompare::operator()(const RenderableRecord& a, const RenderableRecord& b) const
 {
-	if (!a->Params.Transparent && b->Params.Transparent)
+	if (!a.Params.Transparent && b.Params.Transparent)
 		return true;
-	else if (a->Params.Transparent && !b->Params.Transparent)
+	else if (a.Params.Transparent && !b.Params.Transparent)
 		return false;
 	else
 	{
-		return a->Params.UsedShader->GetHandle() < a->Params.UsedShader->GetHandle();
+		return a.Params.UsedShader->GetHandle() < a.Params.UsedShader->GetHandle();
 	}
 }
 
@@ -104,7 +104,7 @@ void Renderer3D::setupGL()
 
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
-	glEnable(GL_CULL_FACE);
+	//glEnable(GL_CULL_FACE);
 	glCullFace(GL_FRONT);
 
 	glEnable(GL_BLEND);

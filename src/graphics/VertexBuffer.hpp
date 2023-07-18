@@ -51,16 +51,15 @@ private:
 
 	bool m_Dynamic;
 
-	std::deque<TVertex> m_Vertices;
+	std::vector<TVertex> m_Vertices;
 
 	void setup();
 };
 
 template <typename TVertex>
 VertexBuffer<TVertex>::VertexBuffer(bool dynamic) :
-	m_Dynamic(dynamic)
-	m_Handle(0),
-	m_IndicesCount(0)
+	m_Dynamic(dynamic),
+	m_Handle(0)
 {
 	setup();
 }
@@ -106,7 +105,7 @@ VertexBuffer<TVertex>& VertexBuffer<TVertex>::operator=(VertexBuffer&& other) no
 template <typename TVertex>
 BufferHandle VertexBuffer<TVertex>::GetHandle() const
 {
-	return m_Handle);
+	return m_Handle;
 }
 
 template <typename TVertex>
@@ -118,7 +117,7 @@ void VertexBuffer<TVertex>::GetVertexAttributes(std::vector<VertexAttribute> &at
 template <typename TVertex>
 void VertexBuffer<TVertex>::AddVertex(const TVertex &vertex)
 {
-	m_Vertices.push_back(vertex)
+	m_Vertices.push_back(vertex);
 }
 
 template <typename TVertex>
@@ -136,15 +135,15 @@ void VertexBuffer<TVertex>::ClearData()
 template <typename TVertex>
 void VertexBuffer<TVertex>::UpdateBuffer()
 {
-	glBindBuffer(GL_VERTEX_BUFFER, m_Handle);
-	glBufferData(GL_VERTEX_BUFFER, m_Vertices.size() * sizeof(Vertex), m_Vertices.data(), dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, m_Handle);
+	glBufferData(GL_ARRAY_BUFFER, m_Vertices.size() * sizeof(TVertex), m_Vertices.data(), m_Dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
 	CHECK_GL_ERROR();
 }
 
 template <typename TVertex>
 size_t VertexBuffer<TVertex>::GetCurrentIndex()
 {
-	const size_t size = m_Vertices.size();
+	size_t size = m_Vertices.size();
 	if (size) size--; //To return an index of the last element
 	return size;
 }
@@ -152,7 +151,7 @@ size_t VertexBuffer<TVertex>::GetCurrentIndex()
 template <typename TVertex>
 void VertexBuffer<TVertex>::Bind() const
 {
-	glBindBuffer(GL_VERTEX_BUFFER, m_Handle);
+	glBindBuffer(GL_ARRAY_BUFFER, m_Handle);
 	CHECK_GL_ERROR();
 }
 

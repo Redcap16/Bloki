@@ -2,7 +2,6 @@
 
 #include <physics/AABB.hpp>
 #include <world/BlockManager.hpp>
-#include <ui/DebugBox.hpp>
 
 class Rigidbody
 {

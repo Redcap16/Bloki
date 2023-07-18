@@ -6,7 +6,7 @@ layout (location = 1) in vec2 aTexCoord;
 layout (location = 2) in float aLightLevel;
 layout (location = 3) in float aTransparency;
 		
-uniform mat4 mvpMatrix;
+uniform mat4 mvp;
 
 out vec2 TexCoord;		
 out float lightLevel;		
@@ -14,7 +14,7 @@ out float transparency;
 
 void main()
 {
-	gl_Position = mvpMatrix * vec4(aPos.x, aPos.y, aPos.z, 1.0);
+	gl_Position = mvp * vec4(aPos.x, aPos.y, aPos.z, 1.0);
 	//gl_Position = gl_ModelViewProjectionMatrix * vec4(aPos.x, aPos.y, aPos.z, 1.0);
 
 	TexCoord = aTexCoord;

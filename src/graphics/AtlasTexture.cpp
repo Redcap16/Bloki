@@ -218,4 +218,5 @@ void AtlasTexture::load()
 void AtlasTexture::unload()
 {
 	glDeleteTextures(1, &m_Handle);
+	CHECK_GL_ERROR();
 }
