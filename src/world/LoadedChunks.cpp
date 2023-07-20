@@ -1,5 +1,55 @@
 #include <world/LoadedChunks.hpp>
 
+LoadedChunks::LoadedChunk::LoadedChunk(std::shared_ptr<Chunk> data, std::shared_ptr<ChunkRenderer> renderer) :
+	CData(data),
+	CRenderer(renderer)
+{
+
+}
+
+LoadedChunks::LoadedChunk::LoadedChunk(LoadedChunk&& other) noexcept :
+	CData(std::move(other.CData)),
+	CRenderer(std::move(other.CRenderer))
+{
+
+}
+
+LoadedChunks::LoadedChunk& LoadedChunks::LoadedChunk::operator=(LoadedChunk&& other) noexcept
+{
+	if (this == &other)
+		return *this;
+
+	CData = std::move(other.CData);
+	CRenderer = std::move(other.CRenderer);
+
+	return *this;
+}
+
+LoadedChunks::UpdateRecord::UpdateRecord(std::weak_ptr<Chunk> data, std::weak_ptr<ChunkRenderer> renderer) :
+	CData(data),
+	CRenderer(renderer)
+{
+
+}
+
+LoadedChunks::UpdateRecord::UpdateRecord(UpdateRecord&& other) noexcept :
+	CData(std::move(other.CData)),
+	CRenderer(std::move(other.CRenderer))
+{
+
+}
+
+LoadedChunks::UpdateRecord& LoadedChunks::UpdateRecord::operator=(UpdateRecord&& other) noexcept
+{
+	if (this == &other)
+		return *this;
+
+	CData = std::move(other.CData);
+	CRenderer = std::move(other.CRenderer);
+
+	return *this;
+}
+
 LoadedChunks::LoadedChunks(Renderer3D& renderer, const std::string& savePath) :
 	m_Renderer(renderer),
 	m_FileLoader(savePath),
@@ -20,18 +70,18 @@ LoadedChunks::~LoadedChunks()
 	destroyThreads();
 }
 
-Block LoadedChunks::GetBlock(glm::ivec3 position) const
+Block LoadedChunks::GetBlock(WorldPos position) const
 {
-	const Chunk* const chunk = getChunk(position);
+	const LoadedChunk* const chunk = getLoadedChunk(Chunk::GetChunkPosition(position));
 	if (chunk == nullptr)
 		return Block::Air;
 
-	return chunk->GetBlock(Chunk::GetInChunkPosition(position));
+	return chunk->CData->GetBlock(Chunk::GetInChunkPosition(position));
 }
 
-bool LoadedChunks::PlaceBlock(glm::ivec3 position, Block block, bool force)
+bool LoadedChunks::PlaceBlock(WorldPos position, Block block, bool force)
 {
-	Chunk* const chunk = getChunk(position, true);
+	Chunk* const chunk = getChunk(Chunk::GetChunkPosition(position), true);
 	if (chunk == nullptr)
 		return false;
 
@@ -52,9 +102,9 @@ bool LoadedChunks::PlaceBlock(glm::ivec3 position, Block block, bool force)
 	}
 }
 
-void LoadedChunks::DestroyBlock(glm::ivec3 position)
+void LoadedChunks::DestroyBlock(WorldPos position)
 {
-	Chunk* const chunk = getChunk(position);
+	Chunk* const chunk = getChunk(Chunk::GetChunkPosition(position));
 	if (chunk == nullptr)
 		return;
 
@@ -63,12 +113,12 @@ void LoadedChunks::DestroyBlock(glm::ivec3 position)
 
 void LoadedChunks::Update()
 {
-	std::deque<std::weak_ptr<Chunk>> newQueue;
-	forEveryChunk([&newQueue](std::shared_ptr<Chunk>& chunk, const glm::ivec3& position)
+	std::deque<UpdateRecord> newQueue;
+	forEveryChunk([&newQueue](LoadedChunk& chunk, const glm::ivec3& position)
 		{
-			chunk->Update();
-			if (chunk->DoesNeedGeometryUpdate())
-				newQueue.push_back(chunk);
+			chunk.CData->Update();
+			if (chunk.CData->DoesNeedGeometryUpdate())
+				newQueue.push_back({ chunk.CData, chunk.CRenderer });
 		});
 
 	std::lock_guard<std::mutex> lock(m_UpdateQueueMutex);
@@ -77,13 +127,13 @@ void LoadedChunks::Update()
 		m_UpdateCondition.notify_one();
 }
 
-void LoadedChunks::SetHighlight(glm::ivec3 position)
+void LoadedChunks::SetHighlight(WorldPos position)
 {
-	m_ChunkWithHighlight = getChunk(position, false);
+	m_ChunkWithHighlight = getLoadedChunk(Chunk::GetChunkPosition(position));
 	if (m_ChunkWithHighlight == nullptr)
 		return;
 
-	m_ChunkWithHighlight->SetHighlight(position);
+	m_ChunkWithHighlight->CRenderer->SetHighlight(position);
 }
 
 void LoadedChunks::ResetHighlight()
@@ -91,7 +141,7 @@ void LoadedChunks::ResetHighlight()
 	if (m_ChunkWithHighlight == nullptr)
 		return;
 
-	m_ChunkWithHighlight->ResetHighlight();
+	m_ChunkWithHighlight->CRenderer->ResetHighlight();
 	m_ChunkWithHighlight = nullptr;
 }
 
@@ -117,37 +167,45 @@ LoadedChunks::ManagementTask& LoadedChunks::ManagementTask::operator=(Management
 	return *this;
 }
 
-const Chunk* LoadedChunks::getChunk(glm::ivec3 position) const
+const LoadedChunks::LoadedChunk* LoadedChunks::getLoadedChunk(ChunkPos position) const
 {
 	glm::ivec3 arrayIndex = getArrayIndex(position);
 	if (arrayIndexInBounds(arrayIndex))
-		return m_LoadedChunks[arrayIndex.x][arrayIndex.y][arrayIndex.z].get();
+		return &m_LoadedChunks[arrayIndex.x][arrayIndex.y][arrayIndex.z];
 
 	return nullptr;
 }
 
-Chunk* LoadedChunks::getChunk(glm::ivec3 position, bool force)
+LoadedChunks::LoadedChunk* LoadedChunks::getLoadedChunk(ChunkPos position)
 {
 	glm::ivec3 arrayIndex = getArrayIndex(position);
 	if (arrayIndexInBounds(arrayIndex))
-		return m_LoadedChunks[arrayIndex.x][arrayIndex.y][arrayIndex.z].get();
+		return &m_LoadedChunks[arrayIndex.x][arrayIndex.y][arrayIndex.z];
+
+	return nullptr;
+}
+
+Chunk* LoadedChunks::getChunk(ChunkPos position, bool force)
+{
+	glm::ivec3 arrayIndex = getArrayIndex(position);
+	if (arrayIndexInBounds(arrayIndex))
+		return m_LoadedChunks[arrayIndex.x][arrayIndex.y][arrayIndex.z].CData.get();
 
 	if (!force)
 		return nullptr;
 
-	ChunkPos chunkPos = Chunk::GetChunkPosition(position);
-	if (m_SubsidiaryChunks.find(chunkPos) != m_SubsidiaryChunks.end())
-		return m_SubsidiaryChunks.at(chunkPos).get();
+	if (m_SubsidiaryChunks.find(position) != m_SubsidiaryChunks.end())
+		return m_SubsidiaryChunks.at(position).get();
 
 	//It not exits, it should be created
-	m_SubsidiaryChunks[chunkPos] = std::make_unique<Chunk>(m_Renderer, chunkPos);
+	m_SubsidiaryChunks[position] = std::make_unique<Chunk>(m_Renderer, position);
 
-	if (m_FileLoader.IsPresent(chunkPos))
+	if (m_FileLoader.IsPresent(position))
 	{
-		m_FileLoader.LoadChunk(*m_SubsidiaryChunks[chunkPos]);
-		return m_SubsidiaryChunks.at(chunkPos).get();
+		m_FileLoader.LoadChunk(*m_SubsidiaryChunks[position]);
+		return m_SubsidiaryChunks.at(position).get();
 	}
-	return m_SubsidiaryChunks[chunkPos].get();
+	return m_SubsidiaryChunks[position].get();
 }
 
 void LoadedChunks::setupThreads()
@@ -188,15 +246,15 @@ void LoadedChunks::reloadChunks(ChunkPos newCenter)
 	std::lock_guard<std::mutex> lock(m_UpdateQueueMutex);
 	m_UpdateQueue.clear();
 
-	std::shared_ptr<Chunk> newLoadedChunks[c_LoadedSize.x][c_LoadedSize.y][c_LoadedSize.z];
+	LoadedChunk newLoadedChunks[c_LoadedSize.x][c_LoadedSize.y][c_LoadedSize.z];
 
-	forEveryChunk(newLoadedChunks, [&](std::shared_ptr<Chunk>& chunk, const glm::ivec3& position)
+	forEveryChunk(newLoadedChunks, [&](LoadedChunk& chunk, const glm::ivec3& position)
 		{
 			glm::ivec3 chunkPositionInOldArray = position + newCenter - m_CenterChunkPos;
 			if (arrayIndexInBounds(chunkPositionInOldArray))
 			{
-				std::shared_ptr<Chunk>& oldChunk = m_LoadedChunks[chunkPositionInOldArray.x][chunkPositionInOldArray.y][chunkPositionInOldArray.z];
-				if (oldChunk.get() == m_ChunkWithHighlight)
+				LoadedChunk& oldChunk = m_LoadedChunks[chunkPositionInOldArray.x][chunkPositionInOldArray.y][chunkPositionInOldArray.z];
+				if (&oldChunk == m_ChunkWithHighlight)
 					ResetHighlight();
 
 				chunk = std::move(oldChunk);
@@ -208,16 +266,16 @@ void LoadedChunks::reloadChunks(ChunkPos newCenter)
 			}
 		}); 
 
-	forEveryChunk([&](std::shared_ptr<Chunk>& chunk, const::glm::ivec3& position) 
+	forEveryChunk([&](LoadedChunk& chunk, const::glm::ivec3& position) 
 		{
-			if (chunk)
+			if (chunk.CData)
 				unloadChunk(std::move(chunk));
 			chunk = std::move(newLoadedChunks[position.x][position.y][position.z]);
 		});
 
-	forEveryChunk([&](std::shared_ptr<Chunk>& chunk, const glm::ivec3& position)
+	forEveryChunk([&](LoadedChunk& chunk, const glm::ivec3& position)
 		{
-			updateNeighbors(chunk.get());
+			updateNeighbors(chunk.CData.get());
 		});
 
 	addFlushTask(); //To flush saving all of the unloaded chunks
@@ -225,16 +283,18 @@ void LoadedChunks::reloadChunks(ChunkPos newCenter)
 
 void LoadedChunks::loadChunks()
 {
-	forEveryChunk([this](std::shared_ptr<Chunk>& chunk, const glm::ivec3& position)
+	forEveryChunk([this](LoadedChunk& chunk, const glm::ivec3& position)
 		{
 			chunk = std::move(loadChunk(position));
 		});
 
-	forEveryChunk([this](std::shared_ptr<Chunk>& chunk, const glm::ivec3& position)
+	forEveryChunk([this](LoadedChunk& chunk, const glm::ivec3& position)
 		{
-			updateNeighbors(chunk.get());
+			updateNeighbors(chunk.CData.get());
 		});
 }
+
+//TODO: UnloadChunks to unload and save them. And flush everything at end
 
 void LoadedChunks::updateNeighbors(Chunk* chunk)
 {
@@ -249,7 +309,7 @@ void LoadedChunks::updateNeighbors(Chunk* chunk)
 	chunk->UpdateNeighbors(neighbors);
 }
 
-std::shared_ptr<Chunk> LoadedChunks::loadChunk(ChunkPos position)
+LoadedChunks::LoadedChunk LoadedChunks::loadChunk(ChunkPos position)
 {
 	if (m_SubsidiaryChunks.find(position) != m_SubsidiaryChunks.end())
 	{
@@ -258,23 +318,24 @@ std::shared_ptr<Chunk> LoadedChunks::loadChunk(ChunkPos position)
 			addLoadTask(chunk);
 
 		m_SubsidiaryChunks.erase(position);
-		return std::move(chunk);
+		return { std::move(chunk), std::make_shared<ChunkRenderer>(m_Renderer, std::const_pointer_cast<const Chunk>(chunk)) };
 	}
 
 	std::shared_ptr<Chunk> newChunk = std::make_shared<Chunk>(m_Renderer, position);
 	addLoadTask(newChunk);
-	return std::move(newChunk);
+	return { std::move(newChunk), std::make_shared<ChunkRenderer>(m_Renderer,  std::const_pointer_cast<const Chunk>(newChunk)) };
 }
 
-void LoadedChunks::unloadChunk(std::shared_ptr<Chunk>&& chunk)
+void LoadedChunks::unloadChunk(LoadedChunk&& chunk)
 {
-	addSaveTask(std::move(chunk));
+	addSaveTask(std::move(chunk.CData));
 }
 
 void LoadedChunks::updateThreadLoop()
 {
 	while (!m_UpdateThreadDone)
 	{
+		//TODO: Change to unique_lock
 		m_UpdateQueueMutex.lock();
 		if (m_UpdateQueue.empty())
 		{
@@ -285,17 +346,20 @@ void LoadedChunks::updateThreadLoop()
 			continue;
 		}
 
-		std::shared_ptr<Chunk> chunk = m_UpdateQueue.front().lock();
+		std::shared_ptr<Chunk> chunk = m_UpdateQueue.front().CData.lock();
+		std::shared_ptr<ChunkRenderer> chunkRenderer = m_UpdateQueue.front().CRenderer.lock();
 		m_UpdateQueue.pop_front();
 		m_UpdateQueueMutex.unlock();
 
-		if (!chunk) //if it was deleted in meantime
+		if (!chunkRenderer ||
+			!chunk) //if it was deleted in meantime
 			continue;
 
 		if (!chunk->DoesNeedGeometryUpdate())
 			continue;
 
-		chunk->UpdateGeometry();
+		chunkRenderer->UpdateGeometry();
+		chunk->GeometryUpdated();
 	}
 }
 
@@ -303,6 +367,7 @@ void LoadedChunks::managementThreadLoop()
 {
 	while (!m_ManagementThreadDone)
 	{
+		//TODO: Change to unique_lock
 		m_ManagementQueueMutex.lock();
 		if (m_ManagementTaskQueue.empty())
 		{

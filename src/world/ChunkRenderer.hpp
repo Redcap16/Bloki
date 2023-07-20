@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include <world/ChunkMesh.hpp>
 #include <core/Renderer.hpp>
+#include <world/Chunk.hpp>
 
 #include <array>
 
@@ -31,23 +32,27 @@ private:
 class ChunkRenderer
 {
 public:
-	ChunkRenderer(Renderer3D& renderer, const BlockArray& blockArray, const glm::vec3& position);
+	ChunkRenderer(Renderer3D& renderer, std::shared_ptr<const Chunk> chunk);
 
 	void SetHighlight(InChunkPos position);
 	void ResetHighlight();
-	void UpdateNeighbors(const std::array<const BlockArray*, 6>& neighbors);
+
+	const Chunk* GetChunk() const { return m_Chunk.get(); }
+
 	void UpdateGeometry();
 private:
 	glm::vec3 m_Position;
 	ChunkMesh m_OpaqueMesh,
 		m_TransparentMesh;
-	const BlockArray& m_BlockArray;
-	std::array<const BlockArray*, 6> m_Neighbors;
+
+	const std::array<const Chunk*, 6>& m_Neighbors;
+	std::shared_ptr<const Chunk> m_Chunk;
+	Chunk::BlockAccess<const BlockArray>* m_CurrentBlockAccess;
 
 	InChunkPos m_HighlightedPosition;
 	bool m_AnythingHighlighted;
 
 	void processBlock(InChunkPos position);
 	bool isBlockVisible(InChunkPos position, Direction direction);
-	const BlockArray* getNeighbor(glm::ivec3 position);
+	const Chunk* getNeighbor(glm::ivec3 position) const;
 };

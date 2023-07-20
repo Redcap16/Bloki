@@ -8,7 +8,7 @@ Player::Player(BlockManager& world, Keyboard& keyboard, Mouse& mouse, glm::ivec2
 	m_WindowSize(windowSize),
 	m_Mouse(mouse)
 {
-
+	setFlying(true);
 }
 
 void Player::Update(float deltaTime)
@@ -81,9 +81,13 @@ void Player::MouseMoved(const glm::ivec2& position)
 {
 	m_Mouse.SetMousePosition(m_WindowSize / 2);
 
-	const glm::ivec2 delta = position - m_WindowSize / 2;
+	glm::ivec2 delta = position - m_WindowSize / 2;
+	delta.y = -delta.y;
 	m_Rotation += (glm::vec2)delta * c_MouseSensitivity;
-	m_Rotation = { Math::Mod(m_Rotation.x, 360.0f), Math::Mod(m_Rotation.y + 90, 180.0f) - 90 };
+
+	m_Rotation.x = Math::Mod(m_Rotation.x, 360.0f);
+	if (m_Rotation.y > 90) m_Rotation.y = 90;
+	if (m_Rotation.y < -90) m_Rotation.y = -90;
 
 	m_Camera->SetRotation(m_Rotation.x, m_Rotation.y);
 	updateHighlightment();

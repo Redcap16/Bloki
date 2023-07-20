@@ -55,7 +55,7 @@ void ChunkMesh::AddFace(Direction dir, InChunkPos position, Block block, BlockSt
 	for (int i = 0; i < 4; i++)
 	{
 		const unsigned int vertexIndex = faceIndices[(unsigned int)dir][i];
-		vertex.Position = faceVertices[vertexIndex].Position + position;
+		vertex.Position = (InChunkPos)faceVertices[vertexIndex].Position + position;
 
 		vertex.TextureCoords = subTexture.UV;
 		vertex.TextureCoords += faceVertices[vertexIndex].TexCoords * subTexture.Size;
@@ -66,21 +66,16 @@ void ChunkMesh::AddFace(Direction dir, InChunkPos position, Block block, BlockSt
 		m_MeshVBO.AddVertex(vertex);
 	}
 
-	const size_t index = m_MeshVBO.GetCurrentIndex();
+	const ElementIndex index = (ElementIndex)m_MeshVBO.GetCurrentIndex();
 
 	//Add two faces
-	m_MeshEBO.AddIndex(index - 4);
-	m_MeshEBO.AddIndex(index - 2);
 	m_MeshEBO.AddIndex(index - 3);
-
-	m_MeshEBO.AddIndex(index - 2);
 	m_MeshEBO.AddIndex(index - 1);
-	m_MeshEBO.AddIndex(index - 3);
-}
+	m_MeshEBO.AddIndex(index - 2);
 
-void ChunkMesh::FinishGeometry()
-{
-	m_GeometryFinished = true;
+	m_MeshEBO.AddIndex(index - 1);
+	m_MeshEBO.AddIndex(index - 0);
+	m_MeshEBO.AddIndex(index - 2);
 }
 
 glm::mat4 ChunkMesh::GetModelMatrix() const

@@ -17,7 +17,7 @@ public:
 	ChunkMesh(glm::vec3& position, const AtlasTexture::SubTexture (&textureCoords)[Block::c_BlockCount]);
 
 	void AddFace(Direction dir, InChunkPos position, Block block, BlockState state);
-	void FinishGeometry();
+	void FinishGeometry() { m_GeometryFinished = true; }
 	
 	glm::mat4 GetModelMatrix() const override;
 	void Render(const RenderingContext& context) override;

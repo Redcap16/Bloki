@@ -9,6 +9,7 @@ ResourceManager::ResourceManager()
 
 ResourceManager::~ResourceManager()
 {
+	FreeResources();
 	s_Instance = nullptr;
 }
 
@@ -40,4 +41,11 @@ ImageTexture* ResourceManager::GetImageTexture(std::string fileName)
 		m_ImageTextures[fileName] = std::make_unique<ImageTexture>(fileName, true);
 
 	return m_ImageTextures[fileName].get();
+}
+
+void ResourceManager::FreeResources()
+{
+	m_ShaderPrograms.clear();
+	m_AtlasTextures.clear();
+	m_ImageTextures.clear();
 }

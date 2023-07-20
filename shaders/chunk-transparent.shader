@@ -38,4 +38,6 @@ void main()
 	if (lightLevel > 0)
 		FragColor = mix(FragColor, vec4(1, 1, 1, 1), lightLevel);
 	FragColor.a = transparency;
+	
+	FragColor = vec4(0, 0, 1, 1);
 }

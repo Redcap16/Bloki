@@ -3,6 +3,8 @@
 #include <world/Chunk.hpp>
 #include <string>
 #include <fstream>
+#include <unordered_map>
+
 #include <zlib.h>
 
 class ChunkFileLoader

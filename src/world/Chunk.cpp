@@ -2,29 +2,11 @@
 
 Chunk::Chunk(Renderer3D& renderer, const ChunkPos& position) :
 	m_Position(position),
-	m_ChunkRenderer(renderer, m_BlockArray, (glm::vec3)(position * (glm::ivec3)BlockArray::ChunkSize)),
-	m_AnythingHighlighted(false),
 	m_GeometryUpdateNeeded(false),
 	m_Generated(false),
-	m_HighlightedPosition(glm::ivec3()),
 	m_Neighbors()
 {
 
-}
-
-void Chunk::SetHighlight(InChunkPos position)
-{
-	std::lock_guard<std::mutex> lock(m_GeometryMutex);
-	m_HighlightedPosition = position;
-	m_AnythingHighlighted = true;
-	m_GeometryUpdateNeeded = true;
-}
-
-void Chunk::ResetHighlight()
-{
-	std::lock_guard<std::mutex> lock(m_GeometryMutex);
-	m_AnythingHighlighted = false;
-	m_GeometryUpdateNeeded = true;
 }
 
 void Chunk::SetBlock(InChunkPos position, Block block)
@@ -34,7 +16,7 @@ void Chunk::SetBlock(InChunkPos position, Block block)
 	m_GeometryUpdateNeeded = true;
 }
 
-const Block& Chunk::GetBlock(InChunkPos position) const
+Block Chunk::GetBlock(InChunkPos position) const
 {
 	std::lock_guard<std::mutex> lock(m_GeometryMutex);
 	return m_BlockArray.Get(position);
@@ -54,30 +36,16 @@ void Chunk::Update()
 
 void Chunk::UpdateNeighbors(const std::array<Chunk*, 6>& neighbors)
 {
-	std::array<const BlockArray*, 6>neighborsArrays;
+	std::lock_guard<std::mutex> lock(m_GeometryMutex);
+
 	for (int i = 0; i < 6; i++)
-	{
 		if (m_Neighbors[i] != neighbors[i])
 		{
+			assert(neighbors[i] != this); //Important, otherwise double locking mutex error occurs
 			m_Neighbors[i] = neighbors[i];
 			m_Neighbors[i]->m_GeometryUpdateNeeded = true;
 			m_GeometryUpdateNeeded = true;
 		}
-		neighborsArrays[i] = &neighbors[i]->m_BlockArray;
-	}
-
-	m_ChunkRenderer.UpdateNeighbors(neighborsArrays);
-}
-
-void Chunk::UpdateGeometry()
-{
-	if (m_GeometryUpdateNeeded)
-	{
-		std::lock_guard<std::mutex> lock(m_GeometryMutex);
-		m_ChunkRenderer.UpdateGeometry();
-
-		m_GeometryUpdateNeeded = false;
-	}
 }
 
 void Chunk::AddDroppedItem(std::unique_ptr<DroppedItem> item)

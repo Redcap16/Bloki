@@ -102,7 +102,7 @@ void ShaderProgram::SetUniform(UniformLocation location, const glm::mat4& value)
 	if (location == INVALID_UNIFORM_LOCATION)
 		return;
 
-	glUniform4fv(location, 1, glm::value_ptr(value));
+	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
 	CHECK_GL_ERROR();
 }
 

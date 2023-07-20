@@ -1,6 +1,7 @@
 #pragma once
 
 #include <world/Chunk.hpp>
+#include <world/ChunkRenderer.hpp>
 #include <world/ChunkGenerator.hpp>
 #include <world/BlockManager.hpp>
 #include <world/ChunkFileLoader.hpp>
@@ -21,27 +22,50 @@ public:
 	LoadedChunks(const LoadedChunks&) = delete;
 	LoadedChunks& operator=(const LoadedChunks&) = delete;
 
-	Block GetBlock(glm::ivec3 position) const override;
-	bool PlaceBlock(glm::ivec3 position, Block block, bool force = false) override;
-	void DestroyBlock(glm::ivec3 position) override;
+	Block GetBlock(WorldPos position) const override;
+	bool PlaceBlock(WorldPos position, Block block, bool force = false) override;
+	void DestroyBlock(WorldPos position) override;
 
 	void Update();
 
-	void SetHighlight(glm::ivec3 position);
+	void SetHighlight(WorldPos position);
 	void ResetHighlight();
 
-	void SetCenter(glm::ivec3 position);
+	void SetCenter(WorldPos position);
 
 private:
+	struct LoadedChunk
+	{
+		std::shared_ptr<Chunk> CData;
+		std::shared_ptr<ChunkRenderer> CRenderer;
+		LoadedChunk() {};
+		LoadedChunk(std::shared_ptr<Chunk> data, std::shared_ptr<ChunkRenderer> renderer);
+		~LoadedChunk() = default;
+		LoadedChunk(const LoadedChunk&) = default;
+		LoadedChunk& operator=(const LoadedChunk&) = default;
+		LoadedChunk(LoadedChunk&& other) noexcept;
+		LoadedChunk& operator=(LoadedChunk&& other) noexcept;
+	};
+
 	static const int c_LoadingRadius = 5;
 	static constexpr glm::ivec3 c_LoadedSize = { c_LoadingRadius * 2 + 1, 3, c_LoadingRadius * 2 + 1 };
 
-	std::shared_ptr<Chunk> m_LoadedChunks[c_LoadedSize.x][c_LoadedSize.y][c_LoadedSize.z] = { nullptr };
+	LoadedChunk m_LoadedChunks[c_LoadedSize.x][c_LoadedSize.y][c_LoadedSize.z];
 	ChunkPos m_CenterChunkPos;
 
 	std::unordered_map<ChunkPos, std::unique_ptr<Chunk>> m_SubsidiaryChunks;
 
-	std::deque<std::weak_ptr<Chunk>> m_UpdateQueue;
+	struct UpdateRecord
+	{
+		std::weak_ptr<Chunk> CData;
+		std::weak_ptr<ChunkRenderer> CRenderer;
+		
+		UpdateRecord(std::weak_ptr<Chunk> data, std::weak_ptr<ChunkRenderer> renderer);
+		UpdateRecord(UpdateRecord&& other) noexcept;
+		UpdateRecord& operator=(UpdateRecord&& other) noexcept;
+	};
+
+	std::deque<UpdateRecord> m_UpdateQueue;
 	std::mutex m_UpdateQueueMutex;
 	std::thread m_UpdateThread;
 	std::condition_variable m_UpdateCondition;
@@ -76,12 +100,13 @@ private:
 	ChunkFileLoader m_FileLoader;
 	ChunkGenerator m_ChunkGenerator;
 
-	Chunk* m_ChunkWithHighlight;
+	LoadedChunk* m_ChunkWithHighlight;
 
-	inline glm::ivec3 getArrayIndex(glm::ivec3 position) const;
+	inline glm::ivec3 getArrayIndex(ChunkPos position) const;
 	inline bool arrayIndexInBounds(glm::ivec3 index) const;
-	const Chunk* getChunk(glm::ivec3 position) const;
-	Chunk* getChunk(glm::ivec3 position, bool force = false);
+	const LoadedChunk* getLoadedChunk(ChunkPos position) const; 
+	LoadedChunk* getLoadedChunk(ChunkPos position);
+	Chunk* getChunk(ChunkPos position, bool force = false);
 
 	void setupThreads();
 	void destroyThreads();
@@ -90,8 +115,8 @@ private:
 	void loadChunks();
 
 	void updateNeighbors(Chunk* chunk);
-	std::shared_ptr<Chunk> loadChunk(ChunkPos position);
-	void unloadChunk(std::shared_ptr<Chunk>&& chunk);
+	LoadedChunk loadChunk(ChunkPos position);
+	void unloadChunk(LoadedChunk&& chunk);
 
 	void updateThreadLoop();
 	void managementThreadLoop();
@@ -104,12 +129,12 @@ private:
 	inline void forEveryChunk(Operation op);
 
 	template <class Operation>
-	void forEveryChunk(std::shared_ptr<Chunk> (&array)[c_LoadedSize.x][c_LoadedSize.y][c_LoadedSize.z], Operation op) const;
+	void forEveryChunk(LoadedChunk (&array)[c_LoadedSize.x][c_LoadedSize.y][c_LoadedSize.z], Operation op) const;
 };
 
-glm::ivec3 LoadedChunks::getArrayIndex(glm::ivec3 position) const
+glm::ivec3 LoadedChunks::getArrayIndex(ChunkPos position) const
 {
-	return Chunk::GetChunkPosition(position) - m_CenterChunkPos + ((glm::ivec3)c_LoadedSize - glm::ivec3(1, 1, 1)) / 2;
+	return position - m_CenterChunkPos + ((glm::ivec3)c_LoadedSize - glm::ivec3(1, 1, 1)) / 2;
 }
 
 bool LoadedChunks::arrayIndexInBounds(glm::ivec3 index) const
@@ -126,7 +151,7 @@ void LoadedChunks::forEveryChunk(Operation op)
 }
 
 template <class Operation>
-void LoadedChunks::forEveryChunk(std::shared_ptr<Chunk>(&array)[c_LoadedSize.x][c_LoadedSize.y][c_LoadedSize.z], Operation op) const
+void LoadedChunks::forEveryChunk(LoadedChunk(&array)[c_LoadedSize.x][c_LoadedSize.y][c_LoadedSize.z], Operation op) const
 {
 	for (int x = 0; x < c_LoadedSize.x; x++)
 		for (int y = 0; y < c_LoadedSize.y; y++)

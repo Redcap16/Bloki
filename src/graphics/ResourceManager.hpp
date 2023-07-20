@@ -18,6 +18,8 @@ public:
 	AtlasTexture* GetAtlasTexture(std::string name);
 	ImageTexture* GetImageTexture(std::string fileName);
 
+	void FreeResources();
+
 private:
 	static ResourceManager* s_Instance;
 

@@ -43,12 +43,13 @@ uniform sampler2D textureAtlas;
 
 void main()
 {
-	FragColor = texture(textureAtlas, TexCoord);
-	if(FragColor.a < 0.1)
-		discard;
+	//FragColor = texture(textureAtlas, TexCoord);
+	//if(FragColor.a < 0.1)
+	//	discard;
 		
-	FragColor = vec4(vec3(FragColor) * cosTheta, FragColor.a);
+	//FragColor = vec4(vec3(FragColor) * cosTheta, FragColor.a);
 	
-	if (State == 1)
-		FragColor = mix(FragColor, vec4(1, 1, 1, 1), 0.1);
+	//if (State == 1)
+	//	FragColor = mix(FragColor, vec4(1, 1, 1, 1), 0.1);
+	FragColor = vec4(1, 0, 0, 1);
 }

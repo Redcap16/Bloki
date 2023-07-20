@@ -4,6 +4,7 @@ Camera3D::Camera3D(glm::ivec2 windowSize) :
 	m_AspectRatio((float)windowSize.x / windowSize.y)
 {
 	updateProjectionMatrix();
+	updateDirection();
 	updateViewMatrix();
 }
 

@@ -9,6 +9,8 @@
 #include <graphics/Buffer.hpp>
 #include <graphics/ErrorCheck.hpp>
 
+typedef unsigned int ElementIndex;
+
 class ElementBuffer
 {
 public:
@@ -20,8 +22,8 @@ public:
 	ElementBuffer& operator=(ElementBuffer &&other) noexcept;
 
 
-	inline void AddIndex(size_t index);
-	inline void AddIndices(std::vector<size_t> indices);
+	inline void AddIndex(ElementIndex index);
+	inline void AddIndices(std::vector<ElementIndex> indices);
 	inline BufferHandle GetHandle() const;
 	void UpdateBuffer();
 	void ClearData();
@@ -32,17 +34,17 @@ private:
 	bool m_Dynamic;
 	size_t m_IndicesCount;
 
-	std::vector<size_t> m_Indices;
+	std::vector<ElementIndex> m_Indices;
 	
 	void setup();
 };
 
-void ElementBuffer::AddIndex(size_t index)
+void ElementBuffer::AddIndex(ElementIndex index)
 {
 	m_Indices.push_back(index);
 }
 
-void ElementBuffer::AddIndices(std::vector<size_t> indices)
+void ElementBuffer::AddIndices(std::vector<ElementIndex> indices)
 {
 	m_Indices.insert(m_Indices.end(), indices.begin(), indices.end());
 }

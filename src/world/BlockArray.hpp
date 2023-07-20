@@ -2,8 +2,9 @@
 
 #include <world/Block.hpp>
 #include <stdexcept>
+#include <mutex>
 
-typedef glm::uvec3 InChunkPos;
+typedef glm::ivec3 InChunkPos;
 
 struct BlockArray
 {
@@ -39,7 +40,7 @@ constexpr bool BlockArray::PositionOnBorder(InChunkPos position)
 
 constexpr bool BlockArray::PositionInBounds(InChunkPos position)
 {
-	return position.x < ChunkSize.x &&
-		position.y < ChunkSize.y &&
-		position.z < ChunkSize.z;
+	return position.x > 0 && position.x < ChunkSize.x &&
+		position.y > 0 && position.y < ChunkSize.y &&
+		position.z > 0 && position.z < ChunkSize.z;
 }
