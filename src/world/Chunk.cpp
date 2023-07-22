@@ -14,6 +14,34 @@ void Chunk::SetBlock(InChunkPos position, Block block)
 	std::lock_guard<std::mutex> lock(m_GeometryMutex);
 	m_BlockArray.Set(position, block);
 	m_GeometryUpdateNeeded = true;
+
+	if (BlockArray::PositionOnBorder(position))
+	{
+		if (position.x == 0)
+		{
+			if (m_Neighbors[(unsigned int)Direction::Left] != nullptr) m_Neighbors[(unsigned int)Direction::Left]->m_GeometryUpdateNeeded = true;
+		}
+		else if (position.x == BlockArray::ChunkSize.x - 1)
+		{
+			if (m_Neighbors[(unsigned int)Direction::Right] != nullptr) m_Neighbors[(unsigned int)Direction::Right]->m_GeometryUpdateNeeded = true;
+		}
+		if (position.y == 0)
+		{
+			if (m_Neighbors[(unsigned int)Direction::Bottom] != nullptr) m_Neighbors[(unsigned int)Direction::Bottom]->m_GeometryUpdateNeeded = true;
+		}
+		else if (position.y == BlockArray::ChunkSize.y - 1)
+		{
+			if (m_Neighbors[(unsigned int)Direction::Top] != nullptr) m_Neighbors[(unsigned int)Direction::Top]->m_GeometryUpdateNeeded = true;
+		}
+		if (position.z == 0)
+		{
+			if (m_Neighbors[(unsigned int)Direction::Back] != nullptr) m_Neighbors[(unsigned int)Direction::Back]->m_GeometryUpdateNeeded = true;
+		}
+		else if (position.z == BlockArray::ChunkSize.z - 1)
+		{
+			if (m_Neighbors[(unsigned int)Direction::Front] != nullptr) m_Neighbors[(unsigned int)Direction::Front]->m_GeometryUpdateNeeded = true;
+		}
+	}
 }
 
 Block Chunk::GetBlock(InChunkPos position) const
@@ -22,11 +50,14 @@ Block Chunk::GetBlock(InChunkPos position) const
 	return m_BlockArray.Get(position);
 }
 
-void Chunk::SwapBlockArray(BlockArray&& blockArray)
+void Chunk::SwapBlockArray(BlockArray& blockArray)
 {
 	std::lock_guard<std::mutex> lock(m_GeometryMutex);
-	m_BlockArray = std::move(blockArray);
+	m_BlockArray.Swap(blockArray);
 	m_GeometryUpdateNeeded = true;
+	for (int i = 0; i < 6; i++)
+		if (m_Neighbors[i])
+			m_Neighbors[i]->m_GeometryUpdateNeeded = true;
 }
 
 void Chunk::Update()
@@ -42,8 +73,10 @@ void Chunk::UpdateNeighbors(const std::array<Chunk*, 6>& neighbors)
 		if (m_Neighbors[i] != neighbors[i])
 		{
 			assert(neighbors[i] != this); //Important, otherwise double locking mutex error occurs
+
 			m_Neighbors[i] = neighbors[i];
-			m_Neighbors[i]->m_GeometryUpdateNeeded = true;
+			if (m_Neighbors[i] != nullptr)
+				m_Neighbors[i]->m_GeometryUpdateNeeded = true;
 			m_GeometryUpdateNeeded = true;
 		}
 }
@@ -95,7 +128,7 @@ void Chunk::checkItemsBoundaries()
 			&& m_Neighbors[(unsigned int)Direction::Front] != nullptr)
 			moveItem(*(m_Neighbors[(unsigned int)Direction::Front]), m_DroppedItems.begin() + i);
 		else
-			i++;
+			i++; //TODO: Rewrite
 	}
 }
 

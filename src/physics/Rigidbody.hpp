@@ -34,7 +34,8 @@ private:
 
 	static constexpr float c_Drag = 0.3f,
 		c_GroundFriction = 1.0f,
-		c_Gravity = 0.7f;
+		c_Gravity = 0.7f,
+		c_CollisionCorrection = 1.001f;
 
 	const BlockManager& m_World;
 

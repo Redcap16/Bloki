@@ -19,6 +19,7 @@ public:
 	void Update(float deltaTime);
 
 	const glm::vec3& GetPosition() const { return m_Rigidbody.GetPosition(); };
+	void SetPosition(const glm::vec3& position);
 
 	void SetWindowSize(const glm::ivec2& windowSize) { m_WindowSize = windowSize; };
 	void KeyPressed(char key);
@@ -32,7 +33,7 @@ private:
 	static constexpr glm::vec3 c_BodySize = {0.8f, 1.8f, 0.8f};
 	static constexpr glm::vec3 c_BodyCenter = { 0, -0.8f, 0 };
 	static constexpr float c_MouseSensitivity = 0.1f,
-		c_MoveSpeed = 0.1f,
+		c_MoveSpeed = 0.8f,
 		c_MoveSpeedInAir = 0.2f * c_MoveSpeed,
 		c_WorkingDistance = 3,
 		c_JumpSpeed = 1.7f,

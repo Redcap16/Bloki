@@ -75,31 +75,36 @@ void Rigidbody::checkCollisions()
 
 						step = intersection / glm::abs(m_Velocity);
 
-
 						if (m_Velocity.x && step.x < std::min(step.y, step.z))
+						{
 							if (maxStep < step.x)
 							{
 								maxStep = step.x;
 								maxDirection = glm::vec3(1, 0, 0);
 							}
+						}
 						else if (m_Velocity.y && step.y < std::min(step.x, step.z))
+						{
 							if (maxStep < step.y)
 							{
 								maxStep = step.y;
 								maxDirection = glm::vec3(0, 1, 0);
 							}
+						}
 						else if (m_Velocity.z && step.z < std::min(step.x, step.y)) //Experimental
+						{
 							if (maxStep < step.z)
 							{
 								maxStep = step.z;
 								maxDirection = glm::vec3(0, 0, 1);
 							}
+						}
 					}
 				}
 		if (maxDirection == glm::vec3(0, 1, 0) && m_Velocity.y < 0)
 			m_OnGround = true;
 
-		m_Collider.Position -= m_Velocity * maxStep * maxDirection;
+		m_Collider.Position -= m_Velocity * maxStep * maxDirection * c_CollisionCorrection;
 		m_Velocity -= m_Velocity * maxDirection;
 	} while (maxDirection != glm::vec3(0));
 }

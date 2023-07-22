@@ -33,6 +33,9 @@ class ChunkRenderer
 {
 public:
 	ChunkRenderer(Renderer3D& renderer, std::shared_ptr<const Chunk> chunk);
+	~ChunkRenderer();
+	ChunkRenderer(const ChunkRenderer&) = delete;
+	ChunkRenderer& operator=(const ChunkRenderer&) = delete;
 
 	void SetHighlight(InChunkPos position);
 	void ResetHighlight();
@@ -41,6 +44,8 @@ public:
 
 	void UpdateGeometry();
 private:
+	Renderer3D& m_Renderer;
+
 	glm::vec3 m_Position;
 	ChunkMesh m_OpaqueMesh,
 		m_TransparentMesh;
@@ -52,7 +57,7 @@ private:
 	InChunkPos m_HighlightedPosition;
 	bool m_AnythingHighlighted;
 
-	void processBlock(InChunkPos position);
-	bool isBlockVisible(InChunkPos position, Direction direction);
-	const Chunk* getNeighbor(glm::ivec3 position) const;
+	void processBlock(const InChunkPos& position);
+	bool isBlockVisible(Block block, const InChunkPos& position, Direction direction);
+	const Chunk* getNeighbor(const glm::ivec3& position) const;
 };

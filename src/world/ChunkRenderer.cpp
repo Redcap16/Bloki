@@ -69,7 +69,8 @@ ChunkRenderer::ChunkRenderer(Renderer3D& renderer, std::shared_ptr<const Chunk> 
 	m_AnythingHighlighted(false),
 	m_HighlightedPosition(glm::ivec3(0)),
 	m_Neighbors(chunk->GetNeighbors()),
-	m_CurrentBlockAccess(nullptr)
+	m_CurrentBlockAccess(nullptr),
+	m_Renderer(renderer)
 {
 	ChunkResources& resources = ChunkResources::GetInstance();
 	if (resources.IsOpen())
@@ -77,6 +78,12 @@ ChunkRenderer::ChunkRenderer(Renderer3D& renderer, std::shared_ptr<const Chunk> 
 		renderer.RegisterRenderable(&m_OpaqueMesh, RenderableParameters(false, resources.OpaqueShader, resources.BlockTexture));
 		renderer.RegisterRenderable(&m_TransparentMesh, RenderableParameters(true, resources.TransparentShader, resources.BlockTexture));
 	}
+}
+
+ChunkRenderer::~ChunkRenderer()
+{
+	m_Renderer.RemoveRenderable(&m_OpaqueMesh);
+	m_Renderer.RemoveRenderable(&m_TransparentMesh);
 }
 
 void ChunkRenderer::SetHighlight(InChunkPos position)
@@ -105,7 +112,7 @@ void ChunkRenderer::UpdateGeometry()
 	m_TransparentMesh.FinishGeometry();
 }
 
-void ChunkRenderer::processBlock(InChunkPos position)
+void ChunkRenderer::processBlock(const InChunkPos& position)
 {
 	assert(m_CurrentBlockAccess != nullptr);
 
@@ -113,11 +120,11 @@ void ChunkRenderer::processBlock(InChunkPos position)
 	for (int side = 0; side < 6; ++side)
 	{
 		if (block.Type != Block::Air &&
-			isBlockVisible(position, (Direction)side))
+			isBlockVisible(block, position, (Direction)side))
 		{
 			bool&& highlighted = m_AnythingHighlighted && position == m_HighlightedPosition;
 
-			if (block.GetTransparencyType() == TransparencyType::FullTransparency)
+			if (block.GetTransparencyType() == TransparencyType::PartialTransparency)
 				m_TransparentMesh.AddFace((Direction)side, position, block, { highlighted });
 			else 
 				m_OpaqueMesh.AddFace((Direction)side, position, block, { highlighted });
@@ -125,7 +132,7 @@ void ChunkRenderer::processBlock(InChunkPos position)
 	}
 }
 
-bool ChunkRenderer::isBlockVisible(InChunkPos position, Direction direction) 
+bool ChunkRenderer::isBlockVisible(Block block, const InChunkPos& position, Direction direction) 
 {
 	assert(m_CurrentBlockAccess != nullptr);
 
@@ -143,13 +150,14 @@ bool ChunkRenderer::isBlockVisible(InChunkPos position, Direction direction)
 		neighborBlock = neighbor->GetBlock(Math::Mod(neighborBlockPos, (glm::ivec3)BlockArray::ChunkSize));
 	}
 
-	if (neighborBlock.GetTransparencyType() == TransparencyType::Opaque)
+	if (neighborBlock.GetTransparencyType() == TransparencyType::Opaque || 
+		neighborBlock.Type == block.Type)
 		return false;
 
 	return true;
 }
 
-const Chunk* ChunkRenderer::getNeighbor(glm::ivec3 position) const
+const Chunk* ChunkRenderer::getNeighbor(const glm::ivec3& position) const
 {
 	if (position.x >= BlockArray::ChunkSize.x)
 		return m_Neighbors[(unsigned int)Direction::Right];

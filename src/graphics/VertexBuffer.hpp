@@ -11,9 +11,10 @@
 
 struct VertexAttribute
 {
+	size_t offset;
 	GLint size;
 	GLenum type;
-	VertexAttribute(GLint size, GLenum type);
+	VertexAttribute(size_t offset, GLint size, GLenum type);
 };
 
 class AbstractVertexBuffer

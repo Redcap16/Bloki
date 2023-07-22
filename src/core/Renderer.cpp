@@ -77,7 +77,10 @@ void Renderer3D::RenderScene()
 		sortRenderList();
 		
 	RenderableParameters* lastParams = nullptr;
-	for (RenderableRecord record : m_Renderables)
+
+	//glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	for (RenderableRecord& record : m_Renderables)
 	{
 		if (lastParams == nullptr ||
 			lastParams->UsedShader->GetHandle() != record.Params.UsedShader->GetHandle())
@@ -85,6 +88,8 @@ void Renderer3D::RenderScene()
 		if (lastParams == nullptr ||
 			lastParams->UsedTexture->GetHandle() != record.Params.UsedTexture->GetHandle())
 			record.Params.UsedTexture->Bind(0);
+		//if ((lastParams == nullptr || !lastParams->Transparent) && record.Params.Transparent)
+			//glDisable(GL_DEPTH_TEST);
 
 		record.Params.UsedShader->SetMVPMatrix(m_CurrentCamera3D->GetCameraMatrix() * record.Object->GetModelMatrix());
 		record.Object->Render(m_Context);

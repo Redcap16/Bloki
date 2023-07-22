@@ -70,6 +70,15 @@ LoadedChunks::~LoadedChunks()
 	destroyThreads();
 }
 
+bool LoadedChunks::IsLoaded(WorldPos position)
+{
+	const LoadedChunk* const chunk = getLoadedChunk(Chunk::GetChunkPosition(position));
+	if (chunk == nullptr)
+		return false;
+	
+	return chunk->CData->IsGenerated();
+}
+
 Block LoadedChunks::GetBlock(WorldPos position) const
 {
 	const LoadedChunk* const chunk = getLoadedChunk(Chunk::GetChunkPosition(position));
@@ -113,6 +122,8 @@ void LoadedChunks::DestroyBlock(WorldPos position)
 
 void LoadedChunks::Update()
 {
+	freeUnusedRenderers();
+
 	std::deque<UpdateRecord> newQueue;
 	forEveryChunk([&newQueue](LoadedChunk& chunk, const glm::ivec3& position)
 		{
@@ -145,11 +156,12 @@ void LoadedChunks::ResetHighlight()
 	m_ChunkWithHighlight = nullptr;
 }
 
-void LoadedChunks::SetCenter(glm::ivec3 position)
+void LoadedChunks::SetCenter(WorldPos position)
 {
 	const ChunkPos newCenter = Chunk::GetChunkPosition(position);
+	if (newCenter == m_CenterChunkPos)
+		return;
 	reloadChunks(newCenter);
-	m_CenterChunkPos = newCenter;
 }
 
 LoadedChunks::ManagementTask::ManagementTask(ManagementTask&& other) noexcept : 
@@ -243,7 +255,8 @@ void LoadedChunks::destroyThreads()
 
 void LoadedChunks::reloadChunks(ChunkPos newCenter)
 {
-	std::lock_guard<std::mutex> lock(m_UpdateQueueMutex);
+	std::lock_guard<std::mutex> uLock(m_UpdateQueueMutex);
+	std::lock_guard<std::mutex> mLock(m_ManagementMutex);
 	m_UpdateQueue.clear();
 
 	LoadedChunk newLoadedChunks[c_LoadedSize.x][c_LoadedSize.y][c_LoadedSize.z];
@@ -273,6 +286,8 @@ void LoadedChunks::reloadChunks(ChunkPos newCenter)
 			chunk = std::move(newLoadedChunks[position.x][position.y][position.z]);
 		});
 
+	m_CenterChunkPos = newCenter;
+
 	forEveryChunk([&](LoadedChunk& chunk, const glm::ivec3& position)
 		{
 			updateNeighbors(chunk.CData.get());
@@ -283,9 +298,11 @@ void LoadedChunks::reloadChunks(ChunkPos newCenter)
 
 void LoadedChunks::loadChunks()
 {
+	std::lock_guard<std::mutex> lock(m_ManagementMutex);
+
 	forEveryChunk([this](LoadedChunk& chunk, const glm::ivec3& position)
 		{
-			chunk = std::move(loadChunk(position));
+			chunk = std::move(loadChunk(position + m_CenterChunkPos - (c_LoadedSize - glm::ivec3(1, 1, 1)) / 2));
 		});
 
 	forEveryChunk([this](LoadedChunk& chunk, const glm::ivec3& position)
@@ -331,6 +348,12 @@ void LoadedChunks::unloadChunk(LoadedChunk&& chunk)
 	addSaveTask(std::move(chunk.CData));
 }
 
+void LoadedChunks::freeUnusedRenderers()
+{
+	std::lock_guard<std::mutex> freeingLock(m_FreeingMutex);
+	m_ChunkRenderersToFree.clear();
+}
+
 void LoadedChunks::updateThreadLoop()
 {
 	while (!m_UpdateThreadDone)
@@ -356,10 +379,17 @@ void LoadedChunks::updateThreadLoop()
 			continue;
 
 		if (!chunk->DoesNeedGeometryUpdate())
+		{
+			std::lock_guard<std::mutex> freeingLock(m_FreeingMutex);
+			m_ChunkRenderersToFree.push_back(chunkRenderer);
 			continue;
+		}
 
 		chunkRenderer->UpdateGeometry();
 		chunk->GeometryUpdated();
+
+		std::lock_guard<std::mutex> freeingLock(m_FreeingMutex);
+		m_ChunkRenderersToFree.push_back(chunkRenderer);
 	}
 }
 
@@ -382,6 +412,7 @@ void LoadedChunks::managementThreadLoop()
 
 		m_ManagementQueueMutex.unlock();
 
+		std::lock_guard<std::mutex> lock(m_ManagementMutex);
 		switch (task.Type)
 		{
 		case ManagementTask::Load:

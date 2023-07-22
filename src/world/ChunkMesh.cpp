@@ -59,6 +59,7 @@ void ChunkMesh::AddFace(Direction dir, InChunkPos position, Block block, BlockSt
 
 		vertex.TextureCoords = subTexture.UV;
 		vertex.TextureCoords += faceVertices[vertexIndex].TexCoords * subTexture.Size;
+		//vertex.TextureCoords = glm::ivec2(1, 1);
 
 		vertex.Normal = faceNormals[(unsigned int)dir];
 

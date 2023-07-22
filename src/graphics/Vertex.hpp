@@ -5,6 +5,8 @@
 
 #include <graphics/VertexBuffer.hpp>
 
+//TODO: Struct packing
+
 struct Vertex2D
 {
 	glm::vec2 Position;
@@ -25,8 +27,8 @@ struct Vertex3D
 
 struct Vertex3DS
 {
-	glm::vec<3, int8_t> Position;
 	glm::vec2 TextureCoords;
+	glm::vec<3, int8_t> Position;
 	glm::vec<3, int8_t> Normal;
 	uint8_t state;
 

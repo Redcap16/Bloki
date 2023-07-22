@@ -16,6 +16,6 @@ public:
 private:
 	BlockManager& m_World;
 
-	void generateTree(Chunk& chunk, glm::ivec3 givenChunkPosition, glm::ivec3 rootPosition);
-	void setStructureBlock(Chunk& chunk, const glm::ivec3& blockPosition, Block block);
+	void generateTree(BlockArray& chunk, const ChunkPos& givenChunkPosition, const WorldPos& rootPosition);
+	void setStructureBlock(BlockArray& chunk, const ChunkPos& givenChunkPosition, const WorldPos& blockPosition, Block block);
 };

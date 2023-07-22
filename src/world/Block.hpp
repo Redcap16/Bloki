@@ -5,6 +5,8 @@
 
 #include <graphics/AtlasTexture.hpp>
 
+typedef glm::ivec3 WorldPos;
+
 enum class TransparencyType
 {
 	Opaque,

@@ -22,6 +22,7 @@ public:
 	LoadedChunks(const LoadedChunks&) = delete;
 	LoadedChunks& operator=(const LoadedChunks&) = delete;
 
+	bool IsLoaded(WorldPos position) override;
 	Block GetBlock(WorldPos position) const override;
 	bool PlaceBlock(WorldPos position, Block block, bool force = false) override;
 	void DestroyBlock(WorldPos position) override;
@@ -52,6 +53,9 @@ private:
 
 	LoadedChunk m_LoadedChunks[c_LoadedSize.x][c_LoadedSize.y][c_LoadedSize.z];
 	ChunkPos m_CenterChunkPos;
+
+	std::mutex m_FreeingMutex;
+	std::vector<std::shared_ptr<ChunkRenderer>> m_ChunkRenderersToFree;
 
 	std::unordered_map<ChunkPos, std::unique_ptr<Chunk>> m_SubsidiaryChunks;
 
@@ -93,7 +97,8 @@ private:
 	std::deque<ManagementTask> m_ManagementTaskQueue;
 	std::condition_variable m_ManagementQueueEmpty;
 	std::mutex m_ManagementQueueMutex,
-		m_ManagementConditionMutex;
+		m_ManagementConditionMutex,
+		m_ManagementMutex;
 	std::atomic<bool> m_ManagementThreadDone;
 
 	Renderer3D& m_Renderer;
@@ -117,6 +122,8 @@ private:
 	void updateNeighbors(Chunk* chunk);
 	LoadedChunk loadChunk(ChunkPos position);
 	void unloadChunk(LoadedChunk&& chunk);
+
+	void freeUnusedRenderers();
 
 	void updateThreadLoop();
 	void managementThreadLoop();

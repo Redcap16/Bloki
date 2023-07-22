@@ -14,7 +14,6 @@
 #include <entity/DroppedItem.hpp>
 
 typedef glm::ivec3 ChunkPos;
-typedef glm::ivec3 WorldPos;
 
 class Chunk
 {
@@ -46,7 +45,7 @@ public:
 
 	void SetBlock(InChunkPos position, Block block);
 	Block GetBlock(InChunkPos position) const;
-	void SwapBlockArray(BlockArray&& blockArray);
+	void SwapBlockArray(BlockArray& blockArray);
 	BlockAccess<BlockArray> GetBlockAccess() { return BlockAccess<BlockArray>(m_BlockArray, m_GeometryMutex); }
 	BlockAccess<const BlockArray> GetBlockAccess() const { return BlockAccess<const BlockArray>(m_BlockArray, m_GeometryMutex); }
 

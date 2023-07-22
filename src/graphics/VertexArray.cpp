@@ -60,7 +60,7 @@ void VertexArray::Draw()
 
 	glBindVertexArray(m_Handle);
 	m_CurrentElementBuffer->Bind();
-	glDrawElements(GL_TRIANGLES, m_CurrentElementBuffer->Count() / 3, sizeof(ElementIndex) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, m_CurrentElementBuffer->Count(), sizeof(ElementIndex) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, 0);
 	CHECK_GL_ERROR();
 }
 
@@ -93,7 +93,7 @@ void VertexArray::updateArray(AbstractVertexBuffer* buffer)
 		case GL_HALF_FLOAT:
 		case GL_FLOAT:
 		case GL_DOUBLE:
-			glVertexAttribPointer(m_CurrentVertexAttribIndex, attribute.size, attribute.type, GL_FALSE, (GLsizei)buffer->GetVertexSize(), (const void*)currentOffset);
+			glVertexAttribPointer(m_CurrentVertexAttribIndex, attribute.size, attribute.type, GL_FALSE, (GLsizei)buffer->GetVertexSize(), (const void*)attribute.offset);
 			break;
 		case GL_BYTE:
 		case GL_UNSIGNED_BYTE:
@@ -101,37 +101,13 @@ void VertexArray::updateArray(AbstractVertexBuffer* buffer)
 		case GL_UNSIGNED_SHORT:
 		case GL_INT:
 		case GL_UNSIGNED_INT:
-			glVertexAttribIPointer(m_CurrentVertexAttribIndex, attribute.size, attribute.type, (GLsizei)buffer->GetVertexSize(), (const void*)currentOffset);
+			glVertexAttribIPointer(m_CurrentVertexAttribIndex, attribute.size, attribute.type, (GLsizei)buffer->GetVertexSize(), (const void*)attribute.offset);
 			break;
 		default:
 			DEBUG_LOG("VertexArray use of unknown attribute type");
 			break;
 		}
-
-		switch (attribute.type)
-		{
-		case GL_BYTE:
-		case GL_UNSIGNED_BYTE:
-			currentOffset += 1 * attribute.size;
-			break;
-		case GL_SHORT:
-		case GL_UNSIGNED_SHORT:
-		case GL_HALF_FLOAT:
-			currentOffset += 2 * attribute.size;
-			break;
-		case GL_INT:
-		case GL_UNSIGNED_INT:
-		case GL_FLOAT:
-			currentOffset += 4 * attribute.size;
-			break;
-		case GL_DOUBLE:
-			currentOffset += 8 * attribute.size;
-			break;
-		default:
-			DEBUG_LOG("VertexArray use of unknown attribute type");
-			break;
-		}
-
+		
 		m_CurrentVertexAttribIndex++;
 
 		CHECK_GL_ERROR();

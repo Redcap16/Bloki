@@ -8,7 +8,7 @@ Player::Player(BlockManager& world, Keyboard& keyboard, Mouse& mouse, glm::ivec2
 	m_WindowSize(windowSize),
 	m_Mouse(mouse)
 {
-	setFlying(true);
+	setFlying(false);
 }
 
 void Player::Update(float deltaTime)
@@ -16,16 +16,18 @@ void Player::Update(float deltaTime)
 	if (!m_Camera)
 		return;
 
+	if (!m_World.IsLoaded(m_Rigidbody.GetPosition()))
+		return;
+
 	glm::vec3 moveDirection = m_Camera->GetDirection(),
 		rightDirection = glm::cross(moveDirection, glm::vec3(0, 1, 0));
-	moveDirection.y = 0;
-	moveDirection = glm::normalize(moveDirection);
-	rightDirection.y = 0;
-	rightDirection = glm::normalize(rightDirection); 
 
 
 	if (m_Flying)
 	{
+		rightDirection = glm::normalize(rightDirection);
+		moveDirection = glm::normalize(moveDirection);
+
 		moveDirection *= c_FlyingSpeed;
 		rightDirection *= c_FlyingSpeed;
 
@@ -45,6 +47,11 @@ void Player::Update(float deltaTime)
 	}
 	else
 	{
+		moveDirection.y = 0;
+		moveDirection = glm::normalize(moveDirection);
+		rightDirection.y = 0;
+		rightDirection = glm::normalize(rightDirection);
+
 		moveDirection *= (m_Rigidbody.IsOnGround() ? c_MoveSpeed : c_MoveSpeedInAir);
 		rightDirection *= (m_Rigidbody.IsOnGround() ? c_MoveSpeed : c_MoveSpeedInAir);
 
@@ -60,10 +67,15 @@ void Player::Update(float deltaTime)
 			m_Rigidbody.ChangeVelocity(glm::vec3(0, c_JumpSpeed, 0));
 	}
 
-
 	m_Rigidbody.Update(deltaTime);
 
 	m_Camera->SetPosition(m_Rigidbody.GetPosition());
+}
+
+void Player::SetPosition(const glm::vec3& position) 
+{ 
+	m_Rigidbody.SetPosition(position); 
+	m_Rigidbody.SetVelocity(glm::vec3(0)); 
 }
 
 void Player::KeyPressed(char key)
