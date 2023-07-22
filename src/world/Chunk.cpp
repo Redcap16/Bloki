@@ -140,12 +140,30 @@ void Chunk::moveItem(Chunk& destination, std::vector<std::unique_ptr<DroppedItem
 
 void Chunk::Deserialize(const std::vector<char>& data)
 {
-	//Remember locking mutex
-	//TODO
+	std::lock_guard<std::mutex> lock(m_GeometryMutex);
+	if (data.size() != (size_t)BlockArray::ChunkSize.x * BlockArray::ChunkSize.y * BlockArray::ChunkSize.z + 1)
+	{
+		DEBUG_LOG("Error: Corrupted data in file");
+		return;
+	}
+
+	m_Generated = (bool)data[0];
+	size_t index = 0;
+	for (int y = 0; y < BlockArray::ChunkSize.y; ++y)
+		for (int x = 0; x < BlockArray::ChunkSize.x; ++x)
+			for (int z = 0; z < BlockArray::ChunkSize.z; ++z)
+				m_BlockArray.Set({ x, y, z }, (Block::BlockType)data[++index]);
 }
 
 void Chunk::Serialize(std::vector<char>& result) const
 {
-	//Remember locking mutex
-	//TODO
+	std::lock_guard<std::mutex> lock(m_GeometryMutex);
+	result.clear();
+	result.reserve((size_t)BlockArray::ChunkSize.x * BlockArray::ChunkSize.y * BlockArray::ChunkSize.z + 1);
+
+	result.push_back((char)m_Generated);
+	for (int y = 0; y < BlockArray::ChunkSize.y; ++y)
+		for (int x = 0; x < BlockArray::ChunkSize.x; ++x)
+			for (int z = 0; z < BlockArray::ChunkSize.z; ++z)
+				result.push_back((char)m_BlockArray.Get({ x, y, z }).Type);
 }

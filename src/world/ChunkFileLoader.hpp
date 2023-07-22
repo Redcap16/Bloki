@@ -45,7 +45,6 @@ private:
 		ChunkHeaderData m_ChunkHeaderData[c_RegionSize.x][c_RegionSize.y][c_RegionSize.z];
 		std::unordered_map<InRegionPosition, std::vector<char>> m_ChunkCache;
 
-		std::fstream m_File;
 		std::string m_Filename;
 
 		std::mutex m_AccessMutex;

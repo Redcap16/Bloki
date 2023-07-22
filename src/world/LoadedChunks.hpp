@@ -118,6 +118,7 @@ private:
 
 	void reloadChunks(ChunkPos newCenter);
 	void loadChunks();
+	void unloadChunks();
 
 	void updateNeighbors(Chunk* chunk);
 	LoadedChunk loadChunk(ChunkPos position);

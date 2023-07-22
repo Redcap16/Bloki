@@ -67,6 +67,7 @@ LoadedChunks::LoadedChunks(Renderer3D& renderer, const std::string& savePath) :
 
 LoadedChunks::~LoadedChunks()
 {
+	unloadChunks();
 	destroyThreads();
 }
 
@@ -311,7 +312,20 @@ void LoadedChunks::loadChunks()
 		});
 }
 
-//TODO: UnloadChunks to unload and save them. And flush everything at end
+void LoadedChunks::unloadChunks()
+{
+	{
+		std::lock_guard<std::mutex> uLock(m_UpdateQueueMutex);
+		m_UpdateQueue.clear();
+	}
+
+	forEveryChunk([this](LoadedChunk& chunk, const glm::ivec3& position)
+		{
+			unloadChunk(std::move(chunk));
+		});
+	
+	addFlushTask();
+}
 
 void LoadedChunks::updateNeighbors(Chunk* chunk)
 {
@@ -395,13 +409,17 @@ void LoadedChunks::updateThreadLoop()
 
 void LoadedChunks::managementThreadLoop()
 {
-	while (!m_ManagementThreadDone)
+	while (true)
 	{
 		//TODO: Change to unique_lock
 		m_ManagementQueueMutex.lock();
 		if (m_ManagementTaskQueue.empty())
 		{
 			m_ManagementQueueMutex.unlock();
+
+			if (m_ManagementThreadDone)
+				break;
+
 			std::unique_lock<std::mutex> lock(m_ManagementConditionMutex);
 			m_ManagementQueueEmpty.wait(lock);
 			continue;

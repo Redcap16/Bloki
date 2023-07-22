@@ -56,13 +56,12 @@ void ChunkFileLoader::Flush()
 }
 
 ChunkFileLoader::RegionFile::RegionFile(const std::string filename) :
-	m_File(filename, std::ios_base::in | std::ios_base::out | std::ios_base::binary),
 	m_Filename(filename),
 	m_Changed(false)
 {
 	std::fill_n((ChunkHeaderData*)m_ChunkHeaderData, c_RegionSize.x * c_RegionSize.y * c_RegionSize.z, ChunkHeaderData{ 0, 0 });
-	if(m_File.peek() != std::fstream::traits_type::eof()) //File is not empty
-		readHeaders();
+	
+	readHeaders();
 }
 
 ChunkFileLoader::RegionFile::~RegionFile()
@@ -132,11 +131,14 @@ void ChunkFileLoader::RegionFile::flush()
 	if (!m_Changed)
 		return;
 
+	std::ofstream file(m_Filename, std::ios_base::out | std::ios_base::binary);
+
 	size_t currentAddress = sizeof(ChunkHeaderData) * c_RegionSize.x * c_RegionSize.y * c_RegionSize.z;
-	m_File.seekp(0, std::ios_base::beg);
+
+	file.seekp(0, std::ios_base::beg);
 	{
 		std::vector<char> headerSection(currentAddress);
-		m_File.write(headerSection.data(), currentAddress);
+		file.write(headerSection.data(), currentAddress);
 	}
 
 	for (int x = 0; x < c_RegionSize.x; ++x)
@@ -147,26 +149,26 @@ void ChunkFileLoader::RegionFile::flush()
 				if (!loadIntoCache(position)) //Nothing to save
 					continue;
 
-				if (!m_File.good())
+				if (!file.good())
 				{
 					DEBUG_LOG("Error: Cant access file in " + m_Filename);
 					return;
 				}
 
 				//Write the data
-				m_File.seekp(currentAddress, std::ios_base::beg);
-				if (!m_File.good())
+				file.seekp(currentAddress, std::ios_base::beg);
+				if (!file.good())
 				{
 					DEBUG_LOG("Error: Cant access file in " + m_Filename);
 					return;
 				}
 
-				m_File.write(m_ChunkCache[position].data(), m_ChunkCache.size());
+				file.write(m_ChunkCache[position].data(), m_ChunkCache[position].size());
 
 				//Write the header
-				const size_t currentHeaderAddress = (size_t)x * c_RegionSize.y * c_RegionSize.z + (size_t)y * c_RegionSize.z + z;
-				m_File.seekp(currentHeaderAddress, std::ios_base::beg);
-				if (!m_File.good())
+				const size_t currentHeaderAddress = ((size_t)x * c_RegionSize.y * c_RegionSize.z + (size_t)y * c_RegionSize.z + z) * sizeof(ChunkHeaderData);
+				file.seekp(currentHeaderAddress, std::ios_base::beg);
+				if (!file.good())
 				{
 					DEBUG_LOG("Error: Cant access file in " + m_Filename);
 					return;
@@ -174,27 +176,29 @@ void ChunkFileLoader::RegionFile::flush()
 
 				ChunkHeaderData buffer = { (uint32_t)currentAddress, (uint32_t)m_ChunkCache[position].size() };
 
-				m_File.write((char*)&buffer, sizeof(buffer));
-				currentAddress += m_ChunkCache.size();
+				file.write((char*)&buffer, sizeof(buffer));
+				currentAddress += m_ChunkCache[position].size();
 			}
 }
 
 void ChunkFileLoader::RegionFile::readHeaders()
 {
-	m_File.seekg(0, std::ios_base::beg);
+	std::ifstream file(m_Filename, std::ios_base::in | std::ios_base::binary);
+	if (!file.is_open())
+		return;
 
 	ChunkHeaderData buffer{ 0 };
 	for(int x = 0; x < c_RegionSize.x; ++x)
 		for(int y = 0; y < c_RegionSize.y; ++y)
 			for (int z = 0; z < c_RegionSize.z; ++z)
 			{
-				if (m_File.good())
+				if (!file.good())
 				{
 					DEBUG_LOG("Error: cant read chunk headers");
 					return;
 				}
 
-				m_File.read((char*)&buffer, sizeof(buffer));
+				file.read((char*)&buffer, sizeof(buffer));
 				m_ChunkHeaderData[x][y][z] = buffer;
 			}
 }
@@ -219,29 +223,31 @@ bool ChunkFileLoader::RegionFile::loadIntoCache(const InRegionPosition& position
 	if (header == nullptr)
 		return false;
 
-	if (!m_File.good())
-	{
-		DEBUG_LOG("Error: Cant access file in " + m_Filename);
+	std::ifstream file(m_Filename, std::ios_base::in | std::ios_base::binary);
+	
+	if (!file.is_open())
 		return false;
-	}
-	m_File.seekg(header->Address, std::ios_base::beg);
 
-	if (!m_File.good())
+	file.seekg(header->Address, std::ios_base::beg);
+
+	if (!file.good())
 	{
 		DEBUG_LOG("Error: Cant access file in " + m_Filename);
 		return false;
 	}
 
 	std::vector<char>& data = m_ChunkCache[position];
-	data.reserve(header->Size);
-	m_File.read(data.data(), header->Size);
+	data.resize(header->Size);
+	file.read(data.data(), header->Size);
 
-	if (data.size() != header->Size)
+	if (file.gcount() != header->Size)
 	{
 		DEBUG_LOG("Error: Cant read all of bytes of a chunk in " + m_Filename);
+		m_ChunkCache.erase(position);
 		return false;
 	}
-	m_ChunkCache.erase(position);
+
+	return true;
 }
 
 std::shared_ptr<ChunkFileLoader::RegionFile> ChunkFileLoader::getRegion(const RegionPosition& position)
@@ -249,8 +255,8 @@ std::shared_ptr<ChunkFileLoader::RegionFile> ChunkFileLoader::getRegion(const Re
 	std::lock_guard<std::mutex> lock(m_OpenedRegionsMutex);
 	if (m_OpenedRegions.find(position) == m_OpenedRegions.end())
 	{
-		std::string filename = m_SavePath + "/" + std::to_string(position.x) + "-" + std::to_string(position.y) + "-" + std::to_string(position.z) + ".reg";
-		m_OpenedRegions[position] = std::make_shared<RegionFile>(m_SavePath);
+		std::string filename = m_SavePath + "/" + std::to_string(position.x) + "'" + std::to_string(position.y) + "'" + std::to_string(position.z) + ".reg";
+		m_OpenedRegions[position] = std::make_shared<RegionFile>(filename);
 	}
 
 	return m_OpenedRegions.at(position);
