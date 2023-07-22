@@ -131,10 +131,14 @@ void ChunkFileLoader::RegionFile::flush()
 	if (!m_Changed)
 		return;
 
+	//Prepare data
+	for (int x = 0; x < c_RegionSize.x; ++x)
+		for (int y = 0; y < c_RegionSize.y; ++y)
+			for (int z = 0; z < c_RegionSize.z; ++z)
+				loadIntoCache({ x, y, z });
+
 	std::ofstream file(m_Filename, std::ios_base::out | std::ios_base::binary);
-
 	size_t currentAddress = sizeof(ChunkHeaderData) * c_RegionSize.x * c_RegionSize.y * c_RegionSize.z;
-
 	file.seekp(0, std::ios_base::beg);
 	{
 		std::vector<char> headerSection(currentAddress);
@@ -146,7 +150,7 @@ void ChunkFileLoader::RegionFile::flush()
 			for (int z = 0; z < c_RegionSize.z; ++z)
 			{
 				const InRegionPosition position{ x, y, z };
-				if (!loadIntoCache(position)) //Nothing to save
+				if (m_ChunkCache.find(position) == m_ChunkCache.end()) //Nothing to save
 					continue;
 
 				if (!file.good())
