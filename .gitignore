@@ -364,3 +364,11 @@ FodyWeavers.xsd
 
 # Bloki saves
 saves/
+/saves/first/0'0'0.reg
+/saves/first/0'0'-1.reg
+/saves/first/0'-1'0.reg
+/saves/first/0'-1'-1.reg
+/saves/first/-1'0'0.reg
+/saves/first/-1'0'-1.reg
+/saves/first/-1'-1'0.reg
+/saves/first/-1'-1'-1.reg
