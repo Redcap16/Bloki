@@ -32,6 +32,8 @@ Application::Application() :
 	m_Player->SetPosition(glm::vec3(0, 40, 0));
 	m_Player->SetEyeCamera(&m_Camera);
 	m_Renderer->SetCamera(&m_Camera);
+
+	m_Canvas = std::make_unique<Canvas>(glm::ivec2(1280, 720));
 }
 
 void Application::OnWindowEvent(const Event& e)
@@ -43,12 +45,21 @@ void Application::OnWindowEvent(const Event& e)
 			m_Renderer->Resize(e.params.window.size);
 		if(m_Player)
 			m_Player->SetWindowSize(e.params.window.size);
+
+		if(m_Canvas) m_Canvas->SetWindowSize(e.params.window.size);
 		break;
 	case Event::EventType::MouseClicked:
-		m_Player->MouseClicked(glm::ivec2(0), e.params.mouseButton.button == Event::MouseButton::LMB);
+		//m_Player->MouseClicked(glm::ivec2(0), e.params.mouseButton.button == Event::MouseButton::LMB);
+
+		if (m_Canvas) m_Canvas->MouseClicked(e.params.mouseButton.button == Event::MouseButton::LMB);
 		break;
 	case Event::EventType::MouseMoved:
-		if(m_Player) m_Player->MouseMoved(e.params.mouse.position);
+		//if(m_Player) m_Player->MouseMoved(e.params.mouse.position);
+
+		if (m_Canvas) m_Canvas->MouseMoved(e.params.mouse.position);
+		break;
+	case Event::EventType::MouseReleased:
+		if (m_Canvas) m_Canvas->MouseReleased(e.params.mouseButton.button == Event::MouseButton::LMB);
 		break;
 	}
 }
@@ -63,45 +74,50 @@ void Application::Start()
 
 	m_Running = true;
 
-	while (!m_Window.Done())
 	{
-		m_Window.CheckForEvents();
-		if (m_Window.Active())
+		Button myButton(*m_Canvas, { 100, 100 }, { 100, 100 });
+
+		while (!m_Window.Done())
 		{
-			if (m_Window.GetKey('P'))
+			m_Window.CheckForEvents();
+			if (m_Window.Active())
 			{
-				m_Window.SetKey('P', false);
-				m_Running = !m_Running;
+				if (m_Window.GetKey('P'))
+				{
+					m_Window.SetKey('P', false);
+					m_Running = !m_Running;
+				}
+
+				if (m_Running && m_Player)
+				{
+					const int parts = ceil(deltaTime / 200.0f); //Max 200ms per update, no more
+					for (int i = 0; i < parts; ++i)
+						m_Player->Update(deltaTime / 1000.0f / parts);
+				}
+
+				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+				m_Renderer->RenderScene();
+				m_Canvas->Render();
+				SwapBuffers(m_Window.GetDeviceContext());
+				CHECK_GL_ERROR();
 			}
 
-			if (m_Running && m_Player)
+			if (frameCounter >= 10)
 			{
-				const int parts = ceil(deltaTime / 200.0f); //Max 200ms per update, no more
-				for (int i = 0; i < parts; ++i)
-					m_Player->Update(deltaTime / 1000.0f / parts);
+				lastTime = currentTime;
+				currentTime = clock();
+				deltaTime = currentTime - lastTime;
+				const int fps = deltaTime != 0 ? ((float)frameCounter / (deltaTime / CLOCKS_PER_SEC)) : 0;
+				char buffer[64];
+				sprintf_s(buffer, "%i", fps);
+				frameCounter = 0;
 			}
+			frameCounter++;
 
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-			m_Renderer->RenderScene();
-			SwapBuffers(m_Window.GetDeviceContext());
-			CHECK_GL_ERROR();
+			m_World->Update();
+			m_World->SetCenter(m_Player->GetPosition());
 		}
-
-		if (frameCounter >= 10)
-		{
-			lastTime = currentTime;
-			currentTime = clock();
-			deltaTime = currentTime - lastTime;
-			const int fps = deltaTime != 0 ? ((float)frameCounter / (deltaTime / CLOCKS_PER_SEC)) : 0;
-			char buffer[64];
-			sprintf_s(buffer, "%i", fps);
-			frameCounter = 0;
-		}
-		frameCounter++;
-
-		m_World->Update();
-		m_World->SetCenter(m_Player->GetPosition());
 	}
 
 	m_World.reset();

@@ -78,7 +78,7 @@ void Renderer3D::RenderScene()
 		
 	RenderableParameters* lastParams = nullptr;
 
-	//glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	for (RenderableRecord& record : m_Renderables)
 	{

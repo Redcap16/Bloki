@@ -145,6 +145,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\ui\Button.cpp" />
+    <ClCompile Include="src\ui\Canvas.cpp" />
+    <ClCompile Include="src\ui\Group.cpp" />
     <ClCompile Include="src\world\ChunkFileLoader.cpp" />
     <ClCompile Include="src\entity\Entity.cpp" />
     <ClCompile Include="src\world\LoadedChunks.cpp" />
@@ -180,8 +183,12 @@
     <ClCompile Include="src\world\ChunkGenerator.cpp" />
     <ClCompile Include="src\graphics\Vertex.cpp" />
     <ClCompile Include="src\graphics\VertexArray.cpp" />
+    <ClCompile Include="src\ui\Widget.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\ui\Button.hpp" />
+    <ClInclude Include="src\ui\Canvas.hpp" />
+    <ClInclude Include="src\ui\Group.hpp" />
     <ClInclude Include="src\window\Input.hpp" />
     <ClInclude Include="src\world\ChunkFileLoader.hpp" />
     <ClInclude Include="src\entity\Entity.hpp" />
@@ -220,6 +227,7 @@
     <ClInclude Include="src\world\ChunkGenerator.hpp" />
     <ClInclude Include="src\graphics\VertexArray.hpp" />
     <ClInclude Include="src\physics\Transform.hpp" />
+    <ClInclude Include="src\ui\Widget.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

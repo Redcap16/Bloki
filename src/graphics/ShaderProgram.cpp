@@ -82,6 +82,7 @@ void ShaderProgram::SetMVPMatrix(const glm::mat4& matrix)
 
 UniformLocation ShaderProgram::GetUniformLocation(const char* name) const
 {
+	//TODO: Location caching, there are some places, where its called more that once
 	if (m_ProgramHandle == 0)
 		return INVALID_UNIFORM_LOCATION;
 

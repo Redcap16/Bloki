@@ -20,6 +20,8 @@
 #include <core/Renderer.hpp>
 #include <core/Player.hpp>
 #include <world/LoadedChunks.hpp>
+#include <ui/Canvas.hpp>
+#include <ui/Button.hpp>
 
 class KeyboardDummy : public Keyboard
 {
@@ -75,6 +77,7 @@ private:
 	ResourceManager m_ResourceManager;
 
 	Camera3D m_Camera;
+	std::unique_ptr<Canvas> m_Canvas;
 
 	bool m_Running = false;
 };

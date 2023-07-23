@@ -168,6 +168,18 @@
     <ClCompile Include="src\entity\Entity.cpp">
       <Filter>Pliki źródłowe\entity</Filter>
     </ClCompile>
+    <ClCompile Include="src\ui\Button.cpp">
+      <Filter>Pliki źródłowe\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\Canvas.cpp">
+      <Filter>Pliki źródłowe\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\Group.cpp">
+      <Filter>Pliki źródłowe\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\Widget.cpp">
+      <Filter>Pliki źródłowe\ui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\graphics\Camera.hpp">
@@ -283,6 +295,18 @@
     </ClInclude>
     <ClInclude Include="src\window\Input.hpp">
       <Filter>Pliki nagłówkowe\window</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\Widget.hpp">
+      <Filter>Pliki nagłówkowe\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\Canvas.hpp">
+      <Filter>Pliki nagłówkowe\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\Button.hpp">
+      <Filter>Pliki nagłówkowe\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\Group.hpp">
+      <Filter>Pliki nagłówkowe\ui</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

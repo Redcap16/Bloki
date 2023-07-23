@@ -88,25 +88,28 @@ void VertexArray::updateArray(AbstractVertexBuffer* buffer)
 	{
 		glEnableVertexAttribArray(m_CurrentVertexAttribIndex);
 
-		switch (attribute.type)
-		{
-		case GL_HALF_FLOAT:
-		case GL_FLOAT:
-		case GL_DOUBLE:
-			glVertexAttribPointer(m_CurrentVertexAttribIndex, attribute.size, attribute.type, GL_FALSE, (GLsizei)buffer->GetVertexSize(), (const void*)attribute.offset);
-			break;
-		case GL_BYTE:
-		case GL_UNSIGNED_BYTE:
-		case GL_SHORT:
-		case GL_UNSIGNED_SHORT:
-		case GL_INT:
-		case GL_UNSIGNED_INT:
-			glVertexAttribIPointer(m_CurrentVertexAttribIndex, attribute.size, attribute.type, (GLsizei)buffer->GetVertexSize(), (const void*)attribute.offset);
-			break;
-		default:
-			DEBUG_LOG("VertexArray use of unknown attribute type");
-			break;
-		}
+		if(attribute.Normalized)
+			glVertexAttribPointer(m_CurrentVertexAttribIndex, attribute.Size, attribute.Type, attribute.Normalized, (GLsizei)buffer->GetVertexSize(), (const void*)attribute.Offset);
+		else
+			switch (attribute.Type)
+			{
+			case GL_HALF_FLOAT:
+			case GL_FLOAT:
+			case GL_DOUBLE:
+				glVertexAttribPointer(m_CurrentVertexAttribIndex, attribute.Size, attribute.Type, attribute.Normalized, (GLsizei)buffer->GetVertexSize(), (const void*)attribute.Offset);
+				break;
+			case GL_BYTE:
+			case GL_UNSIGNED_BYTE:
+			case GL_SHORT:
+			case GL_UNSIGNED_SHORT:
+			case GL_INT:
+			case GL_UNSIGNED_INT:
+				glVertexAttribIPointer(m_CurrentVertexAttribIndex, attribute.Size, attribute.Type, (GLsizei)buffer->GetVertexSize(), (const void*)attribute.Offset);
+				break;
+			default:
+				DEBUG_LOG("VertexArray use of unknown attribute type");
+				break;
+			}
 		
 		m_CurrentVertexAttribIndex++;
 

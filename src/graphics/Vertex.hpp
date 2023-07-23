@@ -9,8 +9,9 @@
 
 struct Vertex2D
 {
-	glm::vec2 Position;
+	glm::ivec2 Position;
 	glm::vec2 TextureCoords;
+	glm::vec<3, uint8_t> Color;
 
 	static const std::vector<VertexAttribute> Attributes;
 };
