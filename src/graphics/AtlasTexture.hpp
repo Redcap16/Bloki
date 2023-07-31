@@ -11,6 +11,7 @@
 
 #include <stb_image/stb_image.h>
 #include <graphics/Texture.hpp>
+#include <graphics/Resource.hpp>
 #include <util/Debug.hpp>
 
 class AtlasTexture : public Texture
@@ -72,3 +73,22 @@ TextureHandle AtlasTexture::GetHandle() const
 {
 	return m_Handle;
 }
+
+template <>
+struct ResourceParams<AtlasTexture>
+{
+	const std::string& Filename;
+
+	ResourceParams(const std::string& filename) :
+		Filename(filename) {}
+};
+
+template <>
+class std::hash<ResourceParams<AtlasTexture>>
+{
+public:
+	size_t operator()(const ResourceParams<AtlasTexture>& key) const
+	{
+		return std::hash<std::string>()(key.Filename);
+	}
+};

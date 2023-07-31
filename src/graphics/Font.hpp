@@ -12,6 +12,8 @@
 
 #include <util/Debug.hpp>
 #include <graphics/ErrorCheck.hpp>
+#include <graphics/Resource.hpp>
+#include <util/Math.hpp>
 
 #include <string>
 #include <memory>
@@ -68,4 +70,27 @@ private:
 
 	void setupLibrary();
 	void loadGlyphs();
+};
+
+template <>
+struct ResourceParams<Font>
+{
+	const std::string& Filename;
+	int LetterSize;
+
+	ResourceParams(const std::string& filename, int letterSize) :
+		Filename(filename),
+		LetterSize(letterSize) { }
+};
+
+template <>
+class std::hash<ResourceParams<Font>>
+{
+public:
+	size_t operator()(const ResourceParams<Font>& key) const
+	{
+		size_t result;
+		hash_combine(result, key.Filename, key.LetterSize);
+		return result;
+	}
 };

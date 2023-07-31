@@ -320,5 +320,8 @@
     <ClInclude Include="src\ui\Text.hpp">
       <Filter>Pliki nagłówkowe\ui</Filter>
     </ClInclude>
+    <ClInclude Include="src\graphics\Resource.hpp">
+      <Filter>Pliki nagłówkowe\graphics</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

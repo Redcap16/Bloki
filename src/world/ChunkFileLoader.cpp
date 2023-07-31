@@ -20,6 +20,8 @@ bool ChunkFileLoader::LoadChunk(Chunk& chunk)
 		return false;
 
 	chunk.Deserialize(data);
+
+	return true;
 }
 
 bool ChunkFileLoader::IsPresent(const ChunkPos& position)

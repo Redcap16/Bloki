@@ -188,6 +188,7 @@
     <ClCompile Include="src\ui\Text.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\graphics\Resource.hpp" />
     <ClInclude Include="src\graphics\Font.hpp" />
     <ClInclude Include="src\ui\Button.hpp" />
     <ClInclude Include="src\ui\Canvas.hpp" />

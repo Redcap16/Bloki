@@ -13,6 +13,7 @@
 
 #include <util/Debug.hpp>
 #include <graphics/ErrorCheck.hpp>
+#include <graphics/Resource.hpp>
 #include <stdexcept>
 
 #define INVALID_UNIFORM_LOCATION -1
@@ -64,4 +65,23 @@ private:
 	bool loadShaders(ShaderHandle &vertex, ShaderHandle &fragment);
 
 	void destroyProgram();
+};
+
+template <>
+struct ResourceParams<ShaderProgram>
+{
+	const std::string& Filename;
+
+	ResourceParams(const std::string& filename) :
+		Filename(filename) {}
+};
+
+template <>
+class std::hash<ResourceParams<ShaderProgram>>
+{
+public:
+	size_t operator()(const ResourceParams<ShaderProgram>& key) const
+	{
+		return std::hash<std::string>()(key.Filename);
+	}
 };

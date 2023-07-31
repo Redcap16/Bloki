@@ -9,6 +9,8 @@
 
 #include <stb_image/stb_image.h>
 #include <graphics/Texture.hpp>
+#include <graphics/Resource.hpp>
+#include <util/Math.hpp>
 #include <util/Debug.hpp>
 
 class ImageTexture : public Texture
@@ -33,3 +35,26 @@ TextureHandle ImageTexture::GetHandle() const
 {
 	return m_Handle;
 }
+
+template <>
+struct ResourceParams<ImageTexture>
+{
+	const std::string& Filename;
+	bool Transparency;
+
+	ResourceParams(const std::string& filename, bool transparency) :
+		Filename(filename),
+		Transparency(transparency) {}
+};
+
+template <>
+class std::hash<ResourceParams<ImageTexture>>
+{
+public:
+	size_t operator()(const ResourceParams<ImageTexture>& key) const
+	{
+		size_t result = 0;
+		hash_combine(result, key.Filename, key.Transparency);
+		return result;
+	}
+};
