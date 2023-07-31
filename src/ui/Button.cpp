@@ -2,58 +2,119 @@
 
 Button::Button(WidgetParent& parent, glm::ivec2 position, glm::ivec2 size) :
 	Widget(parent, position, size),
-	m_VBO(false),
-	m_EBO(false)
+	m_Mesh(size)
 {
-	createMesh();
 }
 
 void Button::Render(ShaderProgram& shader)
 {
-	m_VAO.Draw();
+	m_Mesh.Render(shader);
 }
 
 void Button::handleMouseEvent(const MouseEvent& event)
 {
 	switch (event.Type)
 	{
+	case MouseEvent::MouseEnter:
+		m_Mesh.ChangeColor(c_HighlightedColor);
+		break;
+	case MouseEvent::MouseExit:
+		m_Mesh.ChangeColor(glm::ivec3(255, 255, 255));
+		break;
 	case MouseEvent::MouseClick:
-		DEBUG_LOG("I was clicked!");
+		pressed();
 		break;
 	case MouseEvent::MouseRelease:
-		if(m_OnHover)
-			DEBUG_LOG("I was released!");
+		if (m_OnHover)
+			released();
 		break;
 	}
 }
 
-void Button::createMesh()
+Button::ButtonMesh::ButtonMesh(glm::ivec2 size) :
+	m_BorderVBO(false),
+	m_BorderEBO(false),
+	m_CenterVBO(false),
+	m_CenterEBO(false),
+	m_Size(size)
 {
-	m_VAO.AddBuffer(&m_VBO);
-	m_VAO.SetElementBuffer(&m_EBO);
+	m_Texture = ResourceManager::GetInstance().GetImageTexture("button.png");
 
+	createMesh();
+}
+
+void Button::ButtonMesh::ChangeColor(glm::ivec3 color)
+{
+	addRectangle(m_CenterVBO, m_CenterEBO, glm::ivec2(c_BorderWidth, c_BorderWidth), glm::ivec2(m_Size.x - 2 * c_BorderWidth, m_Size.y - 2 * c_BorderWidth), glm::vec2(c_BorderTextureWidth, c_BorderTextureWidth), glm::vec2(1 - 2 * c_BorderTextureWidth, 1 - 2 * c_BorderTextureWidth), color);
+
+	m_CenterVBO.UpdateBuffer();
+	m_CenterEBO.UpdateBuffer();
+	m_CenterVBO.ClearData();
+	m_CenterEBO.ClearData();
+}
+
+void Button::ButtonMesh::Render(ShaderProgram& shader)
+{
+	UniformLocation hasTexture = shader.GetUniformLocation("HasTexture"),
+		texture = shader.GetUniformLocation("Texture");
+	shader.SetUniform(hasTexture, 1);
+	shader.SetUniform(texture, 0);
+	m_Texture->Bind(0);
+
+	m_BorderVAO.Draw();
+	m_CenterVAO.Draw();
+}
+
+void Button::ButtonMesh::createMesh()
+{
+	m_BorderVAO.AddBuffer(&m_BorderVBO);
+	m_BorderVAO.SetElementBuffer(&m_BorderEBO);
+
+	const glm::ivec3 color = glm::ivec3(255, 255, 255);
+
+	addRectangle(m_BorderVBO, m_BorderEBO, glm::ivec2(c_BorderWidth, 0), glm::ivec2(m_Size.x - 2 * c_BorderWidth, c_BorderWidth), glm::vec2(c_BorderTextureWidth, 0), glm::vec2(1 - 2 * c_BorderTextureWidth, c_BorderTextureWidth), color);
+	addRectangle(m_BorderVBO, m_BorderEBO, glm::ivec2(0, c_BorderWidth), glm::ivec2(c_BorderWidth, m_Size.y - 2 * c_BorderWidth), glm::vec2(0, c_BorderTextureWidth), glm::vec2(c_BorderTextureWidth, 1 - 2 * c_BorderTextureWidth), color);
+	addRectangle(m_BorderVBO, m_BorderEBO, glm::ivec2(c_BorderWidth, m_Size.y - c_BorderWidth), glm::ivec2(m_Size.x - 2 * c_BorderWidth, c_BorderWidth), glm::vec2(c_BorderTextureWidth, 1 - c_BorderTextureWidth), glm::vec2(1 - 2 * c_BorderTextureWidth, c_BorderTextureWidth), color);
+	addRectangle(m_BorderVBO, m_BorderEBO, glm::ivec2(m_Size.x - c_BorderWidth, c_BorderWidth), glm::ivec2(c_BorderWidth, m_Size.y - 2 * c_BorderWidth), glm::vec2(1 - c_BorderTextureWidth, c_BorderTextureWidth), glm::vec2(c_BorderTextureWidth, 1 - 2 * c_BorderTextureWidth), color);
+
+	addRectangle(m_BorderVBO, m_BorderEBO, glm::ivec2(0, 0), glm::ivec2(c_BorderWidth, c_BorderWidth), glm::vec2(0, 0), glm::vec2(c_BorderTextureWidth, c_BorderTextureWidth), color);
+	addRectangle(m_BorderVBO, m_BorderEBO, glm::ivec2(0, m_Size.y - c_BorderWidth), glm::ivec2(c_BorderWidth, c_BorderWidth), glm::vec2(0, 1 - c_BorderTextureWidth), glm::vec2(c_BorderTextureWidth, c_BorderTextureWidth), color);
+	addRectangle(m_BorderVBO, m_BorderEBO, glm::ivec2(m_Size.x - c_BorderWidth, m_Size.y - c_BorderWidth), glm::ivec2(c_BorderWidth, c_BorderWidth), glm::vec2(1 - c_BorderTextureWidth, 1 - c_BorderTextureWidth), glm::vec2(c_BorderTextureWidth, c_BorderTextureWidth), color);
+	addRectangle(m_BorderVBO, m_BorderEBO, glm::ivec2(m_Size.x - c_BorderWidth, 0), glm::ivec2(c_BorderWidth, c_BorderWidth), glm::vec2(1 - c_BorderTextureWidth, 0), glm::vec2(c_BorderTextureWidth, c_BorderTextureWidth), color);
+
+	m_BorderVBO.UpdateBuffer();
+	m_BorderEBO.UpdateBuffer();
+	m_BorderVBO.ClearData();
+	m_BorderEBO.ClearData();
+
+	m_CenterVAO.AddBuffer(&m_CenterVBO);
+	m_CenterVAO.SetElementBuffer(&m_CenterEBO);
+
+	ChangeColor(color);
+}
+
+void Button::ButtonMesh::addRectangle(VertexBuffer<Vertex2D>& vbo, ElementBuffer& ebo, glm::ivec2 position, glm::ivec2 size, glm::vec2 textureCoords, glm::vec2 textureSize, glm::ivec3 color)
+{
+	addVertex(vbo, position, textureCoords, color);
+	addVertex(vbo, position + glm::ivec2(size.x, 0), textureCoords + glm::vec2(textureSize.x, 0), color);
+	addVertex(vbo, position + size, textureCoords + textureSize, color);
+	addVertex(vbo, position + glm::ivec2(0, size.y), textureCoords + glm::vec2(0, textureSize.y), color);
+
+	unsigned int index = vbo.GetCurrentIndex();
+	ebo.AddIndex(index - 3);
+	ebo.AddIndex(index - 2);
+	ebo.AddIndex(index - 1);
+
+	ebo.AddIndex(index - 3);
+	ebo.AddIndex(index - 1);
+	ebo.AddIndex(index);
+}
+
+void Button::ButtonMesh::addVertex(VertexBuffer<Vertex2D>& vbo, glm::ivec2 position, glm::vec2 textureCoords, glm::ivec3 color)
+{
 	Vertex2D vertex;
-	vertex.Color = glm::ivec3(100, 255, 90);
-
-	vertex.Position = glm::ivec2(0);
-	m_VBO.AddVertex(vertex);
-	vertex.Position = glm::ivec2(m_Size.x, 0);
-	m_VBO.AddVertex(vertex);
-	vertex.Position = m_Size;
-	m_VBO.AddVertex(vertex);
-	vertex.Position = glm::ivec2(0, m_Size.x);
-	m_VBO.AddVertex(vertex);
-
-	m_EBO.AddIndex(0);
-	m_EBO.AddIndex(1);
-	m_EBO.AddIndex(2);
-
-	m_EBO.AddIndex(0);
-	m_EBO.AddIndex(2);
-	m_EBO.AddIndex(3);
-
-	m_VBO.UpdateBuffer();
-	m_EBO.UpdateBuffer();
-	m_VBO.ClearData();
-	m_EBO.ClearData();
+	vertex.Color = color;
+	vertex.Position = position;
+	vertex.TextureCoords = textureCoords;
+	vbo.AddVertex(vertex);
 }

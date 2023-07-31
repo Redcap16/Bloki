@@ -145,6 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\graphics\Font.cpp" />
     <ClCompile Include="src\ui\Button.cpp" />
     <ClCompile Include="src\ui\Canvas.cpp" />
     <ClCompile Include="src\ui\Group.cpp" />
@@ -184,8 +185,10 @@
     <ClCompile Include="src\graphics\Vertex.cpp" />
     <ClCompile Include="src\graphics\VertexArray.cpp" />
     <ClCompile Include="src\ui\Widget.cpp" />
+    <ClCompile Include="src\ui\Text.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\graphics\Font.hpp" />
     <ClInclude Include="src\ui\Button.hpp" />
     <ClInclude Include="src\ui\Canvas.hpp" />
     <ClInclude Include="src\ui\Group.hpp" />
@@ -228,6 +231,7 @@
     <ClInclude Include="src\graphics\VertexArray.hpp" />
     <ClInclude Include="src\physics\Transform.hpp" />
     <ClInclude Include="src\ui\Widget.hpp" />
+    <ClInclude Include="src\ui\Text.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

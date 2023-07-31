@@ -6,6 +6,8 @@
 #include <string>
 #include <unordered_map>
 
+
+//TODO: Seperate creating resources from accesing them.
 class ResourceManager
 {
 public:

@@ -180,6 +180,12 @@
     <ClCompile Include="src\ui\Widget.cpp">
       <Filter>Pliki źródłowe\ui</Filter>
     </ClCompile>
+    <ClCompile Include="src\graphics\Font.cpp">
+      <Filter>Pliki źródłowe\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\Text.cpp">
+      <Filter>Pliki źródłowe\ui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\graphics\Camera.hpp">
@@ -306,6 +312,12 @@
       <Filter>Pliki nagłówkowe\ui</Filter>
     </ClInclude>
     <ClInclude Include="src\ui\Group.hpp">
+      <Filter>Pliki nagłówkowe\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\Font.hpp">
+      <Filter>Pliki nagłówkowe\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\Text.hpp">
       <Filter>Pliki nagłówkowe\ui</Filter>
     </ClInclude>
   </ItemGroup>

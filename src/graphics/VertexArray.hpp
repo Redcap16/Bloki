@@ -19,7 +19,7 @@ public:
 
 	void AddBuffer(AbstractVertexBuffer* buffer);
 	inline void SetElementBuffer(ElementBuffer* buffer);
-	void Draw();
+	void Draw() const;
 private:
 	std::vector<AbstractVertexBuffer*> m_Buffers;
 	ElementBuffer* m_CurrentElementBuffer;

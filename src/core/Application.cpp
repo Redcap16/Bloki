@@ -75,7 +75,23 @@ void Application::Start()
 	m_Running = true;
 
 	{
-		Button myButton(*m_Canvas, { 100, 100 }, { 100, 100 });
+		class SimpleButton : public Button
+		{
+		public:
+			SimpleButton(WidgetParent& parent, glm::ivec2 position, glm::ivec2 size) :
+				Button(parent, position, size) { }
+		protected:
+			void pressed()
+			{
+				DEBUG_LOG("Hell yeah, i've been pressed");
+			}
+			void released()
+			{
+				DEBUG_LOG("Oh no, i've been released");
+			}
+		};
+
+		SimpleButton myButton(*m_Canvas, { 100, 100 }, { 500, 100 });
 
 		while (!m_Window.Done())
 		{

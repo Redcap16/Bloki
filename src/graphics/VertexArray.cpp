@@ -53,7 +53,7 @@ void VertexArray::AddBuffer(AbstractVertexBuffer* buffer)
 	updateArray(buffer);
 }
 
-void VertexArray::Draw()
+void VertexArray::Draw() const
 {
 	if (m_CurrentElementBuffer == nullptr)
 		return;
