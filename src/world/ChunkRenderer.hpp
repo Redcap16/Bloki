@@ -7,28 +7,6 @@
 
 #include <array>
 
-struct ChunkResources
-{
-public:
-	AtlasTexture* BlockTexture;
-	AtlasTexture::SubTexture TextureCoords[Block::c_BlockCount];
-	ShaderProgram* OpaqueShader;
-	ShaderProgram* TransparentShader;
-
-	static ChunkResources& GetInstance();
-	bool IsOpen() const { return m_IsOpen; }
-private:
-	const char* c_TextureFilename = "block.td";
-	const char* c_OpaqueShaderFilename = "chunk-solid.shader";
-	const char* c_TransparentShaderFilename = "chunk-transparent.shader";
-
-	bool m_IsOpen;
-	ChunkResources();
-
-	bool setupTexture();
-	bool setupShaders();
-};
-
 class ChunkRenderer
 {
 public:
@@ -44,6 +22,17 @@ public:
 
 	void UpdateGeometry();
 private:
+	const char* c_TextureFilename = "block.td";
+	const char* c_OpaqueShaderFilename = "chunk-solid.shader";
+	const char* c_TransparentShaderFilename = "chunk-transparent.shader";
+
+	Resource<AtlasTexture> m_BlockTexture;
+	Resource<ShaderProgram> m_OpaqueShader,
+		m_TransparentShader;
+
+	static AtlasTexture::SubTexture s_TextureCoords[Block::c_BlockCount];
+	static bool s_TextureCoordsCreated;
+
 	Renderer3D& m_Renderer;
 
 	glm::vec3 m_Position;
@@ -60,4 +49,6 @@ private:
 	void processBlock(const InChunkPos& position);
 	bool isBlockVisible(Block block, const InChunkPos& position, Direction direction);
 	const Chunk* getNeighbor(const glm::ivec3& position) const;
+
+	void loadTextureCoords();
 };

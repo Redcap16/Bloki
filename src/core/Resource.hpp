@@ -23,8 +23,11 @@ public:
 	Resource(Resource&& other) noexcept;
 	Resource& operator=(Resource&& other) noexcept;
 
-	TResource& Get() { return *m_Instance.get(); }
-	const TResource& Get() const { return *m_Instance.get(); }
+	TResource* Get() { return m_Instance.get(); }
+	const TResource* Get() const { return m_Instance.get(); }
+
+	TResource* operator->() { return m_Instance.get(); }
+	const TResource* operator->() const { return m_Instance.get(); }
 
 private:
 	std::shared_ptr<TResource> m_Instance;
@@ -32,6 +35,9 @@ private:
 
 	void lastInstanceCheck();
 };
+
+template <class TResource>
+std::unordered_map<ResourceParams<TResource>, std::weak_ptr<TResource>> Resource<TResource>::m_Resources;
 
 template <class TResource>
 template <typename... Args>

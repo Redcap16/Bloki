@@ -12,7 +12,7 @@
 
 #include <util/Debug.hpp>
 #include <graphics/ErrorCheck.hpp>
-#include <graphics/Resource.hpp>
+#include <core/Resource.hpp>
 #include <util/Math.hpp>
 
 #include <string>
@@ -75,13 +75,19 @@ private:
 template <>
 struct ResourceParams<Font>
 {
-	const std::string& Filename;
+	std::string Filename;
 	int LetterSize;
 
 	ResourceParams(const std::string& filename, int letterSize) :
 		Filename(filename),
 		LetterSize(letterSize) { }
 };
+
+inline bool operator==(const ResourceParams<Font>& lhs, const ResourceParams<Font>& rhs)
+{
+	return lhs.Filename == rhs.Filename &&
+		lhs.LetterSize == lhs.LetterSize;
+}
 
 template <>
 class std::hash<ResourceParams<Font>>

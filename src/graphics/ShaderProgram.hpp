@@ -13,7 +13,7 @@
 
 #include <util/Debug.hpp>
 #include <graphics/ErrorCheck.hpp>
-#include <graphics/Resource.hpp>
+#include <core/Resource.hpp>
 #include <stdexcept>
 
 #define INVALID_UNIFORM_LOCATION -1
@@ -70,11 +70,16 @@ private:
 template <>
 struct ResourceParams<ShaderProgram>
 {
-	const std::string& Filename;
+	std::string Filename;
 
 	ResourceParams(const std::string& filename) :
 		Filename(filename) {}
 };
+
+inline bool operator==(const ResourceParams<ShaderProgram>& lhs, const ResourceParams<ShaderProgram>& rhs) noexcept
+{
+	return lhs.Filename == rhs.Filename;
+}
 
 template <>
 class std::hash<ResourceParams<ShaderProgram>>

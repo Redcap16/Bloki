@@ -162,7 +162,6 @@
     <ClCompile Include="src\physics\BlockRay.cpp" />
     <ClCompile Include="src\physics\Rigidbody.cpp" />
     <ClCompile Include="src\world\ChunkRenderer.cpp" />
-    <ClCompile Include="src\graphics\ResourceManager.cpp" />
     <ClCompile Include="src\graphics\RenderingContext.cpp" />
     <ClCompile Include="src\world\ChunkMesh.cpp" />
     <ClCompile Include="src\Bloki.cpp" />
@@ -188,7 +187,7 @@
     <ClCompile Include="src\ui\Text.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\graphics\Resource.hpp" />
+    <ClInclude Include="src\core\Resource.hpp" />
     <ClInclude Include="src\graphics\Font.hpp" />
     <ClInclude Include="src\ui\Button.hpp" />
     <ClInclude Include="src\ui\Canvas.hpp" />
@@ -208,7 +207,6 @@
     <ClInclude Include="src\physics\AABB.hpp" />
     <ClInclude Include="src\physics\Rigidbody.hpp" />
     <ClInclude Include="src\world\ChunkRenderer.hpp" />
-    <ClInclude Include="src\graphics\ResourceManager.hpp" />
     <ClInclude Include="src\graphics\RenderingContext.hpp" />
     <ClInclude Include="src\world\BlockArray.hpp" />
     <ClInclude Include="src\world\ChunkMesh.hpp" />

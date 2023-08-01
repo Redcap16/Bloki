@@ -11,7 +11,7 @@
 
 #include <stb_image/stb_image.h>
 #include <graphics/Texture.hpp>
-#include <graphics/Resource.hpp>
+#include <core/Resource.hpp>
 #include <util/Debug.hpp>
 
 class AtlasTexture : public Texture
@@ -77,11 +77,16 @@ TextureHandle AtlasTexture::GetHandle() const
 template <>
 struct ResourceParams<AtlasTexture>
 {
-	const std::string& Filename;
+	std::string Filename;
 
 	ResourceParams(const std::string& filename) :
-		Filename(filename) {}
+		Filename(filename) { }
 };
+
+inline bool operator==(const ResourceParams<AtlasTexture>& lhs, const ResourceParams<AtlasTexture>& rhs)
+{
+	return lhs.Filename == rhs.Filename;
+}
 
 template <>
 class std::hash<ResourceParams<AtlasTexture>>

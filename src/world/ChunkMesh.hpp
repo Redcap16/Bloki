@@ -3,10 +3,10 @@
 #include <graphics/Vertex.hpp>
 #include <graphics/VertexArray.hpp>
 #include <graphics/ShaderProgram.hpp>
+#include <graphics/AtlasTexture.hpp>
 #include <core/Renderer.hpp>
 #include <world/BlockArray.hpp>
 #include <world/Block.hpp>
-#include <graphics/ResourceManager.hpp>
 #include <util/Direction.hpp>
 #include <string>
 #include <thread>

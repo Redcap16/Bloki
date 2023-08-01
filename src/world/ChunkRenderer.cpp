@@ -1,83 +1,26 @@
 #include <world/ChunkRenderer.hpp>
 
-ChunkResources& ChunkResources::GetInstance()
-{
-	static ChunkResources instance;
-	return instance;
-}
-
-ChunkResources::ChunkResources() :
-	m_IsOpen(true),
-	BlockTexture(nullptr)
-{
-	if (!setupTexture())
-		m_IsOpen = false;
-	if (!setupShaders())
-		m_IsOpen = false;
-}
-
-bool ChunkResources::setupTexture()
-{
-	if (BlockTexture != nullptr)
-		return true;
-
-	ResourceManager& resourceManager = ResourceManager::GetInstance();
-	BlockTexture = resourceManager.GetAtlasTexture(c_TextureFilename);
-	
-	if (BlockTexture == nullptr)
-	{
-		DEBUG_LOG("Error: cant load block texture");
-		return false;
-	}
-
-	for (int i = 0; i < Block::c_BlockCount; ++i)
-	{
-		if (i == Block::Air)
-			continue;
-		const std::string& blockName = Block::GetBlockName((Block::BlockType)i);
-		const AtlasTexture::SubTexture* subTexture = BlockTexture->GetSubTexture(blockName);
-		if (subTexture == nullptr)
-		{
-			DEBUG_LOG("Error: cant load sub textures");
-			return false;
-		}
-		TextureCoords[i] = *subTexture;
-	}
-
-	return true;
-}
-
-bool ChunkResources::setupShaders()
-{
-	ResourceManager& resourceManager = ResourceManager::GetInstance();
-
-	OpaqueShader = resourceManager.GetShaderProgram(c_OpaqueShaderFilename);
-	TransparentShader = resourceManager.GetShaderProgram(c_TransparentShaderFilename);
-
-	if (OpaqueShader == nullptr ||
-		TransparentShader == nullptr)
-		return false;
-
-	return true;
-}
+AtlasTexture::SubTexture ChunkRenderer::s_TextureCoords[Block::c_BlockCount];
+bool ChunkRenderer::s_TextureCoordsCreated = false;
 
 ChunkRenderer::ChunkRenderer(Renderer3D& renderer, std::shared_ptr<const Chunk> chunk) :
 	m_Chunk(chunk),
-	m_Position(chunk->GetPosition() * BlockArray::ChunkSize),
-	m_OpaqueMesh(m_Position, ChunkResources::GetInstance().TextureCoords),
-	m_TransparentMesh(m_Position, ChunkResources::GetInstance().TextureCoords),
+	m_Position(chunk->GetPosition()* BlockArray::ChunkSize),
+	m_OpaqueMesh(m_Position, s_TextureCoords),
+	m_TransparentMesh(m_Position, s_TextureCoords),
 	m_AnythingHighlighted(false),
 	m_HighlightedPosition(glm::ivec3(0)),
 	m_Neighbors(chunk->GetNeighbors()),
 	m_CurrentBlockAccess(nullptr),
-	m_Renderer(renderer)
+	m_Renderer(renderer),
+	m_BlockTexture(c_TextureFilename),
+	m_OpaqueShader(c_OpaqueShaderFilename),
+	m_TransparentShader(c_TransparentShaderFilename)
 {
-	ChunkResources& resources = ChunkResources::GetInstance();
-	if (resources.IsOpen())
-	{
-		renderer.RegisterRenderable(&m_OpaqueMesh, RenderableParameters(false, resources.OpaqueShader, resources.BlockTexture));
-		renderer.RegisterRenderable(&m_TransparentMesh, RenderableParameters(true, resources.TransparentShader, resources.BlockTexture));
-	}
+	loadTextureCoords();
+
+	renderer.RegisterRenderable(&m_OpaqueMesh, RenderableParameters(false, m_OpaqueShader.Get(), m_BlockTexture.Get()));
+	renderer.RegisterRenderable(&m_TransparentMesh, RenderableParameters(true, m_TransparentShader.Get(), m_BlockTexture.Get()));
 }
 
 ChunkRenderer::~ChunkRenderer()
@@ -172,4 +115,26 @@ const Chunk* ChunkRenderer::getNeighbor(const glm::ivec3& position) const
 	if (position.z < 0)
 		return m_Neighbors[(unsigned int)Direction::Back];
 	return nullptr;
+}
+
+void ChunkRenderer::loadTextureCoords()
+{
+	if (s_TextureCoordsCreated)
+		return;
+
+	for (int i = 0; i < Block::c_BlockCount; ++i)
+	{
+		if (i == Block::Air)
+			continue;
+
+		const std::string& blockName = Block::GetBlockName((Block::BlockType)i);
+		const AtlasTexture::SubTexture* subTexture = m_BlockTexture->GetSubTexture(blockName);
+		if (subTexture == nullptr)
+		{
+			DEBUG_LOG("Error: cant load sub textures");
+		}
+		s_TextureCoords[i] = *subTexture;
+	}
+
+	s_TextureCoordsCreated = true;
 }

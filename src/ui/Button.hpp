@@ -5,7 +5,6 @@
 #include <graphics/VertexArray.hpp>
 #include <graphics/Vertex.hpp>
 #include <graphics/ImageTexture.hpp>
-#include <graphics/ResourceManager.hpp>
 
 //TODO: Change ivec3 to vec<3, uint8_t>
 class Button : public Widget
@@ -35,6 +34,8 @@ private:
 		static const int c_BorderWidth = 10;
 		static constexpr float c_BorderTextureWidth = 0.1f;
 
+		static constexpr const char* c_TextureFilename = "button.png";
+
 		glm::ivec2 m_Size;
 
 		VertexBuffer<Vertex2D> m_BorderVBO;
@@ -44,7 +45,7 @@ private:
 		VertexArray m_CenterVAO;
 		ElementBuffer m_CenterEBO;
 
-		ImageTexture* m_Texture;
+		Resource<ImageTexture> m_Texture;
 
 		void createMesh();
 		void addRectangle(VertexBuffer<Vertex2D>& vbo, ElementBuffer& ebo, glm::ivec2 position, glm::ivec2 size, glm::vec2 texturePosition, glm::vec2 textureSize, glm::ivec3 color);

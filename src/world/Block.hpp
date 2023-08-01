@@ -2,8 +2,7 @@
 
 #include <string>
 #include <vector>
-
-#include <graphics/AtlasTexture.hpp>
+#include <glm/glm.hpp>
 
 typedef glm::ivec3 WorldPos;
 

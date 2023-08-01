@@ -2,7 +2,6 @@
 
 #include <ui/Widget.hpp>
 #include <graphics/ShaderProgram.hpp>
-#include <graphics/ResourceManager.hpp>
 
 #include <vector>
 
@@ -42,7 +41,7 @@ private:
 	std::vector<Widget*> m_Widgets;
 	glm::ivec2 m_WindowSize;
 
-	ShaderProgram* m_Shader;
+	Resource<ShaderProgram> m_Shader;
 	UniformLocation m_HasTextureLocation;
 	glm::mat4 m_ProjectionMatrix;
 

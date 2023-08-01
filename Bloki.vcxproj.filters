@@ -114,9 +114,6 @@
     <ClCompile Include="src\graphics\RenderingContext.cpp">
       <Filter>Pliki źródłowe\graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\graphics\ResourceManager.cpp">
-      <Filter>Pliki źródłowe\graphics</Filter>
-    </ClCompile>
     <ClCompile Include="src\world\ChunkRenderer.cpp">
       <Filter>Pliki źródłowe\world</Filter>
     </ClCompile>
@@ -242,9 +239,6 @@
     <ClInclude Include="src\graphics\RenderingContext.hpp">
       <Filter>Pliki nagłówkowe\graphics</Filter>
     </ClInclude>
-    <ClInclude Include="src\graphics\ResourceManager.hpp">
-      <Filter>Pliki nagłówkowe\graphics</Filter>
-    </ClInclude>
     <ClInclude Include="src\world\ChunkRenderer.hpp">
       <Filter>Pliki nagłówkowe\world</Filter>
     </ClInclude>
@@ -320,8 +314,8 @@
     <ClInclude Include="src\ui\Text.hpp">
       <Filter>Pliki nagłówkowe\ui</Filter>
     </ClInclude>
-    <ClInclude Include="src\graphics\Resource.hpp">
-      <Filter>Pliki nagłówkowe\graphics</Filter>
+    <ClInclude Include="src\core\Resource.hpp">
+      <Filter>Pliki nagłówkowe\core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

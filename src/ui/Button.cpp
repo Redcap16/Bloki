@@ -36,10 +36,9 @@ Button::ButtonMesh::ButtonMesh(glm::ivec2 size) :
 	m_BorderEBO(false),
 	m_CenterVBO(false),
 	m_CenterEBO(false),
-	m_Size(size)
+	m_Size(size),
+	m_Texture(c_TextureFilename, false)
 {
-	m_Texture = ResourceManager::GetInstance().GetImageTexture("button.png");
-
 	createMesh();
 }
 

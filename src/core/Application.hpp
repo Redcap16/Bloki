@@ -74,8 +74,6 @@ private:
 	MouseDummy m_Mouse;
 	ConsoleDebugHandler m_DebugHandler;
 
-	ResourceManager m_ResourceManager;
-
 	Camera3D m_Camera;
 	std::unique_ptr<Canvas> m_Canvas;
 

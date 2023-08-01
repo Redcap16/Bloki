@@ -137,7 +137,7 @@ void Application::Start()
 	}
 
 	m_World.reset();
-	m_ResourceManager.FreeResources();
+	m_Canvas.reset();
 
 	m_Window.Close();
 }

@@ -1,12 +1,11 @@
 #include <ui/Canvas.hpp>
 
 Canvas::Canvas(glm::ivec2 windowSize) :
-	m_Shader(ResourceManager::GetInstance().GetShaderProgram(c_ShaderFile)),
 	m_WindowSize(windowSize),
-	m_MouseState({ glm::ivec2(0, 0), false, false})
+	m_MouseState({ glm::ivec2(0, 0), false, false}),
+	m_Shader(c_ShaderFile)
 {
-	if(m_Shader != nullptr)
-		m_HasTextureLocation = m_Shader->GetUniformLocation("HasTexture");
+	m_HasTextureLocation = m_Shader->GetUniformLocation("HasTexture");
 	updateProjectionMatrix();
 }
 
@@ -83,9 +82,6 @@ void Canvas::MouseMoved(glm::ivec2 position)
 
 void Canvas::Render()
 {
-	if (m_Shader == nullptr)
-		return;
-
 	glDisable(GL_DEPTH_TEST);
 	m_Shader->UseProgram();
 	for (Widget* widget : m_Widgets)
@@ -93,7 +89,7 @@ void Canvas::Render()
 		m_Shader->SetUniform(m_HasTextureLocation, 0);
 		m_Shader->SetMVPMatrix(m_ProjectionMatrix * widget->GetModelMatrix());
 
-		widget->Render(*m_Shader);
+		widget->Render(*m_Shader.Get());
 	}
 }
 

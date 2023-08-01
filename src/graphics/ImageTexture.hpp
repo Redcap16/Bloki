@@ -9,7 +9,7 @@
 
 #include <stb_image/stb_image.h>
 #include <graphics/Texture.hpp>
-#include <graphics/Resource.hpp>
+#include <core/Resource.hpp>
 #include <util/Math.hpp>
 #include <util/Debug.hpp>
 
@@ -39,13 +39,19 @@ TextureHandle ImageTexture::GetHandle() const
 template <>
 struct ResourceParams<ImageTexture>
 {
-	const std::string& Filename;
+	std::string Filename;
 	bool Transparency;
 
 	ResourceParams(const std::string& filename, bool transparency) :
 		Filename(filename),
 		Transparency(transparency) {}
 };
+
+inline bool operator==(const ResourceParams<ImageTexture>& lhs, const ResourceParams<ImageTexture>& rhs)
+{
+	return lhs.Filename == rhs.Filename &&
+		lhs.Transparency == lhs.Transparency;
+}
 
 template <>
 class std::hash<ResourceParams<ImageTexture>>
