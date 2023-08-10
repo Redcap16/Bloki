@@ -22,11 +22,11 @@ public:
 	void Render();
 
 protected:
-	glm::ivec2 GetParentPositition() const override { return glm::ivec2(0, 0); }
-	glm::ivec2 GetParentSize() const override { return m_WindowSize; };
+	glm::ivec2 GetAsParentPositition() const override { return glm::ivec2(0, 0); }
+	glm::ivec2 GetAsParentSize() const override { return m_WindowSize; };
 
 	void AddWidget(Widget* widget) override { m_Widgets.push_back(widget); };
-	void RemoveWidget(Widget* widget) override;
+	void RemoveWidget(const Widget* widget) override;
 
 private:
 	static constexpr const char* c_ShaderFile = "ui.shader";

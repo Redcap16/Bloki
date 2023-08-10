@@ -6,11 +6,6 @@ Button::Button(WidgetParent& parent, glm::ivec2 position, glm::ivec2 size) :
 {
 }
 
-void Button::Render(ShaderProgram& shader)
-{
-	m_Mesh.Render(shader);
-}
-
 void Button::handleMouseEvent(const MouseEvent& event)
 {
 	switch (event.Type)
@@ -29,6 +24,11 @@ void Button::handleMouseEvent(const MouseEvent& event)
 			released();
 		break;
 	}
+}
+
+void Button::render(WidgetRenderParams& shader)
+{
+	m_Mesh.Render(shader.m_Shader);
 }
 
 Button::ButtonMesh::ButtonMesh(glm::ivec2 size) :
@@ -92,7 +92,7 @@ void Button::ButtonMesh::createMesh()
 	ChangeColor(color);
 }
 
-void Button::ButtonMesh::addRectangle(VertexBuffer<Vertex2D>& vbo, ElementBuffer& ebo, glm::ivec2 position, glm::ivec2 size, glm::vec2 textureCoords, glm::vec2 textureSize, glm::ivec3 color)
+void Button::ButtonMesh::addRectangle(VertexBuffer<Vertex2D>& vbo, ElementBuffer& ebo, glm::ivec2 position, glm::ivec2 size, glm::vec2 textureCoords, glm::vec2 textureSize, glm::ivec3 color) //TODO: Use graphics/Rectangle
 {
 	addVertex(vbo, position, textureCoords, color);
 	addVertex(vbo, position + glm::ivec2(size.x, 0), textureCoords + glm::vec2(textureSize.x, 0), color);

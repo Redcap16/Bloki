@@ -61,6 +61,12 @@
     <Filter Include="Pliki źródłowe\entity">
       <UniqueIdentifier>{c4886f97-105c-4faa-a1be-c925de693006}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Pliki nagłówkowe\items">
+      <UniqueIdentifier>{260d5b39-dd46-4476-b41f-99540cf1f9ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pliki źródłowe\items">
+      <UniqueIdentifier>{085a3a2d-f28a-43ad-8397-7ef7001fd223}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Bloki.cpp">
@@ -182,6 +188,21 @@
     </ClCompile>
     <ClCompile Include="src\ui\Text.cpp">
       <Filter>Pliki źródłowe\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\InventoryUI.cpp">
+      <Filter>Pliki źródłowe\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\items\Inventory.cpp">
+      <Filter>Pliki źródłowe\items</Filter>
+    </ClCompile>
+    <ClCompile Include="src\items\Item.cpp">
+      <Filter>Pliki źródłowe\items</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\Rectangle.cpp">
+      <Filter>Pliki źródłowe\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\UIManager.cpp">
+      <Filter>Pliki źródłowe\core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -315,6 +336,21 @@
       <Filter>Pliki nagłówkowe\ui</Filter>
     </ClInclude>
     <ClInclude Include="src\core\Resource.hpp">
+      <Filter>Pliki nagłówkowe\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\items\Item.hpp">
+      <Filter>Pliki nagłówkowe\items</Filter>
+    </ClInclude>
+    <ClInclude Include="src\items\Inventory.hpp">
+      <Filter>Pliki nagłówkowe\items</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\InventoryUI.hpp">
+      <Filter>Pliki nagłówkowe\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\Rectangle.hpp">
+      <Filter>Pliki nagłówkowe\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\UIManager.hpp">
       <Filter>Pliki nagłówkowe\core</Filter>
     </ClInclude>
   </ItemGroup>

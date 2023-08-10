@@ -33,7 +33,9 @@ Application::Application() :
 	m_Player->SetEyeCamera(&m_Camera);
 	m_Renderer->SetCamera(&m_Camera);
 
-	m_Canvas = std::make_unique<Canvas>(glm::ivec2(1280, 720));
+	m_Inventory = std::make_unique<Inventory>();
+	m_Inventory->SetItemStack(2, { Item::Bread, 2 });
+	m_UIManager = std::make_unique<UIManager>(glm::ivec2(1280, 720), *m_Inventory);
 }
 
 void Application::OnWindowEvent(const Event& e)
@@ -46,20 +48,20 @@ void Application::OnWindowEvent(const Event& e)
 		if(m_Player)
 			m_Player->SetWindowSize(e.params.window.size);
 
-		if(m_Canvas) m_Canvas->SetWindowSize(e.params.window.size);
+		if(m_UIManager) m_UIManager->SetWindowSize(e.params.window.size);
 		break;
 	case Event::EventType::MouseClicked:
 		//m_Player->MouseClicked(glm::ivec2(0), e.params.mouseButton.button == Event::MouseButton::LMB);
 
-		if (m_Canvas) m_Canvas->MouseClicked(e.params.mouseButton.button == Event::MouseButton::LMB);
+		if (m_UIManager) m_UIManager->MouseClicked(e.params.mouseButton.button == Event::MouseButton::LMB);
 		break;
 	case Event::EventType::MouseMoved:
 		//if(m_Player) m_Player->MouseMoved(e.params.mouse.position);
 
-		if (m_Canvas) m_Canvas->MouseMoved(e.params.mouse.position);
+		if (m_UIManager) m_UIManager->MouseMoved(e.params.mouse.position);
 		break;
 	case Event::EventType::MouseReleased:
-		if (m_Canvas) m_Canvas->MouseReleased(e.params.mouseButton.button == Event::MouseButton::LMB);
+		if (m_UIManager) m_UIManager->MouseReleased(e.params.mouseButton.button == Event::MouseButton::LMB);
 		break;
 	}
 }
@@ -74,70 +76,56 @@ void Application::Start()
 
 	m_Running = true;
 
+	while (!m_Window.Done())
 	{
-		class SimpleButton : public Button
+		m_Window.CheckForEvents();
+		if (m_Window.Active())
 		{
-		public:
-			SimpleButton(WidgetParent& parent, glm::ivec2 position, glm::ivec2 size) :
-				Button(parent, position, size) { }
-		protected:
-			void pressed()
+			if (m_Window.GetKey('P'))
 			{
-				DEBUG_LOG("Hell yeah, i've been pressed");
+				m_Window.SetKey('P', false);
+				m_Running = !m_Running;
 			}
-			void released()
+			if (m_Window.GetKey('E'))
 			{
-				DEBUG_LOG("Oh no, i've been released");
-			}
-		};
-
-		SimpleButton myButton(*m_Canvas, { 100, 100 }, { 500, 100 });
-
-		while (!m_Window.Done())
-		{
-			m_Window.CheckForEvents();
-			if (m_Window.Active())
-			{
-				if (m_Window.GetKey('P'))
-				{
-					m_Window.SetKey('P', false);
-					m_Running = !m_Running;
-				}
-
-				if (m_Running && m_Player)
-				{
-					const int parts = ceil(deltaTime / 200.0f); //Max 200ms per update, no more
-					for (int i = 0; i < parts; ++i)
-						m_Player->Update(deltaTime / 1000.0f / parts);
-				}
-
-				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-				m_Renderer->RenderScene();
-				m_Canvas->Render();
-				SwapBuffers(m_Window.GetDeviceContext());
-				CHECK_GL_ERROR();
+				m_Window.SetKey('E', false);
+				m_UIManager->ShowInventory(!m_UIManager->IsInventoryVisible());
 			}
 
-			if (frameCounter >= 10)
+			if (m_Running && m_Player)
 			{
-				lastTime = currentTime;
-				currentTime = clock();
-				deltaTime = currentTime - lastTime;
-				const int fps = deltaTime != 0 ? ((float)frameCounter / (deltaTime / CLOCKS_PER_SEC)) : 0;
-				char buffer[64];
-				sprintf_s(buffer, "%i", fps);
-				frameCounter = 0;
+				const int parts = ceil(deltaTime / 200.0f); //Max 200ms per update, no more
+				for (int i = 0; i < parts; ++i)
+					m_Player->Update(deltaTime / 1000.0f / parts);
 			}
-			frameCounter++;
 
-			m_World->Update();
-			m_World->SetCenter(m_Player->GetPosition());
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			m_Renderer->RenderScene();
+			m_UIManager->Render();
+			m_UIManager->Update();
+			SwapBuffers(m_Window.GetDeviceContext());
+			CHECK_GL_ERROR();
 		}
+
+		if (frameCounter >= 10)
+		{
+			lastTime = currentTime;
+			currentTime = clock();
+			deltaTime = currentTime - lastTime;
+			const int fps = deltaTime != 0 ? ((float)frameCounter / (deltaTime / CLOCKS_PER_SEC)) : 0;
+			char buffer[64];
+			sprintf_s(buffer, "%i", fps);
+			frameCounter = 0;
+		}
+		frameCounter++;
+
+		m_World->Update();
+		m_World->SetCenter(m_Player->GetPosition());
 	}
 
 	m_World.reset();
-	m_Canvas.reset();
+	m_UIManager.reset();
 
 	m_Window.Close();
 }

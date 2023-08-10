@@ -21,10 +21,13 @@ public:
 	ImageTexture(const ImageTexture&) = delete;
 	ImageTexture& operator=(const ImageTexture&) = delete;
 
+	glm::ivec2 GetSize() const { return m_Size; }
+
 	void Bind(GLuint textureUnit) const override;
 	inline TextureHandle GetHandle() const override;
 private:
 	TextureHandle m_Handle;
+	glm::ivec2 m_Size;
 	std::string m_Filename;
 
 	void load(bool transparency);

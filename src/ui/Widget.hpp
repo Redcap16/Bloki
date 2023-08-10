@@ -61,23 +61,32 @@ class WidgetParent
 protected:
 	friend class Widget;
 
-	virtual glm::ivec2 GetParentPositition() const = 0;
-	virtual glm::ivec2 GetParentSize() const = 0;
+	virtual glm::ivec2 GetAsParentPositition() const = 0;
+	virtual glm::ivec2 GetAsParentSize() const = 0;
 
 	virtual void AddWidget(Widget* widget) = 0;
-	virtual void RemoveWidget(Widget* widget) = 0;
+	virtual void RemoveWidget(const Widget* widget) = 0;
 };
 
 class Widget
 {
 public:
+	struct WidgetRenderParams
+	{
+		ShaderProgram& m_Shader;
+		const glm::mat4& m_Projection;
+	};
+
 	Widget(WidgetParent& parent, glm::ivec2 position, glm::ivec2 size);
 	~Widget();
-	Widget(const Widget&) = delete;
-	Widget& operator=(const Widget&) = delete;
+	Widget(const Widget& other);
+	Widget& operator=(const Widget& other);
 
 	void SetPosition(glm::ivec2 position);
 	void SetSize(glm::ivec2 size);
+
+	glm::ivec2 GetParentPosition() { return m_Parent->GetAsParentPositition(); }
+	glm::ivec2 GetParentSize() { return m_Parent->GetAsParentSize(); }
 
 	glm::ivec2 GetPosition() const { return m_RelativePosition; }
 	glm::ivec2 GetSize() const { return m_Size; }
@@ -89,24 +98,30 @@ public:
 	void SetAnchor(AnchorPoint anchor);
 
 	void HandleMouseEvent(const MouseEvent& event);
-	virtual void Render(ShaderProgram& shader) = 0;
+	void Render(WidgetRenderParams& params);
 
 	bool Contains(glm::ivec2 position) const;
 
 	bool IsOnHover() const { return m_OnHover; }
 	bool IsOnClick() const { return m_OnClick; }
+
+	void SetVisible(bool visible) { m_Visible = visible; }
+	bool IsVisible() const { return m_Visible; }
 protected:
-	WidgetParent& m_Parent;
+
+	WidgetParent* m_Parent;
 	AnchorPoint m_Anchor,
 		m_RelativeTo;
 
 	bool m_OnHover,
-		m_OnClick;
+		m_OnClick,
+		m_Visible;
 	glm::ivec2 m_RelativePosition,
 		m_FinalPosition, //Position of top left corner, relative to the window top left corner
 		m_Size;
 
 	virtual void handleMouseEvent(const MouseEvent& event) = 0;
+	virtual void render(WidgetRenderParams& params) = 0;
 
 private:
 	glm::mat4 m_ModelMatrix;

@@ -84,16 +84,18 @@ void Canvas::Render()
 {
 	glDisable(GL_DEPTH_TEST);
 	m_Shader->UseProgram();
+
+	Widget::WidgetRenderParams params = { *m_Shader.Get(), m_ProjectionMatrix };
 	for (Widget* widget : m_Widgets)
 	{
 		m_Shader->SetUniform(m_HasTextureLocation, 0);
-		m_Shader->SetMVPMatrix(m_ProjectionMatrix * widget->GetModelMatrix());
+		//m_Shader->SetMVPMatrix(m_ProjectionMatrix * widget->GetModelMatrix());
 
-		widget->Render(*m_Shader.Get());
+		widget->Render(params);
 	}
 }
 
-void Canvas::RemoveWidget(Widget* widget)
+void Canvas::RemoveWidget(const Widget* widget)
 {
 	std::vector<Widget*>::const_iterator it = std::find(m_Widgets.begin(), m_Widgets.end(), widget);
 	if (it != m_Widgets.end())

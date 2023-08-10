@@ -30,6 +30,13 @@ void WidgetGroup::handleMouseEvent(const MouseEvent& event)
 			newEvent.Type = MouseEvent::MouseExit;
 			widget->HandleMouseEvent(newEvent);
 		}
+		else if (!widget->IsOnHover() && widget->Contains(event.Position))
+		{
+			MouseEvent newEvent = event;
+			newEvent.Type = MouseEvent::MouseEnter;
+			widget->HandleMouseEvent(newEvent);
+		}
+
 		if (widget->IsOnClick() && !widget->Contains(event.Position))
 		{
 			MouseEvent newEvent = event;
@@ -39,13 +46,17 @@ void WidgetGroup::handleMouseEvent(const MouseEvent& event)
 	}
 }
 
-void WidgetGroup::Render(ShaderProgram& shader)
+void WidgetGroup::render(WidgetRenderParams& params)
 {
 	for (Widget* widget : m_Widgets)
-		widget->Render(shader);
+	{
+		params.m_Shader.SetMVPMatrix(params.m_Projection * widget->GetModelMatrix());
+
+		widget->Render(params);
+	}
 }
 
-void WidgetGroup::RemoveWidget(Widget* widget)
+void WidgetGroup::RemoveWidget(const Widget* widget)
 {
 	std::vector<Widget*>::const_iterator it = std::find(m_Widgets.begin(), m_Widgets.end(), widget);
 	if (it != m_Widgets.end())

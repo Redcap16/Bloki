@@ -20,7 +20,7 @@
 #include <core/Renderer.hpp>
 #include <core/Player.hpp>
 #include <world/LoadedChunks.hpp>
-#include <ui/Canvas.hpp>
+#include <core/UIManager.hpp>
 #include <ui/Button.hpp>
 
 class KeyboardDummy : public Keyboard
@@ -75,7 +75,8 @@ private:
 	ConsoleDebugHandler m_DebugHandler;
 
 	Camera3D m_Camera;
-	std::unique_ptr<Canvas> m_Canvas;
+	std::unique_ptr<Inventory> m_Inventory;
+	std::unique_ptr<UIManager> m_UIManager;
 
 	bool m_Running = false;
 };

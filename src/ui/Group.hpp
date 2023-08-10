@@ -14,16 +14,15 @@ public:
 
 	void UpdatePosition() override;
 
-	void Render(ShaderProgram& shader) override;
-
 protected:
 	std::vector<Widget*> m_Widgets;
 
-	glm::ivec2 GetParentPositition() const override { return m_FinalPosition; };
-	glm::ivec2 GetParentSize() const override { return m_Size; };
+	glm::ivec2 GetAsParentPositition() const override { return m_FinalPosition; };
+	glm::ivec2 GetAsParentSize() const override { return m_Size; };
 
 	void AddWidget(Widget* widget) override { m_Widgets.push_back(widget); };
-	void RemoveWidget(Widget* widget) override;
+	void RemoveWidget(const Widget* widget) override;
 
 	void handleMouseEvent(const MouseEvent& event) override;
+	void render(WidgetRenderParams& shader) override;
 };

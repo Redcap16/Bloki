@@ -145,6 +145,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\items\Item.cpp" />
+    <ClCompile Include="src\graphics\Rectangle.cpp" />
+    <ClCompile Include="src\items\Inventory.cpp" />
+    <ClCompile Include="src\ui\InventoryUI.cpp" />
     <ClCompile Include="src\graphics\Font.cpp" />
     <ClCompile Include="src\ui\Button.cpp" />
     <ClCompile Include="src\ui\Canvas.cpp" />
@@ -185,8 +189,13 @@
     <ClCompile Include="src\graphics\VertexArray.cpp" />
     <ClCompile Include="src\ui\Widget.cpp" />
     <ClCompile Include="src\ui\Text.cpp" />
+    <ClCompile Include="src\core\UIManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\graphics\Rectangle.hpp" />
+    <ClInclude Include="src\ui\InventoryUI.hpp" />
+    <ClInclude Include="src\items\Inventory.hpp" />
+    <ClInclude Include="src\items\Item.hpp" />
     <ClInclude Include="src\core\Resource.hpp" />
     <ClInclude Include="src\graphics\Font.hpp" />
     <ClInclude Include="src\ui\Button.hpp" />
@@ -231,6 +240,7 @@
     <ClInclude Include="src\physics\Transform.hpp" />
     <ClInclude Include="src\ui\Widget.hpp" />
     <ClInclude Include="src\ui\Text.hpp" />
+    <ClInclude Include="src\core\UIManager.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

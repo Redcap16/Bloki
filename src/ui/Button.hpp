@@ -15,10 +15,10 @@ public:
 	Button(const Button&) = delete;
 	Button& operator=(const Button&) = delete;
 
-	void Render(ShaderProgram& shader) override;
-
 protected:
 	void handleMouseEvent(const MouseEvent& event) override;
+	void render(WidgetRenderParams& shader) override;
+
 	virtual void pressed() = 0;
 	virtual void released() = 0;
 

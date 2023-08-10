@@ -73,8 +73,13 @@ Resource<TResource>::Resource(Resource&& other) noexcept :
 template <class TResource>
 Resource<TResource>& Resource<TResource>::operator=(Resource&& other) noexcept
 {
+	if (this == &other)
+		return *this;
+
 	lastInstanceCheck();
 	m_Instance = std::move(other.m_Instance);
+
+	return *this;
 }
 
 template <class TResource>

@@ -1,19 +1,60 @@
 #include <ui/Widget.hpp>
 
 Widget::Widget(WidgetParent& parent, glm::ivec2 position, glm::ivec2 size) :
-	m_Parent(parent),
+	m_Parent(&parent),
 	m_RelativePosition(position),
 	m_Size(size),
 	m_Anchor(AnchorPoint::LeftTop),
-	m_RelativeTo(AnchorPoint::LeftTop)
+	m_RelativeTo(AnchorPoint::LeftTop),
+	m_Visible(true)
 {
-	m_Parent.AddWidget(this);
+	m_Parent->AddWidget(this);
 	UpdatePosition();
 }
 
 Widget::~Widget()
 {
-	m_Parent.RemoveWidget(this);
+	m_Parent->RemoveWidget(this);
+}
+
+Widget::Widget(const Widget& other) :
+	m_Parent(other.m_Parent),
+	m_Anchor(other.m_Anchor),
+	m_RelativeTo(other.m_RelativeTo),
+	m_OnHover(other.m_OnHover),
+	m_OnClick(other.m_OnClick),
+	m_Visible(other.m_Visible),
+	m_RelativePosition(other.m_RelativePosition),
+	m_FinalPosition(other.m_FinalPosition),
+	m_Size(other.m_Size),
+	m_ModelMatrix(other.m_ModelMatrix)
+{
+	m_Parent->AddWidget(this);
+}
+
+Widget& Widget::operator=(const Widget& other)
+{
+	if (this == &other)
+		return *this;
+
+	if (m_Parent != other.m_Parent)
+	{
+		m_Parent->RemoveWidget(this);
+		m_Parent = other.m_Parent;
+		m_Parent->AddWidget(this);
+	}
+
+	m_Anchor = other.m_Anchor;
+	m_RelativeTo = other.m_RelativeTo;
+	m_OnHover = other.m_OnHover;
+	m_OnClick = other.m_OnClick;
+	m_Visible = other.m_Visible;
+	m_RelativePosition = other.m_RelativePosition;
+	m_FinalPosition = other.m_FinalPosition;
+	m_Size = other.m_Size;
+	m_ModelMatrix = other.m_ModelMatrix;
+
+	return *this;
 }
 
 void Widget::SetPosition(glm::ivec2 position)
@@ -30,7 +71,7 @@ void Widget::SetSize(glm::ivec2 size)
 
 void Widget::UpdatePosition()
 {
-	m_FinalPosition = m_Parent.GetParentPositition() + m_RelativePosition;
+	m_FinalPosition = m_Parent->GetAsParentPositition() + m_RelativePosition;
 	switch (m_Anchor)
 	{
 	case AnchorPoint::CenterTop:
@@ -59,7 +100,7 @@ void Widget::UpdatePosition()
 		break;
 	}
 
-	glm::ivec2 parentSize = m_Parent.GetParentSize();
+	glm::ivec2 parentSize = m_Parent->GetAsParentSize();
 	switch (m_RelativeTo)
 	{
 	case AnchorPoint::CenterTop:
@@ -120,7 +161,18 @@ void Widget::HandleMouseEvent(const MouseEvent& event)
 		m_OnClick = false;
 		break;
 	}
+
+	if (!m_Visible)
+		return;
+
 	handleMouseEvent(event);
+}
+
+void Widget::Render(WidgetRenderParams& params)
+{
+	if (!m_Visible)
+		return;
+	render(params);
 }
 
 bool Widget::Contains(glm::ivec2 position) const
