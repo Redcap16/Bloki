@@ -411,3 +411,8 @@ void Window::CloseConsole()
 {
 	//TODO
 }
+
+void Window::SetCursorVisibility(bool visible)
+{
+	ShowCursor(visible);
+}

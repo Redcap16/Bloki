@@ -1,11 +1,20 @@
 #include <core/UIManager.hpp>
 
 
-UIManager::UIManager(glm::ivec2 windowSize, Inventory& inventory) :
-	m_Canvas(windowSize),
-	m_Inventory(m_Canvas, inventory)
+UIManager::UIManager(Window& window, Inventory& inventory) :
+	m_Canvas(window.GetSize()),
+	m_Inventory(m_Canvas, inventory),
+	m_Window(window),
+	m_Crosshair(m_Canvas)
 {
+	m_Window.SetCursorVisibility(false);
+}
 
+void UIManager::ShowInventory(bool visible)
+{
+	m_Crosshair.SetVisible(!visible);
+	m_Inventory.SetVisible(visible);
+	m_Window.SetCursorVisibility(visible);
 }
 
 void UIManager::Update()

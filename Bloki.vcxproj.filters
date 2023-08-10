@@ -204,6 +204,9 @@
     <ClCompile Include="src\core\UIManager.cpp">
       <Filter>Pliki źródłowe\core</Filter>
     </ClCompile>
+    <ClCompile Include="src\ui\Crosshair.cpp">
+      <Filter>Pliki źródłowe\ui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\graphics\Camera.hpp">
@@ -352,6 +355,9 @@
     </ClInclude>
     <ClInclude Include="src\core\UIManager.hpp">
       <Filter>Pliki nagłówkowe\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\Crosshair.hpp">
+      <Filter>Pliki nagłówkowe\ui</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

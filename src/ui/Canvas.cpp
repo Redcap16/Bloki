@@ -89,7 +89,7 @@ void Canvas::Render()
 	for (Widget* widget : m_Widgets)
 	{
 		m_Shader->SetUniform(m_HasTextureLocation, 0);
-		//m_Shader->SetMVPMatrix(m_ProjectionMatrix * widget->GetModelMatrix());
+		m_Shader->SetMVPMatrix(m_ProjectionMatrix * widget->GetModelMatrix());
 
 		widget->Render(params);
 	}

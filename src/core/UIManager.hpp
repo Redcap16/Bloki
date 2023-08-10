@@ -2,13 +2,15 @@
 
 #include <ui/InventoryUI.hpp>
 #include <ui/Canvas.hpp>
+#include <window/window.h>
+#include <ui/Crosshair.hpp>
 
 class UIManager
 {
 public:
-	UIManager(glm::ivec2 windowSize, Inventory& inventory);
+	UIManager(Window& window, Inventory& inventory);
 
-	void ShowInventory(bool visible) { m_Inventory.SetVisible(visible); }
+	void ShowInventory(bool visible);
 	bool IsInventoryVisible() const { return m_Inventory.IsVisible(); }
 
 	void SetWindowSize(glm::ivec2 windowSize) { m_Canvas.SetWindowSize(windowSize); }
@@ -22,6 +24,8 @@ public:
 	void Update();
 private:
 	Canvas m_Canvas;
+	Window& m_Window;
 
 	InventoryUI m_Inventory;
+	Crosshair m_Crosshair;
 };

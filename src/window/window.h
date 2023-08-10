@@ -112,4 +112,6 @@ public:
 	inline HGLRC GetMainRenderingContext() { return hRC; }
 	HGLRC CreateRenderingContext();
 	inline glm::ivec2 GetSize() { return glm::ivec2(width, height); }
+
+	void SetCursorVisibility(bool visible);
 };

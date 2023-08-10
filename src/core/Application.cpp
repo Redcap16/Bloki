@@ -35,7 +35,7 @@ Application::Application() :
 
 	m_Inventory = std::make_unique<Inventory>();
 	m_Inventory->SetItemStack(2, { Item::Bread, 2 });
-	m_UIManager = std::make_unique<UIManager>(glm::ivec2(1280, 720), *m_Inventory);
+	m_UIManager = std::make_unique<UIManager>(m_Window, *m_Inventory);
 }
 
 void Application::OnWindowEvent(const Event& e)
@@ -51,12 +51,14 @@ void Application::OnWindowEvent(const Event& e)
 		if(m_UIManager) m_UIManager->SetWindowSize(e.params.window.size);
 		break;
 	case Event::EventType::MouseClicked:
-		//m_Player->MouseClicked(glm::ivec2(0), e.params.mouseButton.button == Event::MouseButton::LMB);
+		if(m_UIManager && !m_UIManager->IsInventoryVisible())
+			m_Player->MouseClicked(glm::ivec2(0), e.params.mouseButton.button == Event::MouseButton::LMB);
 
 		if (m_UIManager) m_UIManager->MouseClicked(e.params.mouseButton.button == Event::MouseButton::LMB);
 		break;
 	case Event::EventType::MouseMoved:
-		//if(m_Player) m_Player->MouseMoved(e.params.mouse.position);
+		if (m_UIManager && !m_UIManager->IsInventoryVisible())
+			if(m_Player) m_Player->MouseMoved(e.params.mouse.position);
 
 		if (m_UIManager) m_UIManager->MouseMoved(e.params.mouse.position);
 		break;
@@ -90,6 +92,8 @@ void Application::Start()
 			{
 				m_Window.SetKey('E', false);
 				m_UIManager->ShowInventory(!m_UIManager->IsInventoryVisible());
+				glm::ivec2 pos = m_Window.GetSize() / 2;
+				m_Window.SetMousePos(pos.x, pos.y);
 			}
 
 			if (m_Running && m_Player)

@@ -145,6 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\ui\Crosshair.cpp" />
     <ClCompile Include="src\items\Item.cpp" />
     <ClCompile Include="src\graphics\Rectangle.cpp" />
     <ClCompile Include="src\items\Inventory.cpp" />
@@ -192,6 +193,7 @@
     <ClCompile Include="src\core\UIManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\ui\Crosshair.hpp" />
     <ClInclude Include="src\graphics\Rectangle.hpp" />
     <ClInclude Include="src\ui\InventoryUI.hpp" />
     <ClInclude Include="src\items\Inventory.hpp" />
