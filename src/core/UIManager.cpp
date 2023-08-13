@@ -7,14 +7,14 @@ UIManager::UIManager(Window& window, Inventory& inventory) :
 	m_Window(window),
 	m_Crosshair(m_Canvas)
 {
-	m_Window.SetCursorVisibility(false);
+	m_Window.GetMouse().SetCursorVisible(false);
 }
 
 void UIManager::ShowInventory(bool visible)
 {
 	m_Crosshair.SetVisible(!visible);
 	m_Inventory.SetVisible(visible);
-	m_Window.SetCursorVisibility(visible);
+	m_Window.GetMouse().SetCursorVisible(visible);
 }
 
 void UIManager::Update()

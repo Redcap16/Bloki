@@ -2,33 +2,17 @@
 
 
 Application::Application() :
-	m_Window(Window::GetInstance()),
-	m_Camera({1280, 720})
+	m_Window(glm::ivec2(1280, 720), "Bloki Alpha 2", true),
+	m_Camera(m_Window.GetSize())
 {
-	bool fs = true;
-
-	m_Window.OpenConsole();
-
-	if (MessageBox(NULL, L"Would You Like To Run In Fullscreen Mode?", L"Start FullScreen?", MB_YESNO | MB_ICONQUESTION) == IDNO)
-		fs = false;
-
-	if (!m_Window.Initialize(1280, 720, "Bloki Alpha 1", this, fs))
-	{
-		MessageBox(NULL, L"Initialization failed", L"Fail", MB_OK | MB_ICONERROR);
-		return;
-	}
-
-	m_Window.SetMousePos(640, 360);
-
-	glewInit();
-
-	DebugProvider::Set(&m_DebugHandler);
-
-	Block::SetupBlockData();
+	m_Window.GetMouse().SetPosition(m_Window.GetSize() / 2);
+	m_Window.AddKeyboardListener(*this);
+	m_Window.AddMouseMoveListener(*this);
+	m_Window.AddWindowResizeListener(*this);
 
 	m_Renderer = std::make_unique<Renderer3D>(m_Window.GetSize());
 	m_World = std::make_unique<LoadedChunks>(*m_Renderer, "saves/first");
-	m_Player = std::make_unique<Player>(*m_World, m_Keyboard, m_Mouse, m_Window.GetSize());
+	m_Player = std::make_unique<Player>(*m_World, m_Window.GetKeyboard(), m_Window.GetMouse(), m_Window.GetSize());
 	m_Player->SetPosition(glm::vec3(0, 40, 0));
 	m_Player->SetEyeCamera(&m_Camera);
 	m_Renderer->SetCamera(&m_Camera);
@@ -38,34 +22,53 @@ Application::Application() :
 	m_UIManager = std::make_unique<UIManager>(m_Window, *m_Inventory);
 }
 
-void Application::OnWindowEvent(const Event& e)
+void Application::OnKeyboardEvent(const KeyboardEvent& event)
 {
-	switch (e.type)
+	if(event.m_Type == event.KeyPressed &&
+		event.m_Key == 'p')
+		m_Running = !m_Running;
+	else if (event.m_Type == event.KeyPressed &&
+		event.m_Key == 'e')
 	{
-	case Event::EventType::Resize:
-		if(m_Renderer)
-			m_Renderer->Resize(e.params.window.size);
-		if(m_Player)
-			m_Player->SetWindowSize(e.params.window.size);
-
-		if(m_UIManager) m_UIManager->SetWindowSize(e.params.window.size);
-		break;
-	case Event::EventType::MouseClicked:
-		if(m_UIManager && !m_UIManager->IsInventoryVisible())
-			m_Player->MouseClicked(glm::ivec2(0), e.params.mouseButton.button == Event::MouseButton::LMB);
-
-		if (m_UIManager) m_UIManager->MouseClicked(e.params.mouseButton.button == Event::MouseButton::LMB);
-		break;
-	case Event::EventType::MouseMoved:
-		if (m_UIManager && !m_UIManager->IsInventoryVisible())
-			if(m_Player) m_Player->MouseMoved(e.params.mouse.position);
-
-		if (m_UIManager) m_UIManager->MouseMoved(e.params.mouse.position);
-		break;
-	case Event::EventType::MouseReleased:
-		if (m_UIManager) m_UIManager->MouseReleased(e.params.mouseButton.button == Event::MouseButton::LMB);
-		break;
+		m_UIManager->ShowInventory(!m_UIManager->IsInventoryVisible());
+		m_Window.GetMouse().SetPosition(m_Window.GetSize() / 2);
 	}
+	if (event.m_Type == event.KeyPressed &&
+		event.m_Key == Keyboard::Key::Escape)
+		m_Done = true;
+}
+
+void Application::OnWindowResize(glm::ivec2 size)
+{
+	if (m_Renderer)
+		m_Renderer->Resize(size);
+	if (m_Player)
+		m_Player->SetWindowSize(size);
+
+	if (m_UIManager) m_UIManager->SetWindowSize(size);
+}
+
+void Application::OnMouseButtonEvent(const MouseButtonEvent& event)
+{
+	if (event.m_Type == MouseButtonEvent::Pressed)
+	{
+		if (m_UIManager && !m_UIManager->IsInventoryVisible())
+			m_Player->MouseClicked(glm::ivec2(0), event.m_Button == Mouse::Button::Left);
+
+		if (m_UIManager) m_UIManager->MouseClicked(event.m_Button == Mouse::Button::Left);
+	}
+	else if (event.m_Type == MouseButtonEvent::Released)
+	{
+		if (m_UIManager) m_UIManager->MouseReleased(event.m_Button == Mouse::Button::Left);
+	}
+}
+
+void Application::OnMouseMove(glm::ivec2 position)
+{
+	if (m_UIManager && !m_UIManager->IsInventoryVisible())
+		if (m_Player) m_Player->MouseMoved(position);
+
+	if (m_UIManager) m_UIManager->MouseMoved(position);
 }
 
 void Application::Start()
@@ -78,24 +81,11 @@ void Application::Start()
 
 	m_Running = true;
 
-	while (!m_Window.Done())
+	while (!m_Window.Done() && !m_Done)
 	{
 		m_Window.CheckForEvents();
 		if (m_Window.Active())
 		{
-			if (m_Window.GetKey('P'))
-			{
-				m_Window.SetKey('P', false);
-				m_Running = !m_Running;
-			}
-			if (m_Window.GetKey('E'))
-			{
-				m_Window.SetKey('E', false);
-				m_UIManager->ShowInventory(!m_UIManager->IsInventoryVisible());
-				glm::ivec2 pos = m_Window.GetSize() / 2;
-				m_Window.SetMousePos(pos.x, pos.y);
-			}
-
 			if (m_Running && m_Player)
 			{
 				const int parts = ceil(deltaTime / 200.0f); //Max 200ms per update, no more
@@ -128,8 +118,6 @@ void Application::Start()
 		m_World->SetCenter(m_Player->GetPosition());
 	}
 
-	m_World.reset();
 	m_UIManager.reset();
-
-	m_Window.Close();
+	m_World.reset();
 }

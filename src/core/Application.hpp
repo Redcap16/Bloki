@@ -23,7 +23,7 @@
 #include <core/UIManager.hpp>
 #include <ui/Button.hpp>
 
-class KeyboardDummy : public Keyboard
+/*class KeyboardDummy : public Keyboard
 {
 public:
 	KeyboardDummy() :
@@ -53,8 +53,10 @@ public:
 private:
 	Window& m_Window;
 };
-
-class Application : public WindowListener
+*/
+class Application : public KeyboardListener, 
+	public WindowListener, 
+	public MouseListener
 {
 public:
 	Application();
@@ -62,21 +64,21 @@ public:
 	Application(const Application&) = delete;
 	Application& operator=(const Application&) = delete;
 
-	void OnWindowEvent(const Event& e) override;
+	void OnKeyboardEvent(const KeyboardEvent& event) override;
+	void OnWindowResize(glm::ivec2 size) override;
+	void OnMouseButtonEvent(const MouseButtonEvent& event) override;
+	void OnMouseMove(glm::ivec2 position) override;
 	void Start();
 private:
-	Window& m_Window;
+	Window m_Window;
 	std::unique_ptr<Renderer3D> m_Renderer;
 	std::unique_ptr<Player> m_Player;
 	std::unique_ptr<LoadedChunks> m_World;
-
-	KeyboardDummy m_Keyboard;
-	MouseDummy m_Mouse;
-	ConsoleDebugHandler m_DebugHandler;
 
 	Camera3D m_Camera;
 	std::unique_ptr<Inventory> m_Inventory;
 	std::unique_ptr<UIManager> m_UIManager;
 
-	bool m_Running = false;
+	bool m_Running = false,
+		m_Done = false;
 };

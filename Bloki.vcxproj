@@ -145,6 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Input.cpp" />
     <ClCompile Include="src\ui\Crosshair.cpp" />
     <ClCompile Include="src\items\Item.cpp" />
     <ClCompile Include="src\graphics\Rectangle.cpp" />

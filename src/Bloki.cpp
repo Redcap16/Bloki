@@ -11,6 +11,11 @@
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE   hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+	Block::SetupBlockData();
+
+	ConsoleDebugHandler m_DebugHandler;
+	DebugProvider::Set(&m_DebugHandler);
+
 	Application app;
 	app.Start();
 

@@ -207,6 +207,9 @@
     <ClCompile Include="src\ui\Crosshair.cpp">
       <Filter>Pliki źródłowe\ui</Filter>
     </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>Pliki źródłowe\window</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\graphics\Camera.hpp">

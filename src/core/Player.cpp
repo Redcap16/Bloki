@@ -40,9 +40,9 @@ void Player::Update(float deltaTime)
 			m_Rigidbody.ChangeVelocity(rightDirection);
 		if (m_Keyboard.GetKeyState('A'))
 			m_Rigidbody.ChangeVelocity(-rightDirection);
-		if (m_Keyboard.GetKeyState(Keyboard::KeySpace))
+		if (m_Keyboard.GetKeyState(Keyboard::Key::Spacebar))
 			m_Rigidbody.ChangeVelocity(glm::vec3(0, c_FlyingSpeed, 0));
-		if (m_Keyboard.GetKeyState(Keyboard::KeyShift))
+		if (m_Keyboard.GetKeyState(Keyboard::Key::Shift))
 			m_Rigidbody.ChangeVelocity(glm::vec3(0, -c_FlyingSpeed, 0));
 	}
 	else
@@ -63,7 +63,7 @@ void Player::Update(float deltaTime)
 			m_Rigidbody.ChangeVelocity(rightDirection * deltaTime);
 		if (m_Keyboard.GetKeyState('A'))
 			m_Rigidbody.ChangeVelocity(-rightDirection * deltaTime);
-		if (m_Keyboard.GetKeyState(Keyboard::KeySpace) && m_Rigidbody.IsOnGround())
+		if (m_Keyboard.GetKeyState(Keyboard::Key::Spacebar) && m_Rigidbody.IsOnGround())
 			m_Rigidbody.ChangeVelocity(glm::vec3(0, c_JumpSpeed, 0));
 	}
 
@@ -91,7 +91,7 @@ void Player::KeyReleased(char key)
 
 void Player::MouseMoved(const glm::ivec2& position)
 {
-	m_Mouse.SetMousePosition(m_WindowSize / 2);
+	m_Mouse.SetPosition(m_WindowSize / 2);
 
 	glm::ivec2 delta = position - m_WindowSize / 2;
 	delta.y = -delta.y;
