@@ -40,13 +40,13 @@ public:
 	void Start();
 private:
 	Window m_Window;
-	std::unique_ptr<Renderer3D> m_Renderer;
-	std::unique_ptr<Player> m_Player;
-	std::unique_ptr<LoadedChunks> m_World;
+	Renderer3D m_Renderer;
+	LoadedChunks m_World;
+	Player m_Player;
 
 	Camera3D m_Camera;
-	std::unique_ptr<Inventory> m_Inventory;
-	std::unique_ptr<UIManager> m_UIManager;
+	Inventory m_Inventory;
+	UIManager m_UIManager;
 
 	bool m_Running = false,
 		m_Done = false;
