@@ -1,4 +1,4 @@
-#include <window/window.h>
+#include <window/Window.hpp>
 
 std::weak_ptr<ConsoleWindow::Console> ConsoleWindow::s_Instance;
 

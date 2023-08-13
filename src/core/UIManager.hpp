@@ -2,7 +2,7 @@
 
 #include <ui/InventoryUI.hpp>
 #include <ui/Canvas.hpp>
-#include <window/window.h>
+#include <window/Window.hpp>
 #include <ui/Crosshair.hpp>
 
 class UIManager

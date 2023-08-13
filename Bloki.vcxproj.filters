@@ -87,7 +87,7 @@
     <ClCompile Include="src\graphics\VertexBuffer.cpp">
       <Filter>Pliki źródłowe\graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\window\window.cpp">
+    <ClCompile Include="src\window\Window.cpp">
       <Filter>Pliki źródłowe\window</Filter>
     </ClCompile>
     <ClCompile Include="src\util\db_perlin.cpp">
@@ -207,7 +207,7 @@
     <ClCompile Include="src\ui\Crosshair.cpp">
       <Filter>Pliki źródłowe\ui</Filter>
     </ClCompile>
-    <ClCompile Include="Input.cpp">
+    <ClCompile Include="src\window\Input.cpp">
       <Filter>Pliki źródłowe\window</Filter>
     </ClCompile>
   </ItemGroup>
@@ -233,7 +233,7 @@
     <ClInclude Include="src\util\Math.hpp">
       <Filter>Pliki nagłówkowe\util</Filter>
     </ClInclude>
-    <ClInclude Include="src\window\window.h">
+    <ClInclude Include="src\window\Window.hpp">
       <Filter>Pliki nagłówkowe\window</Filter>
     </ClInclude>
     <ClInclude Include="src\graphics\ImageTexture.hpp">

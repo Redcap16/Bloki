@@ -16,44 +16,13 @@
 #include <cctype>
 #include <ctime>
 
-#include <window/window.h>
+#include <window/Window.hpp>
 #include <core/Renderer.hpp>
 #include <core/Player.hpp>
 #include <world/LoadedChunks.hpp>
 #include <core/UIManager.hpp>
 #include <ui/Button.hpp>
 
-/*class KeyboardDummy : public Keyboard
-{
-public:
-	KeyboardDummy() :
-		m_Window(Window::GetInstance())
-	{
-	}
-
-	bool GetKeyState(char key) override
-	{
-		return m_Window.GetKey(key);
-	}
-private:
-	Window& m_Window;
-};
-
-class MouseDummy : public Mouse
-{
-public:
-	MouseDummy() :
-		m_Window(Window::GetInstance())
-	{
-	}
-	void SetMousePosition(glm::ivec2 position) override
-	{
-		m_Window.SetMousePos(position.x, position.y);
-	}
-private:
-	Window& m_Window;
-};
-*/
 class Application : public KeyboardListener, 
 	public WindowListener, 
 	public MouseListener
