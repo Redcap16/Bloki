@@ -78,6 +78,34 @@ private:
 	int m_Index;
 };
 
+class ItemPicture : public Widget
+{
+public:
+	ItemPicture(WidgetParent& parent, glm::ivec2 position);
+
+	void SetItem(const ItemStack& stack);
+
+protected:
+	void handleMouseEvent(const MouseEvent& event) override { };
+	void render(WidgetRenderParams& params) override;
+
+	ItemQuad m_Mesh;
+};
+
+class PictureBox : public Widget
+{
+public:
+	PictureBox(WidgetParent& parent, std::string filename, glm::ivec2 position, glm::ivec2 size = { 0, 0 });
+
+	glm::ivec2 GetOriginalSize() { return m_Texture->GetSize(); };
+public:
+	void handleMouseEvent(const MouseEvent& event) override { };
+	void render(WidgetRenderParams& params) override;
+
+	Resource<ImageTexture> m_Texture;
+	graphics::Rectangle m_Rectangle;
+};
+
 class InventoryUI : public WidgetGroup, public InventoryUpdateListener
 {
 public:
@@ -117,6 +145,25 @@ private:
 
 	std::unique_ptr<MouseHolder> m_MouseHolder;
 	InventoryBackground m_Background;
+
+	void prepareSlots();
+};
+
+class Hotbar : public WidgetGroup, public InventoryUpdateListener
+{
+public:
+	Hotbar(WidgetParent& parent, Inventory& inventory);
+
+	void Updated(int index);
+private:
+	static constexpr const char* c_TextureFilename = "hotbar.png";
+	static constexpr glm::ivec2 c_Position = { 0, 30 };
+	static const int c_ItemCount = 9;
+
+	Inventory& m_Inventory;
+	std::vector<ItemPicture> m_Slots;
+
+	PictureBox m_Background;
 
 	void prepareSlots();
 };

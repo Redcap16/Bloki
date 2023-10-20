@@ -43,6 +43,9 @@ void ItemQuad::SetItem(const ItemStack& stack)
 
 void ItemQuad::Render(ShaderProgram& shader) const
 {
+	if (!m_Stack.Count)
+		return;
+
 	UniformLocation hasTexture = shader.GetUniformLocation("HasTexture"),
 		texture = shader.GetUniformLocation("Texture");
 	shader.SetUniform(hasTexture, 1);
@@ -79,8 +82,7 @@ void MouseHolder::SetStack(const ItemStack& stack)
 		return;
 	
 	m_Stack = stack;
-	if (m_Stack.Count != 0)
-		m_Mesh.SetItem(m_Stack);
+	m_Mesh.SetItem(m_Stack);
 }
 
 void MouseHolder::handleMouseEvent(const MouseEvent& event)
@@ -113,8 +115,7 @@ void ItemSlot::Update(const ItemStack& stack)
 		return;
 
 	m_Stack = stack;
-	if (m_Stack.Count != 0)
-		m_Mesh.SetItem(stack);
+	m_Mesh.SetItem(stack);
 }
 
 void ItemSlot::handleMouseEvent(const MouseEvent& event)
@@ -146,10 +147,44 @@ void ItemSlot::handleMouseEvent(const MouseEvent& event)
 
 void ItemSlot::render(WidgetRenderParams& params)
 {
-	if (!m_Stack.Count)
-		return;
-
 	m_Mesh.Render(params.m_Shader);
+}
+
+ItemPicture::ItemPicture(WidgetParent& parent, glm::ivec2 position) :
+	Widget(parent, position, ItemQuad::c_Size)
+{
+	
+}
+
+void ItemPicture::SetItem(const ItemStack& stack)
+{
+	m_Mesh.SetItem(stack);
+}
+
+void ItemPicture::render(WidgetRenderParams& params)
+{
+	m_Mesh.Render(params.m_Shader);
+}
+
+PictureBox::PictureBox(WidgetParent& parent, std::string filename, glm::ivec2 position, glm::ivec2 size) :
+	Widget(parent, position, size),
+	m_Texture(filename, true),
+	m_Rectangle(glm::ivec2(0), glm::ivec2(0), glm::vec2(0), glm::vec2(1, 1))
+{
+	if (size == glm::ivec2(0, 0))
+		SetSize(m_Texture->GetSize());
+	m_Rectangle.SetSize(m_Texture->GetSize());
+}
+
+void PictureBox::render(WidgetRenderParams& params)
+{
+	UniformLocation hasTexture = params.m_Shader.GetUniformLocation("HasTexture"),
+		texture = params.m_Shader.GetUniformLocation("Texture");
+	params.m_Shader.SetUniform(hasTexture, 1);
+	params.m_Shader.SetUniform(texture, 0);
+
+	m_Texture->Bind(0);
+	m_Rectangle.Render();
 }
 
 InventoryUI::InventoryUI(WidgetParent& parent, Inventory& inventory) :
@@ -229,5 +264,41 @@ void InventoryUI::prepareSlots()
 			else
 				currentPosition.y += slotMargin.y;
 		}
+	}
+}
+
+Hotbar::Hotbar(WidgetParent& parent, Inventory& inventory) :
+	WidgetGroup(parent, -c_Position, glm::ivec2(0)),
+	m_Inventory(inventory),
+	m_Background(*this, c_TextureFilename, glm::ivec2(0))
+{
+	m_Inventory.AddListener(this);
+
+	SetAnchor(AnchorPoint::CenterBottom);
+	SetRelativeTo(AnchorPoint::CenterBottom);
+
+	SetSize(m_Background.GetSize());
+
+	prepareSlots();
+}
+
+void Hotbar::Updated(int index)
+{
+	if (index >= c_ItemCount)
+		return;
+
+	m_Slots[index].SetItem(m_Inventory.GetItemStack(index));
+}
+
+void Hotbar::prepareSlots()
+{
+	static constexpr glm::ivec2 firstSlot = { 17, 18 };
+	static const int slotMargin = 8;
+
+	glm::ivec2 currentPosition = firstSlot;
+	for (int i = 0; i < c_ItemCount; ++i)
+	{
+		m_Slots.emplace_back(*this, currentPosition);
+		currentPosition.x += slotMargin + ItemQuad::c_Size.x;
 	}
 }

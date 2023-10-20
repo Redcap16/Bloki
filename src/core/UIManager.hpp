@@ -27,5 +27,6 @@ private:
 	Window& m_Window;
 
 	InventoryUI m_Inventory;
+	Hotbar m_Hotbar;
 	Crosshair m_Crosshair;
 };
