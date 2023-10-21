@@ -1,21 +1,13 @@
 #include <graphics/Font.hpp>
 
-FT_Library Font::s_Library;
-FT_Memory Font::s_LibraryMemory;
+std::weak_ptr<FT_LibraryRec_> Font::s_Library;
 
 Font::Font(const std::string& filename, int letterSize) :
 	m_LetterSize(letterSize)
 {
 	setupLibrary();
 
-	FT_Error error = FT_Reference_Library(s_Library);
-	if (error)
-	{
-		DEBUG_LOG("Error: Cannot reference FreeType library");
-		return;
-	}
-
-	error = FT_New_Face(s_Library, filename.c_str(), 0, &m_Face);
+	FT_Error error = FT_New_Face(&*m_Library, (c_FontPath + filename).c_str(), 0, &m_Face);
 	if (error)
 	{
 		DEBUG_LOG("Error: Cant load FreeType face");
@@ -36,20 +28,13 @@ Font::Font(const std::string& filename, int letterSize) :
 		DEBUG_LOG("Error: Cant release FreeType face");
 }
 
-Font::~Font()
-{
-	FT_Error error = FT_Done_Library(s_Library);
-	if (error)
-		DEBUG_LOG("Error: Cant release FreeType library");
-}
-
 const Font::Glyph* Font::GetGlyph(char letter) const
 {
 	if (letter < c_FirstPrintableChar ||
 		letter > c_LastPrintableChar)
 		return nullptr;
 
-	if (m_Glyphs[letter - c_FirstPrintableChar].Size.x == 0)
+	if (m_Glyphs[letter - c_FirstPrintableChar].Advance == 0)
 		return nullptr;
 
 	return &m_Glyphs[letter - c_FirstPrintableChar];
@@ -57,18 +42,23 @@ const Font::Glyph* Font::GetGlyph(char letter) const
 
 void Font::setupLibrary()
 {
-	if (s_Library != nullptr)
+	m_Library = s_Library.lock();
+	if (m_Library)
 		return;
 
-	FT_Error error = FT_New_Library(s_LibraryMemory, &s_Library);
+	FT_Library library;
+	FT_Error error = FT_Init_FreeType(&library);
 	if (error)
 	{
 		DEBUG_LOG("Error: cannot create FreeType library instance");
 		return;
 	}
 
-	FT_Add_Default_Modules(s_Library);
-	FT_Set_Default_Properties(s_Library);
+	m_Library = std::shared_ptr<FT_LibraryRec_>(library, [](auto ptr) {
+		FT_Error error = FT_Done_Library(ptr);
+		if (error)
+			DEBUG_LOG("Error: Cant release FreeType library"); });
+	s_Library = m_Library;
 }
 
 void Font::loadGlyphs()
@@ -77,8 +67,8 @@ void Font::loadGlyphs()
 	CHECK_GL_ERROR();
 
 	std::vector<unsigned char> buffers[c_CharsCount];
-	glm::ivec2 textureSize,
-		rowSize;
+	glm::ivec2 textureSize(0),
+		rowSize(0);
 	int rowLenght = std::ceil(sqrt(c_CharsCount));
 
 	for (int i = 0; i < c_CharsCount; ++i)
@@ -105,10 +95,10 @@ void Font::loadGlyphs()
 		}
 		
 		m_Glyphs[i].Size = glm::ivec2(m_Face->glyph->bitmap.width, m_Face->glyph->bitmap.rows);
-		m_Glyphs[i].Bearing = glm::ivec2(m_Face->glyph->bitmap_left, m_Face->glyph->bitmap_top);
-		m_Glyphs[i].Advance = m_Face->glyph->advance.x;
+		m_Glyphs[i].Bearing = glm::ivec2(m_Face->glyph->bitmap_left, -m_Face->glyph->bitmap_top);
+		m_Glyphs[i].Advance = m_Face->glyph->advance.x >> 6;
 
-		buffers[i].reserve((size_t)m_Glyphs[i].Size.x * m_Glyphs[i].Size.y);
+		buffers[i].resize((size_t)m_Glyphs[i].Size.x * m_Glyphs[i].Size.y);
 		std::memcpy(buffers[i].data(), m_Face->glyph->bitmap.buffer, (size_t)m_Glyphs[i].Size.x * m_Glyphs[i].Size.y);
 
 		rowSize.x += m_Glyphs[i].Size.x;
@@ -119,12 +109,12 @@ void Font::loadGlyphs()
 
 	glGenTextures(1, &m_Texture);
 	glBindTexture(GL_TEXTURE_2D, m_Texture);
-	glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, textureSize.x, textureSize.y, 0, GL_RED, GL_UNSIGNED_BYTE, nullptr);
 	CHECK_GL_ERROR();
 
-	glm::ivec2 currentOffset;
+	glm::ivec2 currentOffset = { 0, 0 };
 	int rowHeight = 0;
 
 	for (int i = 0; i < c_CharsCount; ++i)

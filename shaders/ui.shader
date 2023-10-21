@@ -33,4 +33,10 @@ void main()
 {
 	vec4 sampled = HasTexture ? texture(Texture, TexCoord) : vec4(1, 1, 1, 1);
 	FragColor = vec4(Color, 1) * sampled;
+	if(sampled.x < 0.3)
+	{
+		sampled.x = 0;
+		if(distance(sampled, vec4(0, 0, 0, 1)) < 0.05)
+			discard;
+	}
 }

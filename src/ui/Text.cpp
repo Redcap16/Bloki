@@ -27,6 +27,7 @@ void Text::SetPosition(glm::ivec2 position)
 
 void Text::Render() const
 {
+	m_Font.Bind();
 	m_VAO.Draw();
 }
 

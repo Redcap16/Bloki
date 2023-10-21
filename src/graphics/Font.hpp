@@ -48,18 +48,20 @@ public:
 	};
 
 	Font(const std::string& filename, int letterSize);
-	~Font();
+	~Font() = default;
 	Font(const Font&) = delete;
 	Font& operator=(const Font&) = delete;
 
+	void Bind() const { glBindTexture(GL_TEXTURE_2D, m_Texture); };
 	const Glyph* GetGlyph(char letter) const;
 private:
+	static constexpr const char* c_FontPath = "assets/fonts/";
 	static const int c_FirstPrintableChar = ' ', 
 		c_LastPrintableChar = '~',
 		c_CharsCount = c_LastPrintableChar - c_FirstPrintableChar + 1;
 
-	static FT_Library s_Library;
-	static FT_Memory s_LibraryMemory;
+	static std::weak_ptr<FT_LibraryRec_> s_Library;
+	std::shared_ptr<FT_LibraryRec_> m_Library;
 
 	FT_Face m_Face;
 
