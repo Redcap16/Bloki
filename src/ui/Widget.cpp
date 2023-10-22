@@ -168,7 +168,7 @@ void Widget::HandleMouseEvent(const MouseEvent& event)
 	handleMouseEvent(event);
 }
 
-void Widget::Render(WidgetRenderParams& params)
+void Widget::Render(RenderingParams& params)
 {
 	if (!m_Visible)
 		return;

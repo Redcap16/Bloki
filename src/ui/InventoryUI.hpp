@@ -22,7 +22,7 @@ public:
 
 	void SetItem(const ItemStack& stack);
 
-	void Render(ShaderProgram& shader) const;
+	void Render(RenderingParams& shader) const;
 private:
 	ItemStack m_Stack;
 	graphics::Rectangle m_Rectangle;
@@ -45,7 +45,7 @@ public:
 
 protected:
 	void handleMouseEvent(const MouseEvent& event) override;
-	void render(WidgetRenderParams& params) override;
+	void render(RenderingParams& params) override;
 
 private:
 	ItemStack m_Stack;
@@ -66,7 +66,7 @@ public:
 
 protected:
 	void handleMouseEvent(const MouseEvent& event) override;
-	void render(WidgetRenderParams& params) override;
+	void render(RenderingParams& params) override;
 
 private:
 	Inventory* m_Inventory;
@@ -87,10 +87,12 @@ public:
 
 protected:
 	void handleMouseEvent(const MouseEvent& event) override { };
-	void render(WidgetRenderParams& params) override;
+	void render(RenderingParams& params) override;
 
 	ItemQuad m_Mesh;
 };
+
+#include <ui/Text.hpp>
 
 class PictureBox : public Widget
 {
@@ -100,10 +102,13 @@ public:
 	glm::ivec2 GetOriginalSize() { return m_Texture->GetSize(); };
 public:
 	void handleMouseEvent(const MouseEvent& event) override { };
-	void render(WidgetRenderParams& params) override;
+	void render(RenderingParams& params) override;
 
 	Resource<ImageTexture> m_Texture;
 	graphics::Rectangle m_Rectangle;
+
+	Font m_Font;
+	Text m_Test;
 };
 
 class InventoryUI : public WidgetGroup, public InventoryUpdateListener
@@ -131,7 +136,7 @@ private:
 
 	protected:
 		void handleMouseEvent(const MouseEvent& event) override { };
-		void render(WidgetRenderParams& params) override;
+		void render(RenderingParams& params) override;
 
 	private:
 		static constexpr const char* c_TextureFilename = "inventory.png";

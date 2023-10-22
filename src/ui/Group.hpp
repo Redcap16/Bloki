@@ -24,5 +24,5 @@ protected:
 	void RemoveWidget(const Widget* widget) override;
 
 	void handleMouseEvent(const MouseEvent& event) override;
-	void render(WidgetRenderParams& shader) override;
+	void render(RenderingParams& shader) override;
 };

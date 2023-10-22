@@ -42,7 +42,6 @@ private:
 	glm::ivec2 m_WindowSize;
 
 	Resource<ShaderProgram> m_Shader;
-	UniformLocation m_HasTextureLocation;
 	glm::mat4 m_ProjectionMatrix;
 
 	void updateProjectionMatrix();

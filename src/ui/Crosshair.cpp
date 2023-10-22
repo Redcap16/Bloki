@@ -12,12 +12,9 @@ Crosshair::Crosshair(WidgetParent& parent) :
 	m_Rectangle.SetSize(m_Texture->GetSize());
 }
 
-void Crosshair::render(WidgetRenderParams& params)
+void Crosshair::render(RenderingParams& params)
 {
-	UniformLocation hasTexture = params.m_Shader.GetUniformLocation("HasTexture"),
-		texture = params.m_Shader.GetUniformLocation("Texture");
-	params.m_Shader.SetUniform(hasTexture, 1);
-	params.m_Shader.SetUniform(texture, 0);
+	params.SetColoringType(ColoringType::ColorTexture);
 
 	m_Texture->Bind(0);
 

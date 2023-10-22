@@ -27,16 +27,21 @@ in vec3 Color;
 out vec4 FragColor;
 
 uniform sampler2D Texture;
-uniform bool HasTexture;
+uniform int ColoringType;
 
 void main()
 {
-	vec4 sampled = HasTexture ? texture(Texture, TexCoord) : vec4(1, 1, 1, 1);
-	FragColor = vec4(Color, 1) * sampled;
-	if(sampled.x < 0.3)
+	switch(ColoringType)
 	{
-		sampled.x = 0;
-		if(distance(sampled, vec4(0, 0, 0, 1)) < 0.05)
-			discard;
+		case 0:
+			FragColor = vec4(Color, 1);
+			break;
+		case 1:
+			vec4 sampled = texture(Texture, TexCoord);
+			FragColor = vec4(Color, 1) * sampled;
+			break;
+		case 2:
+			FragColor = vec4(Color, texture(Texture, TexCoord)[0]);
+			break;
 	}
 }

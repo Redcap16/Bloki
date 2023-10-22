@@ -210,6 +210,12 @@
     <ClCompile Include="src\window\Input.cpp">
       <Filter>Pliki źródłowe\window</Filter>
     </ClCompile>
+    <ClCompile Include="src\ui\PrimitiveBuffer.cpp">
+      <Filter>Pliki źródłowe\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\UIRender.cpp">
+      <Filter>Pliki źródłowe\ui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\graphics\Camera.hpp">
@@ -360,6 +366,12 @@
       <Filter>Pliki nagłówkowe\core</Filter>
     </ClInclude>
     <ClInclude Include="src\ui\Crosshair.hpp">
+      <Filter>Pliki nagłówkowe\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\PrimitiveBuffer.hpp">
+      <Filter>Pliki nagłówkowe\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\UIRender.hpp">
       <Filter>Pliki nagłówkowe\ui</Filter>
     </ClInclude>
   </ItemGroup>

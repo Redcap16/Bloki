@@ -2,6 +2,7 @@
 
 #include <glm/glm.hpp>
 #include <graphics/ShaderProgram.hpp>
+#include <ui/UIRender.hpp>
 
 enum class AnchorPoint
 {
@@ -71,11 +72,7 @@ protected:
 class Widget
 {
 public:
-	struct WidgetRenderParams
-	{
-		ShaderProgram& m_Shader;
-		const glm::mat4& m_Projection;
-	};
+	
 
 	Widget(WidgetParent& parent, glm::ivec2 position, glm::ivec2 size);
 	~Widget();
@@ -98,7 +95,7 @@ public:
 	void SetAnchor(AnchorPoint anchor);
 
 	void HandleMouseEvent(const MouseEvent& event);
-	void Render(WidgetRenderParams& params);
+	void Render(RenderingParams& params);
 
 	bool Contains(glm::ivec2 position) const;
 
@@ -121,7 +118,7 @@ protected:
 		m_Size;
 
 	virtual void handleMouseEvent(const MouseEvent& event) = 0;
-	virtual void render(WidgetRenderParams& params) = 0;
+	virtual void render(RenderingParams& params) = 0;
 
 private:
 	glm::mat4 m_ModelMatrix;

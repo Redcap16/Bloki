@@ -17,7 +17,7 @@ public:
 
 protected:
 	void handleMouseEvent(const MouseEvent& event) override;
-	void render(WidgetRenderParams& shader) override;
+	void render(RenderingParams& params) override;
 
 	virtual void pressed() = 0;
 	virtual void released() = 0;
@@ -29,7 +29,7 @@ private:
 		ButtonMesh(glm::ivec2 size);
 		
 		void ChangeColor(glm::ivec3 color);
-		void Render(ShaderProgram& shader);
+		void Render(RenderingParams& params);
 	private:
 		static const int c_BorderWidth = 10;
 		static constexpr float c_BorderTextureWidth = 0.1f;

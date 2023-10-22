@@ -41,15 +41,12 @@ void ItemQuad::SetItem(const ItemStack& stack)
 	update();
 }
 
-void ItemQuad::Render(ShaderProgram& shader) const
+void ItemQuad::Render(RenderingParams& params) const
 {
 	if (!m_Stack.Count)
 		return;
 
-	UniformLocation hasTexture = shader.GetUniformLocation("HasTexture"),
-		texture = shader.GetUniformLocation("Texture");
-	shader.SetUniform(hasTexture, 1);
-	shader.SetUniform(texture, 0);
+	params.SetColoringType(ColoringType::ColorTexture);
 
 	m_Texture->Bind(0);
 	m_Rectangle.Render();
@@ -90,12 +87,12 @@ void MouseHolder::handleMouseEvent(const MouseEvent& event)
 
 }
 
-void MouseHolder::render(WidgetRenderParams& params)
+void MouseHolder::render(RenderingParams& params)
 {
 	if (!m_Stack.Count)
 		return;
 
-	m_Mesh.Render(params.m_Shader);
+	m_Mesh.Render(params);
 }
 
 ItemSlot::ItemSlot(WidgetParent& parent, glm::ivec2 position, MouseHolder& mouseHolder, Inventory& inventory, int index) :
@@ -145,9 +142,9 @@ void ItemSlot::handleMouseEvent(const MouseEvent& event)
 	}
 }
 
-void ItemSlot::render(WidgetRenderParams& params)
+void ItemSlot::render(RenderingParams& params)
 {
-	m_Mesh.Render(params.m_Shader);
+	m_Mesh.Render(params);
 }
 
 ItemPicture::ItemPicture(WidgetParent& parent, glm::ivec2 position) :
@@ -161,30 +158,32 @@ void ItemPicture::SetItem(const ItemStack& stack)
 	m_Mesh.SetItem(stack);
 }
 
-void ItemPicture::render(WidgetRenderParams& params)
+void ItemPicture::render(RenderingParams& params)
 {
-	m_Mesh.Render(params.m_Shader);
+	m_Mesh.Render(params);
 }
 
 PictureBox::PictureBox(WidgetParent& parent, std::string filename, glm::ivec2 position, glm::ivec2 size) :
 	Widget(parent, position, size),
 	m_Texture(filename, true),
-	m_Rectangle(glm::ivec2(0), glm::ivec2(0), glm::vec2(0), glm::vec2(1, 1))
+	m_Rectangle(glm::ivec2(0), glm::ivec2(0), glm::vec2(0), glm::vec2(1, 1)),
+	m_Font("DejaVuSerif.ttf", 50),
+	m_Test(m_Font, { -30, -30 }, "Hello, my name is FILIP mm m  m,,,,", glm::ivec3(255, 0, 0))
 {
 	if (size == glm::ivec2(0, 0))
 		SetSize(m_Texture->GetSize());
 	m_Rectangle.SetSize(m_Texture->GetSize());
 }
 
-void PictureBox::render(WidgetRenderParams& params)
+void PictureBox::render(RenderingParams& params)
 {
-	UniformLocation hasTexture = params.m_Shader.GetUniformLocation("HasTexture"),
-		texture = params.m_Shader.GetUniformLocation("Texture");
-	params.m_Shader.SetUniform(hasTexture, 1);
-	params.m_Shader.SetUniform(texture, 0);
+	params.SetColoringType(ColoringType::ColorTexture);
 
 	m_Texture->Bind(0);
 	m_Rectangle.Render();
+
+	params.SetColoringType(ColoringType::AlphaTexture);
+	m_Test.Render();
 }
 
 InventoryUI::InventoryUI(WidgetParent& parent, Inventory& inventory) :
@@ -230,12 +229,9 @@ InventoryUI::InventoryBackground::InventoryBackground(InventoryUI& inventory) :
 	m_Rectangle.SetSize(m_Texture->GetSize());
 }
 
-void InventoryUI::InventoryBackground::render(WidgetRenderParams& params)
+void InventoryUI::InventoryBackground::render(RenderingParams& params)
 {
-	UniformLocation hasTexture = params.m_Shader.GetUniformLocation("HasTexture"),
-		texture = params.m_Shader.GetUniformLocation("Texture");
-	params.m_Shader.SetUniform(hasTexture, 1);
-	params.m_Shader.SetUniform(texture, 0);
+	params.SetColoringType(ColoringType::ColorTexture);
 
 	m_Texture->Bind(0);
 	m_Rectangle.Render();

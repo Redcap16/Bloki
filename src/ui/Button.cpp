@@ -26,9 +26,9 @@ void Button::handleMouseEvent(const MouseEvent& event)
 	}
 }
 
-void Button::render(WidgetRenderParams& shader)
+void Button::render(RenderingParams& params)
 {
-	m_Mesh.Render(shader.m_Shader);
+	m_Mesh.Render(params);
 }
 
 Button::ButtonMesh::ButtonMesh(glm::ivec2 size) :
@@ -52,12 +52,9 @@ void Button::ButtonMesh::ChangeColor(glm::ivec3 color)
 	m_CenterEBO.ClearData();
 }
 
-void Button::ButtonMesh::Render(ShaderProgram& shader)
+void Button::ButtonMesh::Render(RenderingParams& params)
 {
-	UniformLocation hasTexture = shader.GetUniformLocation("HasTexture"),
-		texture = shader.GetUniformLocation("Texture");
-	shader.SetUniform(hasTexture, 1);
-	shader.SetUniform(texture, 0);
+	params.SetColoringType(ColoringType::ColorTexture);
 	m_Texture->Bind(0);
 
 	m_BorderVAO.Draw();

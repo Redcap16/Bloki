@@ -145,6 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\ui\PrimitiveBuffer.cpp" />
     <ClCompile Include="src\window\Input.cpp" />
     <ClCompile Include="src\ui\Crosshair.cpp" />
     <ClCompile Include="src\items\Item.cpp" />
@@ -192,8 +193,10 @@
     <ClCompile Include="src\ui\Widget.cpp" />
     <ClCompile Include="src\ui\Text.cpp" />
     <ClCompile Include="src\core\UIManager.cpp" />
+    <ClCompile Include="src\ui\UIRender.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\ui\PrimitiveBuffer.hpp" />
     <ClInclude Include="src\ui\Crosshair.hpp" />
     <ClInclude Include="src\graphics\Rectangle.hpp" />
     <ClInclude Include="src\ui\InventoryUI.hpp" />
@@ -244,6 +247,7 @@
     <ClInclude Include="src\ui\Widget.hpp" />
     <ClInclude Include="src\ui\Text.hpp" />
     <ClInclude Include="src\core\UIManager.hpp" />
+    <ClInclude Include="src\ui\UIRender.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

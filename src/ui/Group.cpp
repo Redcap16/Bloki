@@ -46,11 +46,11 @@ void WidgetGroup::handleMouseEvent(const MouseEvent& event)
 	}
 }
 
-void WidgetGroup::render(WidgetRenderParams& params)
+void WidgetGroup::render(RenderingParams& params)
 {
 	for (Widget* widget : m_Widgets)
 	{
-		params.m_Shader.SetMVPMatrix(params.m_Projection * widget->GetModelMatrix());
+		params.SetModelMatrix(widget->GetModelMatrix());
 
 		widget->Render(params);
 	}

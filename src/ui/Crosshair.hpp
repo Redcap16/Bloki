@@ -16,7 +16,7 @@ public:
 
 protected:
 	void handleMouseEvent(const MouseEvent& event) override { };
-	void render(WidgetRenderParams& params) override;
+	void render(RenderingParams& params) override;
 
 private:
 	static constexpr const char* c_TextureFilename = "crosshair.png";
