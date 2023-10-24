@@ -23,8 +23,8 @@ public:
 	void Render(const RenderingContext& context) override;
 private:
 	VertexArray m_MeshVAO;
-	VertexBuffer<Vertex3DS> m_MeshVBO;
-	ElementBuffer m_MeshEBO;
+	VertexBuffer<Vertex3DS>& m_MeshVBO;
+	ElementBuffer& m_MeshEBO;
 
 	std::atomic<bool> m_GeometryFinished;
 

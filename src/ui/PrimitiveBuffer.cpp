@@ -1,63 +1,66 @@
 #include <ui/PrimitiveBuffer.hpp>
 
-template<typename T>
-rect<T>::rect(glm::vec<2, T> position, glm::vec<2, T> size) :
-	Position(position),
-	Size(size)
-{
-
-}
-
-template<typename T>
-rect<T>::rect(T x, T y, T w, T h) :
-	Position(x, y),
-	Size(w, h)
-{
-
-}
-
 PrimitiveBuffer::PrimitiveBuffer(ColoringType coloringType) :
-	m_VBO(false),
-	m_EBO(false),
-	m_ColoringType(coloringType)
+	m_VAO(false),
+	m_VBO(&m_VAO.CreateVertexBuffer<Vertex2D>(false)),
+	m_EBO(&m_VAO.GetElementBuffer()),
+	m_ColoringType(coloringType),
+	m_Texture(nullptr)
 {
-	m_VAO.AddBuffer(&m_VBO);
-	m_VAO.SetElementBuffer(&m_EBO);
 }
 
-void PrimitiveBuffer::AddRectangle(irect dimensions, frect texDimensions, glm::vec3 color)
+PrimitiveRectangle::PrimitiveRectangle(irect dimensions, frect texDimensions, glm::vec3 color) :
+	m_Dimensions(dimensions),
+	m_TexDimensions(texDimensions),
+	m_Color(color)
 {
-	m_VBO.AddVertex({ dimensions.Position,										texDimensions.Position,											color });
-	m_VBO.AddVertex({ dimensions.Position + glm::ivec2(dimensions.Size.x, 0),	texDimensions.Position + glm::vec2(texDimensions.Size.x, 0),	color });
-	m_VBO.AddVertex({ dimensions.Position + dimensions.Size,					texDimensions.Position + texDimensions.Size,					color });
-	m_VBO.AddVertex({ dimensions.Position + glm::ivec2(0, dimensions.Size.y),	texDimensions.Position + glm::vec2(0, texDimensions.Size.y),	color });
 
-	ElementIndex index = m_VBO.GetCurrentIndex();
-	m_EBO.AddIndex(index - 3);
-	m_EBO.AddIndex(index - 2);
-	m_EBO.AddIndex(index - 1);
-
-	m_EBO.AddIndex(index - 3);
-	m_EBO.AddIndex(index - 1);
-	m_EBO.AddIndex(index);
-
-	m_VBO.UpdateBuffer();
-	m_EBO.UpdateBuffer();
 }
 
-void PrimitiveBuffer::AddRectangle(irect dimensions, glm::vec3 color)
+std::vector<Vertex2D> PrimitiveRectangle::GetVertices() const
 {
-	AddRectangle(dimensions, { 0, 0, 0, 0 }, color);
+	return {{ m_Dimensions.Position,										m_TexDimensions.Position,											m_Color },
+			{ m_Dimensions.Position + glm::ivec2(m_Dimensions.Size.x, 0),	m_TexDimensions.Position + glm::vec2(m_TexDimensions.Size.x, 0),	m_Color },
+			{ m_Dimensions.Position + m_Dimensions.Size,					m_TexDimensions.Position + m_TexDimensions.Size,					m_Color },
+			{ m_Dimensions.Position + glm::ivec2(0, m_Dimensions.Size.y),	m_TexDimensions.Position + glm::vec2(0, m_TexDimensions.Size.y),	m_Color }};
+}
+
+std::vector<ElementIndex> PrimitiveRectangle::GetIndices(ElementIndex lastIndex) const
+{
+	return { lastIndex - 3, lastIndex - 2, lastIndex - 1,
+			lastIndex - 3, lastIndex - 1, lastIndex - 0 };
+}
+
+void PrimitiveBuffer::RemovePrimitive(Primitive* primitive)
+{
+	auto it = std::find(m_Primitives.begin(), m_Primitives.end(), primitive);
+}
+
+void PrimitiveBuffer::Update()
+{
+	for (auto primitive : m_Primitives)
+	{
+		m_VBO->AddVertices(primitive->GetVertices());
+		m_EBO->AddIndices(primitive->GetIndices(m_VBO->GetCurrentIndex()));
+	}
+	m_VBO->UpdateBuffer();
+	m_EBO->UpdateBuffer();
+
+	m_VBO->ClearData();
+	m_EBO->ClearData();
 }
 
 void PrimitiveBuffer::Clear()
 {
-	m_VBO.ClearData();
-	m_EBO.ClearData();
+	m_Primitives.clear();
+	Update();
 }
 
-void PrimitiveBuffer::Render(RenderingParams params)
+void PrimitiveBuffer::Render(RenderingParams params) const
 {
 	params.SetColoringType(m_ColoringType);
+	if (m_Texture != nullptr &&
+		(m_ColoringType == ColoringType::ColorTexture || m_ColoringType == ColoringType::AlphaTexture))
+		m_Texture->Bind(0);
 	m_VAO.Draw();
 }

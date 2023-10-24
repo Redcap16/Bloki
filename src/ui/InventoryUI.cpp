@@ -183,7 +183,7 @@ void PictureBox::render(RenderingParams& params)
 	m_Rectangle.Render();
 
 	params.SetColoringType(ColoringType::AlphaTexture);
-	m_Test.Render();
+	m_Test.Render(params);
 }
 
 InventoryUI::InventoryUI(WidgetParent& parent, Inventory& inventory) :

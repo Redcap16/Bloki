@@ -4,11 +4,9 @@ Text::Text(const Font& font, glm::ivec2 position, const std::string text, glm::i
 	m_Font(font),
 	m_Position(position),
 	m_Text(text),
-	m_VBO(false),
-	m_EBO(false),
+	m_Buffer(ColoringType::AlphaTexture),
 	m_Color(color)
 {
-	setupMesh();
 	if(text != "")
 		updateMesh();
 }
@@ -25,16 +23,10 @@ void Text::SetPosition(glm::ivec2 position)
 	updateMesh();
 }
 
-void Text::Render() const
+void Text::Render(RenderingParams& params) const
 {
 	m_Font.Bind();
-	m_VAO.Draw();
-}
-
-void Text::setupMesh()
-{
-	m_VAO.SetElementBuffer(&m_EBO);
-	m_VAO.AddBuffer(&m_VBO);
+	m_Buffer.Render(params);
 }
 
 void Text::updateMesh()
@@ -43,10 +35,7 @@ void Text::updateMesh()
 	for (char c : m_Text)
 		addLetterQuad(offset, c);
 
-	m_VBO.UpdateBuffer();
-	m_EBO.UpdateBuffer();
-	m_VBO.ClearData();
-	m_EBO.ClearData();
+	m_Buffer.Update();
 }
 
 void Text::addLetterQuad(int& offset, char letter)
@@ -57,19 +46,8 @@ void Text::addLetterQuad(int& offset, char letter)
 
 	glm::ivec2 topLeftCorner = m_Position + glm::ivec2(offset, 0) + glyph->Bearing;
 
-	m_VBO.AddVertex({ topLeftCorner,								glyph->UVCoords,									m_Color });
-	m_VBO.AddVertex({ topLeftCorner + glm::ivec2(glyph->Size.x, 0), glyph->UVCoords + glm::vec2(glyph->UVSize.x, 0),	m_Color });
-	m_VBO.AddVertex({ topLeftCorner + glyph->Size,					glyph->UVCoords + glyph->UVSize,					m_Color });
-	m_VBO.AddVertex({ topLeftCorner + glm::ivec2(0, glyph->Size.y), glyph->UVCoords + glm::vec2(0, glyph->UVSize.y),	m_Color });
-
-	ElementIndex index = m_VBO.GetCurrentIndex();
-	m_EBO.AddIndex(index - 3);
-	m_EBO.AddIndex(index - 2);
-	m_EBO.AddIndex(index - 1);
-
-	m_EBO.AddIndex(index - 3);
-	m_EBO.AddIndex(index - 1);
-	m_EBO.AddIndex(index);
+	m_Letters.push_back(std::make_unique<PrimitiveRectangle>(irect(topLeftCorner, glyph->Size), frect(glyph->UVCoords, glyph->UVSize), m_Color));
+	m_Buffer.AddPrimitive(m_Letters.back().get());
 
 	offset += glyph->Advance;
 }

@@ -22,11 +22,11 @@ namespace graphics
 		void SetTextureCoords(glm::vec2 textureCoords, glm::vec2 textureSize);
 		void SetColor(glm::ivec3 color);
 
-		void Render() const { m_VAO->Draw(); };
+		void Render() const { m_VAO.Draw(); };
 	private:
-		std::shared_ptr<VertexBuffer<Vertex2D>> m_VBO;
-		std::shared_ptr<ElementBuffer> m_EBO;
-		std::shared_ptr<VertexArray> m_VAO;
+		VertexArray m_VAO;
+		VertexBuffer<Vertex2D>* m_VBO;
+		ElementBuffer* m_EBO;
 
 		glm::ivec2 m_Position,
 			m_Size;

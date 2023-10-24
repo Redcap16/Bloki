@@ -4,35 +4,41 @@
 #include <graphics/ElementBuffer.hpp>
 
 #include <util/Debug.hpp>
+#include <cassert>
 
 typedef GLuint VertexArrayHandle;
 
 class VertexArray
 {
 public:
-	VertexArray();
+	VertexArray(bool dynamic);
 	~VertexArray();
 	VertexArray(const VertexArray&) = delete;
 	VertexArray& operator=(const VertexArray&) = delete;
 	VertexArray(VertexArray &&other) noexcept;
 	VertexArray& operator=(VertexArray &&other) noexcept;
 
-	void AddBuffer(AbstractVertexBuffer* buffer);
-	inline void SetElementBuffer(ElementBuffer* buffer);
+	template <typename TVertex>
+	VertexBuffer<TVertex>& CreateVertexBuffer(bool dynamic);
+	ElementBuffer& GetElementBuffer() { return *m_ElementBuffer.get(); };
 	void Draw() const;
 private:
-	std::vector<AbstractVertexBuffer*> m_Buffers;
-	ElementBuffer* m_CurrentElementBuffer;
+	std::vector<std::unique_ptr<AbstractVertexBuffer>> m_Buffers;
+	std::unique_ptr<ElementBuffer> m_ElementBuffer;
 
 	VertexArrayHandle m_Handle;
 
 	unsigned int m_CurrentVertexAttribIndex;
 
 	void setup();
-	void updateArray(AbstractVertexBuffer* buffer);
+	void updateArray(const AbstractVertexBuffer& buffer);
 };
 
-void VertexArray::SetElementBuffer(ElementBuffer* buffer)
+template <typename TVertex>
+VertexBuffer<TVertex>& VertexArray::CreateVertexBuffer(bool dynamic)
 {
-	m_CurrentElementBuffer = buffer;
+	m_Buffers.push_back(std::unique_ptr<AbstractVertexBuffer>(new VertexBuffer<TVertex>(dynamic)));
+
+	updateArray(*m_Buffers.back());
+	return *static_cast<VertexBuffer<TVertex>*>(m_Buffers.back().get());
 }

@@ -32,10 +32,12 @@ void Button::render(RenderingParams& params)
 }
 
 Button::ButtonMesh::ButtonMesh(glm::ivec2 size) :
-	m_BorderVBO(false),
-	m_BorderEBO(false),
-	m_CenterVBO(false),
-	m_CenterEBO(false),
+	m_BorderVBO(m_BorderVAO.CreateVertexBuffer<Vertex2D>(false)),
+	m_BorderEBO(m_BorderVAO.GetElementBuffer()),
+	m_CenterVBO(m_CenterVAO.CreateVertexBuffer<Vertex2D>(false)),
+	m_CenterEBO(m_CenterVAO.GetElementBuffer()),
+	m_CenterVAO(false),
+	m_BorderVAO(false),
 	m_Size(size),
 	m_Texture(c_TextureFilename, false)
 {
@@ -63,9 +65,6 @@ void Button::ButtonMesh::Render(RenderingParams& params)
 
 void Button::ButtonMesh::createMesh()
 {
-	m_BorderVAO.AddBuffer(&m_BorderVBO);
-	m_BorderVAO.SetElementBuffer(&m_BorderEBO);
-
 	const glm::ivec3 color = glm::ivec3(255, 255, 255);
 
 	addRectangle(m_BorderVBO, m_BorderEBO, glm::ivec2(c_BorderWidth, 0), glm::ivec2(m_Size.x - 2 * c_BorderWidth, c_BorderWidth), glm::vec2(c_BorderTextureWidth, 0), glm::vec2(1 - 2 * c_BorderTextureWidth, c_BorderTextureWidth), color);
@@ -82,9 +81,6 @@ void Button::ButtonMesh::createMesh()
 	m_BorderEBO.UpdateBuffer();
 	m_BorderVBO.ClearData();
 	m_BorderEBO.ClearData();
-
-	m_CenterVAO.AddBuffer(&m_CenterVBO);
-	m_CenterVAO.SetElementBuffer(&m_CenterEBO);
 
 	ChangeColor(color);
 }

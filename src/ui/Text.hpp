@@ -5,6 +5,7 @@
 #include <graphics/Vertex.hpp>
 
 #include <string>
+#include <ui/PrimitiveBuffer.hpp>
 
 class Text
 {
@@ -14,18 +15,16 @@ public:
 	void SetText(const std::string text);
 	void SetPosition(glm::ivec2 position);
 
-	void Render() const;
+	void Render(RenderingParams& params) const;
 private:
-	VertexArray m_VAO;
-	VertexBuffer<Vertex2D> m_VBO;
-	ElementBuffer m_EBO;
+	PrimitiveBuffer m_Buffer;
+	std::vector<std::unique_ptr<PrimitiveRectangle>> m_Letters;
 
 	std::string m_Text;
 	glm::ivec2 m_Position;
 	const Font& m_Font;
 	glm::ivec3 m_Color;
 
-	void setupMesh();
 	void updateMesh();
 	void addLetterQuad(int& offset, char letter);
 };

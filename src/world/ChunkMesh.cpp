@@ -1,13 +1,12 @@
 #include <world/ChunkMesh.hpp>
 
 ChunkMesh::ChunkMesh(glm::vec3& position, const AtlasTexture::SubTexture(&textureCoords)[Block::c_BlockCount]) :
-	m_MeshVBO(true),
-	m_MeshEBO(true),
+	m_MeshVAO(true),
 	m_Position(position),
-	m_TextureCoords(textureCoords)
+	m_TextureCoords(textureCoords),
+	m_MeshVBO(m_MeshVAO.CreateVertexBuffer<Vertex3DS>(true)),
+	m_MeshEBO(m_MeshVAO.GetElementBuffer())
 {
-	m_MeshVAO.AddBuffer(&m_MeshVBO);
-	m_MeshVAO.SetElementBuffer(&m_MeshEBO);
 }
 
 void ChunkMesh::AddFace(Direction dir, InChunkPos position, Block block, BlockState state)

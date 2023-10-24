@@ -8,13 +8,10 @@ Rectangle::Rectangle(glm::ivec2 position, glm::ivec2 size, glm::vec2 textureCoor
 	m_TextureCoords(textureCoords),
 	m_TextureSize(textureSize),
 	m_Color(color),
-	m_VBO(std::make_shared<VertexBuffer<Vertex2D>>(false)),
-	m_EBO(std::make_shared<ElementBuffer>(false)),
-	m_VAO(std::make_shared<VertexArray>())
+	m_VBO(&m_VAO.CreateVertexBuffer<Vertex2D>(false)),
+	m_EBO(&m_VAO.GetElementBuffer()),
+	m_VAO(false)
 {
-	m_VAO->AddBuffer(m_VBO.get());
-	m_VAO->SetElementBuffer(m_EBO.get());
-
 	update();
 }
 

@@ -38,12 +38,12 @@ private:
 
 		glm::ivec2 m_Size;
 
-		VertexBuffer<Vertex2D> m_BorderVBO;
 		VertexArray m_BorderVAO;
-		ElementBuffer m_BorderEBO;
-		VertexBuffer<Vertex2D> m_CenterVBO;
+		VertexBuffer<Vertex2D>& m_BorderVBO;
+		ElementBuffer& m_BorderEBO;
 		VertexArray m_CenterVAO;
-		ElementBuffer m_CenterEBO;
+		VertexBuffer<Vertex2D>& m_CenterVBO;
+		ElementBuffer& m_CenterEBO;
 
 		Resource<ImageTexture> m_Texture;
 
