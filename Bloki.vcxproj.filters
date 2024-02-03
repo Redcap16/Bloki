@@ -374,5 +374,8 @@
     <ClInclude Include="src\ui\UIRender.hpp">
       <Filter>Pliki nagłówkowe\ui</Filter>
     </ClInclude>
+    <ClInclude Include="src\util\Event.hpp">
+      <Filter>Pliki nagłówkowe\util</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

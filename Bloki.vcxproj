@@ -196,6 +196,7 @@
     <ClCompile Include="src\ui\UIRender.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\util\Event.hpp" />
     <ClInclude Include="src\ui\PrimitiveBuffer.hpp" />
     <ClInclude Include="src\ui\Crosshair.hpp" />
     <ClInclude Include="src\graphics\Rectangle.hpp" />
