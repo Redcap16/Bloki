@@ -10,7 +10,7 @@
 class ChunkRenderer
 {
 public:
-	ChunkRenderer(Renderer3D& renderer, std::shared_ptr<const Chunk> chunk);
+	ChunkRenderer(Renderer3D& renderer, const Chunk* chunk);
 	~ChunkRenderer();
 	ChunkRenderer(const ChunkRenderer&) = delete;
 	ChunkRenderer& operator=(const ChunkRenderer&) = delete;
@@ -18,7 +18,7 @@ public:
 	void SetHighlight(InChunkPos position);
 	void ResetHighlight();
 
-	const Chunk* GetChunk() const { return m_Chunk.get(); }
+	const Chunk* GetChunk() const { return m_Chunk; }
 
 	void UpdateGeometry();
 private:
@@ -40,7 +40,7 @@ private:
 		m_TransparentMesh;
 
 	const std::array<const Chunk*, 6>& m_Neighbors;
-	std::shared_ptr<const Chunk> m_Chunk;
+	const Chunk* m_Chunk;
 	Chunk::BlockAccess<const BlockArray>* m_CurrentBlockAccess;
 
 	InChunkPos m_HighlightedPosition;

@@ -12,8 +12,14 @@
 #include <core/Renderer.hpp>
 #include <world/BlockArray.hpp>
 #include <entity/DroppedItem.hpp>
+#include <util/Event.hpp>
 
 typedef glm::ivec3 ChunkPos;
+
+class ChunkUpdateListener {
+public:
+	virtual void ChunkUpdated(const glm::ivec3& position) = 0;
+};
 
 class Chunk
 {
@@ -22,8 +28,17 @@ public:
 	class BlockAccess
 	{
 	public:
-		BlockAccess(TBlockArray& blockArray, std::mutex& mutex) : m_BlockArray(&blockArray), m_Lock(mutex) {}
-		~BlockAccess() = default;
+		BlockAccess(TBlockArray& blockArray, std::mutex& mutex) : 
+			m_BlockArray(&blockArray), 
+			m_Lock(mutex), 
+			m_UpdateEvent(nullptr), 
+			m_ChunkPosition(0) {}
+		BlockAccess(TBlockArray& blockArray, std::mutex& mutex, util::Event<ChunkUpdateListener> updateEvent, ChunkPos chunkPosition) : 
+			m_BlockArray(&blockArray), 
+			m_Lock(mutex), 
+			m_UpdateEvent(updateEvent),
+			m_ChunkPosition(chunkPosition) {}
+		~BlockAccess() { if (m_UpdateEvent != nullptr) m_UpdateEvent->Invoke(&ChunkUpdateListener::ChunkUpdated, m_ChunkPosition); };
 		BlockAccess(const BlockAccess&) = delete;
 		BlockAccess& operator=(const BlockAccess&) = delete;
 		BlockAccess(BlockAccess&& other) noexcept;
@@ -35,11 +50,17 @@ public:
 	private:
 		std::unique_lock<std::mutex> m_Lock;
 		TBlockArray* m_BlockArray;
+
+		util::Event<ChunkUpdateListener>* m_UpdateEvent;
+		ChunkPos m_ChunkPosition;
 	};
 
-	Chunk(Renderer3D& renderer, const ChunkPos& position);
+	Chunk(const ChunkPos& position);
 	Chunk(const Chunk&) = delete;
 	Chunk& operator=(const Chunk&) = delete;
+
+	void AddUpdateListener(ChunkUpdateListener* listener) { m_UpdateEvent.AddListener(listener); }
+	void RemoveUpdateListener(ChunkUpdateListener* listener) { m_UpdateEvent.RemoveListener(listener); }
 
 	const ChunkPos& GetPosition() const { return m_Position; }
 
@@ -52,9 +73,6 @@ public:
 	void Update();
 	void UpdateNeighbors(const std::array<Chunk*, 6>& neighbors);
 	const std::array<const Chunk*, 6>& GetNeighbors() const { return reinterpret_cast<const std::array<const Chunk*, 6>&>(m_Neighbors); }
-
-	inline bool DoesNeedGeometryUpdate() const { return m_GeometryUpdateNeeded; }
-	inline void GeometryUpdated() { m_GeometryUpdateNeeded = false; }
 
 	void AddDroppedItem(std::unique_ptr<DroppedItem> item);
 	void RemoveDroppedItem(const DroppedItem* item);
@@ -69,6 +87,8 @@ public:
 	void SetGenerated() { m_Generated = true; }
 	bool IsGenerated() const { return m_Generated; }
 private:
+	util::Event<ChunkUpdateListener> m_UpdateEvent;
+
 	BlockArray m_BlockArray;
 	ChunkPos m_Position;
 
@@ -77,7 +97,6 @@ private:
 	std::vector<std::unique_ptr<DroppedItem>> m_DroppedItems;
 
 	bool m_Generated;
-	std::atomic<bool> m_GeometryUpdateNeeded;
 	mutable std::mutex m_GeometryMutex;
 
 	void checkItemsBoundaries();

@@ -216,6 +216,9 @@
     <ClCompile Include="src\ui\UIRender.cpp">
       <Filter>Pliki źródłowe\ui</Filter>
     </ClCompile>
+    <ClCompile Include="src\world\WorldRenderer.cpp">
+      <Filter>Pliki źródłowe\world</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\graphics\Camera.hpp">
@@ -376,6 +379,9 @@
     </ClInclude>
     <ClInclude Include="src\util\Event.hpp">
       <Filter>Pliki nagłówkowe\util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\world\WorldRenderer.hpp">
+      <Filter>Pliki nagłówkowe\world</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

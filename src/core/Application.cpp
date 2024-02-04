@@ -6,6 +6,7 @@ Application::Application() :
 	m_Camera(m_Window.GetSize()),
 	m_Renderer(m_Window.GetSize()),
 	m_World(m_Renderer, "saves/first"),
+	m_WorldRenderer(m_Renderer, m_World),
 	m_Player(m_World, m_Window.GetKeyboard(), m_Window.GetMouse(), m_Window.GetSize()),
 	m_UIManager(m_Window, m_Inventory)
 {
@@ -68,6 +69,20 @@ void Application::OnMouseMove(glm::ivec2 position)
 	m_UIManager.MouseMoved(position);
 }
 
+void Application::SetChunksToRender() {
+	std::set<Chunk*> chunksToRender;
+	ChunkPos centerChunk = Chunk::GetChunkPosition(m_Player.GetPosition());
+	for (int x = -3; x <= 3; ++x)
+		for(int y = -1; y <= 1; ++y)
+			for (int z = -3; z <= 3; ++z) {
+				Chunk* const chunk = m_World.GetChunk(centerChunk + glm::ivec3(x, y, z));
+				if (chunk != nullptr)
+					chunksToRender.insert(chunk);
+			}
+
+	m_WorldRenderer.SetChunksToRender(chunksToRender);
+}
+
 void Application::Start()
 {
 	clock_t currentTime = clock(),
@@ -113,5 +128,7 @@ void Application::Start()
 		m_UIManager.Update();
 		m_World.Update();
 		m_World.SetCenter(m_Player.GetPosition());
+		SetChunksToRender();
+		m_WorldRenderer.Update();
 	}
 }

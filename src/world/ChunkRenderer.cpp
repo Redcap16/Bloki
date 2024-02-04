@@ -3,7 +3,7 @@
 AtlasTexture::SubTexture ChunkRenderer::s_TextureCoords[Block::c_BlockCount];
 bool ChunkRenderer::s_TextureCoordsCreated = false;
 
-ChunkRenderer::ChunkRenderer(Renderer3D& renderer, std::shared_ptr<const Chunk> chunk) :
+ChunkRenderer::ChunkRenderer(Renderer3D& renderer, const Chunk* chunk) :
 	m_Chunk(chunk),
 	m_Position(chunk->GetPosition()* BlockArray::ChunkSize),
 	m_OpaqueMesh(m_Position, s_TextureCoords),
