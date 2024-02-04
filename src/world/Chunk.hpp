@@ -33,7 +33,7 @@ public:
 			m_Lock(mutex), 
 			m_UpdateEvent(nullptr), 
 			m_ChunkPosition(0) {}
-		BlockAccess(TBlockArray& blockArray, std::mutex& mutex, util::Event<ChunkUpdateListener> updateEvent, ChunkPos chunkPosition) : 
+		BlockAccess(TBlockArray& blockArray, std::mutex& mutex, util::Event<ChunkUpdateListener>* updateEvent, ChunkPos chunkPosition) : 
 			m_BlockArray(&blockArray), 
 			m_Lock(mutex), 
 			m_UpdateEvent(updateEvent),
@@ -67,7 +67,7 @@ public:
 	void SetBlock(InChunkPos position, Block block);
 	Block GetBlock(InChunkPos position) const;
 	void SwapBlockArray(BlockArray& blockArray);
-	BlockAccess<BlockArray> GetBlockAccess() { return BlockAccess<BlockArray>(m_BlockArray, m_GeometryMutex); }
+	BlockAccess<BlockArray> GetBlockAccess() { return BlockAccess<BlockArray>(m_BlockArray, m_GeometryMutex, &m_UpdateEvent, m_Position); }
 	BlockAccess<const BlockArray> GetBlockAccess() const { return BlockAccess<const BlockArray>(m_BlockArray, m_GeometryMutex); }
 
 	void Update();
