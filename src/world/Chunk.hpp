@@ -59,8 +59,8 @@ public:
 	Chunk(const Chunk&) = delete;
 	Chunk& operator=(const Chunk&) = delete;
 
-	void AddUpdateListener(ChunkUpdateListener* listener) { m_UpdateEvent.AddListener(listener); }
-	void RemoveUpdateListener(ChunkUpdateListener* listener) { m_UpdateEvent.RemoveListener(listener); }
+	void AddUpdateListener(ChunkUpdateListener* listener) const { m_UpdateEvent.AddListener(listener); }
+	void RemoveUpdateListener(ChunkUpdateListener* listener) const { m_UpdateEvent.RemoveListener(listener); }
 
 	const ChunkPos& GetPosition() const { return m_Position; }
 

@@ -83,10 +83,6 @@ void LoadedChunks::SetCenter(WorldPos position) {
 	reloadChunks(newCenter);
 }
 
-void LoadedChunks::ChunkUpdated(const glm::ivec3& chunkPosition) {
-	m_ChunkEvent.Invoke(&ChunkEventListener::ChunkUpdated, chunkPosition);
-}
-
 LoadedChunks::ManagementTask::ManagementTask(ManagementTask&& other) noexcept : 
 	ToLoad(std::move(other.ToLoad)), 
 	ToSave(std::move(other.ToSave)), 
@@ -168,7 +164,6 @@ void LoadedChunks::reloadChunks(ChunkPos newCenter)
 			else {
 				const ChunkPos newChunkPos = position + newCenter - ((glm::ivec3)c_LoadedSize - glm::ivec3(1, 1, 1)) / 2;
 				chunk = std::move(loadChunk(newChunkPos));
-				chunk->AddUpdateListener(this);
 				m_ChunkEvent.Invoke(&ChunkEventListener::ChunkLoaded, newChunkPos);
 			}
 		}); 
@@ -198,7 +193,6 @@ void LoadedChunks::loadChunks()
 		{
 			const glm::ivec3 worldChunkPosition = position + m_CenterChunkPos - (c_LoadedSize - glm::ivec3(1, 1, 1)) / 2;
 			chunk = std::move(loadChunk(worldChunkPosition));
-			chunk->AddUpdateListener(this);
 			m_ChunkEvent.Invoke(&ChunkEventListener::ChunkLoaded, worldChunkPosition);
 		});
 

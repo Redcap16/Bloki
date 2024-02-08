@@ -3,30 +3,35 @@
 AtlasTexture::SubTexture ChunkRenderer::s_TextureCoords[Block::c_BlockCount];
 bool ChunkRenderer::s_TextureCoordsCreated = false;
 
-ChunkRenderer::ChunkRenderer(Renderer3D& renderer, const Chunk* chunk) :
-	m_Chunk(chunk),
-	m_Position(chunk->GetPosition()* BlockArray::ChunkSize),
+ChunkRenderer::ChunkRenderer(Renderer3D& renderer, const Chunk& chunk) :
+	m_Chunk(&chunk),
+	m_Position(chunk.GetPosition()* BlockArray::ChunkSize),
 	m_OpaqueMesh(m_Position, s_TextureCoords),
 	m_TransparentMesh(m_Position, s_TextureCoords),
 	m_AnythingHighlighted(false),
 	m_HighlightedPosition(glm::ivec3(0)),
-	m_Neighbors(chunk->GetNeighbors()),
+	m_Neighbors(chunk.GetNeighbors()),
 	m_CurrentBlockAccess(nullptr),
 	m_Renderer(renderer),
 	m_BlockTexture(c_TextureFilename),
 	m_OpaqueShader(c_OpaqueShaderFilename),
-	m_TransparentShader(c_TransparentShaderFilename)
+	m_TransparentShader(c_TransparentShaderFilename),
+	m_MeshNeedUpdate(true)
 {
 	loadTextureCoords();
 
 	renderer.RegisterRenderable(&m_OpaqueMesh, RenderableParameters(false, m_OpaqueShader.Get(), m_BlockTexture.Get()));
 	renderer.RegisterRenderable(&m_TransparentMesh, RenderableParameters(true, m_TransparentShader.Get(), m_BlockTexture.Get()));
+
+	m_Chunk->AddUpdateListener(this);
 }
 
 ChunkRenderer::~ChunkRenderer()
 {
 	m_Renderer.RemoveRenderable(&m_OpaqueMesh);
 	m_Renderer.RemoveRenderable(&m_TransparentMesh);
+	
+	m_Chunk->RemoveUpdateListener(this);
 }
 
 void ChunkRenderer::SetHighlight(InChunkPos position)
@@ -42,6 +47,11 @@ void ChunkRenderer::ResetHighlight()
 
 void ChunkRenderer::UpdateGeometry()
 {
+	if (!m_MeshNeedUpdate)
+		return;
+
+	m_MeshNeedUpdate = false;
+
 	Chunk::BlockAccess<const BlockArray> blockAccess = m_Chunk->GetBlockAccess();
 	m_CurrentBlockAccess = &blockAccess;
 
@@ -53,6 +63,10 @@ void ChunkRenderer::UpdateGeometry()
 	m_CurrentBlockAccess = nullptr;
 	m_OpaqueMesh.FinishGeometry();
 	m_TransparentMesh.FinishGeometry();
+}
+
+void ChunkRenderer::ChunkUpdated(const ChunkPos& chunkPosition) {
+	m_MeshNeedUpdate = true;
 }
 
 void ChunkRenderer::processBlock(const InChunkPos& position)

@@ -19,10 +19,10 @@ class ChunkEventListener {
 public:
 	virtual void ChunkLoaded(const glm::ivec3& chunkPosition) = 0;
 	virtual void ChunkUnloaded(const glm::ivec3& chunkPosition) = 0;
-	virtual void ChunkUpdated(const glm::ivec3& chunkPosition) = 0;
+	virtual void ChunkUpdated(const glm::ivec3& chunkPosition) = 0; //Not even used
 };
 
-class LoadedChunks : public BlockManager, ChunkUpdateListener
+class LoadedChunks : public BlockManager
 {
 public:
 	LoadedChunks(Renderer3D& renderer, const std::string& savePath);
@@ -43,8 +43,6 @@ public:
 	void Update();
 
 	void SetCenter(WorldPos position);
-
-	void ChunkUpdated(const glm::ivec3& chunkPosition) override;
 
 private:
 	util::Event<ChunkEventListener> m_ChunkEvent;

@@ -7,10 +7,10 @@
 
 #include <array>
 
-class ChunkRenderer
+class ChunkRenderer : public ChunkUpdateListener
 {
 public:
-	ChunkRenderer(Renderer3D& renderer, const Chunk* chunk);
+	ChunkRenderer(Renderer3D& renderer, const Chunk& chunk);
 	~ChunkRenderer();
 	ChunkRenderer(const ChunkRenderer&) = delete;
 	ChunkRenderer& operator=(const ChunkRenderer&) = delete;
@@ -21,6 +21,8 @@ public:
 	const Chunk* GetChunk() const { return m_Chunk; }
 
 	void UpdateGeometry();
+
+	void ChunkUpdated(const ChunkPos& chunkPosition) override;
 private:
 	const char* c_TextureFilename = "block.td";
 	const char* c_OpaqueShaderFilename = "chunk-solid.shader";
@@ -45,6 +47,8 @@ private:
 
 	InChunkPos m_HighlightedPosition;
 	bool m_AnythingHighlighted;
+
+	bool m_MeshNeedUpdate;
 
 	void processBlock(const InChunkPos& position);
 	bool isBlockVisible(Block block, const InChunkPos& position, Direction direction);

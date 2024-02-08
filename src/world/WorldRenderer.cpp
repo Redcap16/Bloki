@@ -36,23 +36,17 @@ void WorldRenderer::ChunkUnloaded(const glm::ivec3& chunkPosition) {
 }
 
 void WorldRenderer::ChunkUpdated(const glm::ivec3& chunkPosition) {
-	for (auto& renderer : m_ChunkRenderers)
-		if (renderer->GetChunk()->GetPosition() == chunkPosition)
-			m_NeedUpdate[renderer.get()] = true;
+	//Nothing
 }
 
 void WorldRenderer::Update() {
 	for (auto& renderer : m_ChunkRenderers)
-		if (m_NeedUpdate[renderer.get()]) {
-			renderer->UpdateGeometry();
-			m_NeedUpdate[renderer.get()] = false;
-		}
+		renderer->UpdateGeometry();
 }
 
 void WorldRenderer::createRenderers(std::set<const Chunk*>& chunks) {
 	for (auto chunk : chunks) {
-		auto newOne = m_ChunkRenderers.insert(std::make_unique<ChunkRenderer>(m_Renderer, chunk));
-		m_NeedUpdate[newOne.first->get()] = true;
+		auto newOne = m_ChunkRenderers.insert(std::make_unique<ChunkRenderer>(m_Renderer, *chunk));
 	}
 }
 
@@ -61,7 +55,6 @@ void WorldRenderer::removeRenderers(std::set<const Chunk*>& chunks) {
 		if (chunks.find(const_cast<Chunk*>((*it)->GetChunk())) == chunks.end())
 			++it;
 		else {
-			m_NeedUpdate.erase(it->get());
 			it = m_ChunkRenderers.erase(it);
 		}
 	}

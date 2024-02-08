@@ -6,23 +6,23 @@ namespace util {
 	template <typename TListener>
 	class Event {
 	public:
-		void AddListener(TListener* listener);
-		void RemoveListener(TListener* listener);
+		void AddListener(TListener* listener) const;
+		void RemoveListener(TListener* listener) const;
 
 		template <typename ...TArgs>
 		void Invoke(void (TListener::* function) (const TArgs&...), const TArgs&... args);
 
 	private:
-		std::set<TListener*> m_Listeners;
+		mutable std::set<TListener*> m_Listeners;
 	};
 
 	template <typename TListener>
-	void Event<TListener>::AddListener(TListener* listener) {
+	void Event<TListener>::AddListener(TListener* listener) const {
 		m_Listeners.insert(listener);
 	}
 
 	template <typename TListener>
-	void Event<TListener>::RemoveListener(TListener* listener) {
+	void Event<TListener>::RemoveListener(TListener* listener) const {
 		m_Listeners.erase(listener);
 	}
 

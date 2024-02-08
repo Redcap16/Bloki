@@ -3,13 +3,14 @@
 #include <world/Chunk.hpp>
 #include <world/ChunkRenderer.hpp>
 #include <world/LoadedChunks.hpp>
+#include <core/Player.hpp>
 
 #include <set>
 #include <memory>
 
 class WorldRenderer : public ChunkEventListener {
 public:
-	WorldRenderer(Renderer3D& renderer, LoadedChunks& loadedChunks);
+	WorldRenderer(Renderer3D& renderer, LoadedChunks& loadedChunks, const Player& player);
 	~WorldRenderer();
 
 	void SetChunksToRender(std::set<Chunk*> chunksToRender);
@@ -21,10 +22,10 @@ public:
 	void Update();
 private:
 	std::set<std::unique_ptr<ChunkRenderer>> m_ChunkRenderers;
-	std::map<ChunkRenderer*, bool> m_NeedUpdate;
 
 	Renderer3D& m_Renderer;
 	LoadedChunks& m_LoadedChunks;
+	const Player& m_Player;
 
 	void createRenderers(std::set<const Chunk*>& chunks);
 	void removeRenderers(std::set<const Chunk*>& chunks);
