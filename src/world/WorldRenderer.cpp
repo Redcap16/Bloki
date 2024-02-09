@@ -42,12 +42,60 @@ void WorldRenderer::Update() {
 	updateHighlight();
 
 	for (auto& renderer : m_ChunkRenderers)
-		renderer.second->UpdateGeometry();
+		if (renderer.second->DoesNeedGeometryUpdate())
+			m_Updater.AddUpdateTask(renderer.first, renderer.second);
+}
+
+WorldRenderer::RendererUpdater::RendererUpdater() :
+	m_UpdateThread(&WorldRenderer::RendererUpdater::threadLoop, this) {
+	
+}
+
+WorldRenderer::RendererUpdater::~RendererUpdater() {
+	m_Done = true;
+	m_UpdateQueueCV.notify_one();
+	m_UpdateThread.join();
+}
+
+void WorldRenderer::RendererUpdater::AddUpdateTask(const glm::ivec3& position, std::weak_ptr<ChunkRenderer>&& chunkRenderer) {
+	std::lock_guard<std::mutex> lock(m_UpdateQueueMutex);
+	if (m_ChunkRenderers.find(position) != m_ChunkRenderers.end()) //It already is in the update queue
+		return;
+
+	m_ChunkRenderers[position] = chunkRenderer;
+	m_UpdateQueue.push(position);
+	m_UpdateQueueCV.notify_one();
+}
+
+void WorldRenderer::RendererUpdater::threadLoop() {
+	while (!m_Done) {
+		std::unique_lock<std::mutex> lock(m_UpdateQueueMutex);
+		if (m_UpdateQueue.empty()) {
+			m_UpdateQueueCV.wait(lock);
+			continue;
+		}
+
+		const glm::ivec3& processedPosition = m_UpdateQueue.front();
+		std::shared_ptr<ChunkRenderer> rendererToUpdate = m_ChunkRenderers[processedPosition].lock();
+		//Clear
+		m_ChunkRenderers.erase(processedPosition);
+		m_UpdateQueue.pop();
+		lock.unlock();
+
+		if (!rendererToUpdate) //Check if expired
+			continue;
+
+		updateRenderer(*rendererToUpdate);
+	}
+}
+
+void WorldRenderer::RendererUpdater::updateRenderer(ChunkRenderer& renderer) {
+	renderer.UpdateGeometry();
 }
 
 void WorldRenderer::createRenderers(std::set<const Chunk*>& chunks) {
 	for (auto chunk : chunks) {
-		m_ChunkRenderers[chunk->GetPosition()] = std::make_unique<ChunkRenderer>(m_Renderer, *chunk);
+		m_ChunkRenderers[chunk->GetPosition()] = std::make_shared<ChunkRenderer>(m_Renderer, *chunk);
 	}
 }
 

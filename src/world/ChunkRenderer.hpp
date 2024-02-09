@@ -20,6 +20,7 @@ public:
 
 	const Chunk* GetChunk() const { return m_Chunk; }
 
+	bool DoesNeedGeometryUpdate() const { return m_MeshNeedUpdate; }
 	void UpdateGeometry();
 
 	void ChunkUpdated(const ChunkPos& chunkPosition) override;
