@@ -51,8 +51,8 @@ void main()
 		
 	//FragColor = vec4(vec3(FragColor) * cosTheta, FragColor.a);
 	
-	//if (State == 1)
-	//	FragColor = mix(FragColor, vec4(1, 1, 1, 1), 0.1);
+	if (State == 1)
+		FragColor = mix(FragColor, vec4(1, 1, 1, 1), 0.1);
 	//FragColor = vec4(1, 0, 0, 1);
 	//FragColor = vec4(TexCoord, 0, 1);
 }

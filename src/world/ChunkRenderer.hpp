@@ -7,10 +7,10 @@
 
 #include <array>
 
-class ChunkRenderer
+class ChunkRenderer : public ChunkUpdateListener
 {
 public:
-	ChunkRenderer(Renderer3D& renderer, std::shared_ptr<const Chunk> chunk);
+	ChunkRenderer(Renderer3D& renderer, const Chunk& chunk);
 	~ChunkRenderer();
 	ChunkRenderer(const ChunkRenderer&) = delete;
 	ChunkRenderer& operator=(const ChunkRenderer&) = delete;
@@ -18,9 +18,12 @@ public:
 	void SetHighlight(InChunkPos position);
 	void ResetHighlight();
 
-	const Chunk* GetChunk() const { return m_Chunk.get(); }
+	const Chunk* GetChunk() const { return m_Chunk; }
 
+	bool DoesNeedGeometryUpdate() const { return m_MeshNeedUpdate; }
 	void UpdateGeometry();
+
+	void ChunkUpdated(const ChunkPos& chunkPosition) override;
 private:
 	const char* c_TextureFilename = "block.td";
 	const char* c_OpaqueShaderFilename = "chunk-solid.shader";
@@ -40,11 +43,13 @@ private:
 		m_TransparentMesh;
 
 	const std::array<const Chunk*, 6>& m_Neighbors;
-	std::shared_ptr<const Chunk> m_Chunk;
+	const Chunk* m_Chunk;
 	Chunk::BlockAccess<const BlockArray>* m_CurrentBlockAccess;
 
 	InChunkPos m_HighlightedPosition;
 	bool m_AnythingHighlighted;
+
+	bool m_MeshNeedUpdate;
 
 	void processBlock(const InChunkPos& position);
 	bool isBlockVisible(Block block, const InChunkPos& position, Direction direction);

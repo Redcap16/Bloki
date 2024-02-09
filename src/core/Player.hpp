@@ -29,6 +29,9 @@ public:
 
 	void SetEyeCamera(Camera3D* camera) { m_Camera = camera; };
 
+	glm::ivec3 GetPointingAt() const;
+	bool IsPointingAtAnything() const;
+
 private:
 	static constexpr glm::vec3 c_BodySize = {0.8f, 1.8f, 0.8f};
 	static constexpr glm::vec3 c_BodyCenter = { 0, -0.8f, 0 };

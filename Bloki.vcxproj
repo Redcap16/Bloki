@@ -194,6 +194,7 @@
     <ClCompile Include="src\ui\Text.cpp" />
     <ClCompile Include="src\core\UIManager.cpp" />
     <ClCompile Include="src\ui\UIRender.cpp" />
+    <ClCompile Include="src\world\WorldRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\util\Event.hpp" />
@@ -249,6 +250,7 @@
     <ClInclude Include="src\ui\Text.hpp" />
     <ClInclude Include="src\core\UIManager.hpp" />
     <ClInclude Include="src\ui\UIRender.hpp" />
+    <ClInclude Include="src\world\WorldRenderer.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
