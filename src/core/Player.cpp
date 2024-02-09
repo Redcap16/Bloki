@@ -124,6 +124,14 @@ void Player::MouseClicked(const glm::ivec2& position, bool leftButton)
 	}
 }
 
+glm::ivec3 Player::GetPointingAt() const {
+	return m_Highlight.HighlightedPos;
+}
+
+bool Player::IsPointingAtAnything() const {
+	return m_Highlight.AnythingHighlighted;
+}
+
 void Player::setFlying(bool flying)
 {
 	m_Flying = flying;

@@ -21,12 +21,16 @@ public:
 
 	void Update();
 private:
-	std::set<std::unique_ptr<ChunkRenderer>> m_ChunkRenderers;
+	std::unordered_map<glm::ivec3, std::unique_ptr<ChunkRenderer>> m_ChunkRenderers;
 
 	Renderer3D& m_Renderer;
 	LoadedChunks& m_LoadedChunks;
 	const Player& m_Player;
 
+	glm::ivec3 m_LastHighlightedPosition;
+	bool m_LastHighlighted;
+
 	void createRenderers(std::set<const Chunk*>& chunks);
 	void removeRenderers(std::set<const Chunk*>& chunks);
+	void updateHighlight();
 };

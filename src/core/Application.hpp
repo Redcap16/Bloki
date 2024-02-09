@@ -45,8 +45,8 @@ private:
 	Window m_Window;
 	Renderer3D m_Renderer;
 	LoadedChunks m_World;
-	WorldRenderer m_WorldRenderer;
 	Player m_Player;
+	WorldRenderer m_WorldRenderer;
 
 	Camera3D m_Camera;
 	Inventory m_Inventory;

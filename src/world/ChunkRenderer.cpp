@@ -38,11 +38,13 @@ void ChunkRenderer::SetHighlight(InChunkPos position)
 {
 	m_HighlightedPosition = position;
 	m_AnythingHighlighted = true;
+	m_MeshNeedUpdate = true;
 }
 
 void ChunkRenderer::ResetHighlight()
 {
 	m_AnythingHighlighted = false;
+	m_MeshNeedUpdate = true;
 }
 
 void ChunkRenderer::UpdateGeometry()
