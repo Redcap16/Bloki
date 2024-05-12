@@ -4,7 +4,7 @@
 UIManager::UIManager(Window& window, Inventory& inventory) :
 	m_Canvas(window.GetSize()),
 	m_Inventory(m_Canvas, inventory),
-	m_Hotbar(m_Canvas, inventory),
+	m_Hotbar(m_Canvas, inventory, window),
 	m_Window(window),
 	m_Crosshair(m_Canvas)
 {

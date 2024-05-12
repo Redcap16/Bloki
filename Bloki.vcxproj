@@ -145,6 +145,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\ui\ItemSlot.cpp" />
+    <ClCompile Include="src\ui\MouseHolder.cpp" />
+    <ClCompile Include="src\items\BlockItem.cpp" />
+    <ClCompile Include="src\items\FoodItem.cpp" />
+    <ClCompile Include="src\ui\ItemQuad.cpp" />
     <ClCompile Include="src\ui\PrimitiveBuffer.cpp" />
     <ClCompile Include="src\window\Input.cpp" />
     <ClCompile Include="src\ui\Crosshair.cpp" />
@@ -197,6 +202,11 @@
     <ClCompile Include="src\world\WorldRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\ui\MouseHolder.hpp" />
+    <ClInclude Include="src\items\BlockItem.hpp" />
+    <ClInclude Include="src\items\FoodItem.hpp" />
+    <ClInclude Include="src\ui\ItemQuad.hpp" />
+    <ClInclude Include="src\ui\ItemSlot.hpp" />
     <ClInclude Include="src\util\Event.hpp" />
     <ClInclude Include="src\ui\PrimitiveBuffer.hpp" />
     <ClInclude Include="src\ui\Crosshair.hpp" />

@@ -1,5 +1,6 @@
 #include <core/Application.hpp>
-
+#include <items/FoodItem.hpp>
+#include <items/BlockItem.hpp>
 
 Application::Application() :
 	m_Window(glm::ivec2(1280, 720), "Bloki Alpha 2", true),
@@ -19,7 +20,10 @@ Application::Application() :
 	m_Player.SetEyeCamera(&m_Camera);
 	m_Renderer.SetCamera(&m_Camera);
 
-	m_Inventory.SetItemStack(2, { Item::Bread, 2 });
+	m_Inventory.GetItemStack(2).Set(FoodItem(FoodItem::FoodType::Apple), 20);
+	m_Inventory.GetItemStack(3).Set(FoodItem(FoodItem::FoodType::Apple), 10);
+	m_Inventory.GetItemStack(5).Set(FoodItem(FoodItem::FoodType::Bread), 3);
+	m_Inventory.GetItemStack(6).Set(BlockItem(Block::Wood), 15);
 }
 
 void Application::OnKeyboardEvent(const KeyboardEvent& event)

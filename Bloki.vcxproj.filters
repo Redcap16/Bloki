@@ -219,6 +219,21 @@
     <ClCompile Include="src\world\WorldRenderer.cpp">
       <Filter>Pliki źródłowe\world</Filter>
     </ClCompile>
+    <ClCompile Include="src\items\FoodItem.cpp">
+      <Filter>Pliki źródłowe\items</Filter>
+    </ClCompile>
+    <ClCompile Include="src\items\BlockItem.cpp">
+      <Filter>Pliki źródłowe\items</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\ItemQuad.cpp">
+      <Filter>Pliki źródłowe\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\ItemSlot.cpp">
+      <Filter>Pliki źródłowe\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\MouseHolder.cpp">
+      <Filter>Pliki źródłowe\ui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\graphics\Camera.hpp">
@@ -382,6 +397,21 @@
     </ClInclude>
     <ClInclude Include="src\world\WorldRenderer.hpp">
       <Filter>Pliki nagłówkowe\world</Filter>
+    </ClInclude>
+    <ClInclude Include="src\items\FoodItem.hpp">
+      <Filter>Pliki nagłówkowe\items</Filter>
+    </ClInclude>
+    <ClInclude Include="src\items\BlockItem.hpp">
+      <Filter>Pliki nagłówkowe\items</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\ItemQuad.hpp">
+      <Filter>Pliki nagłówkowe\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\ItemSlot.hpp">
+      <Filter>Pliki nagłówkowe\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\MouseHolder.hpp">
+      <Filter>Pliki nagłówkowe\ui</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
