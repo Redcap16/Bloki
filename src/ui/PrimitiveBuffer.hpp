@@ -80,4 +80,4 @@ rect<T>::rect(T x, T y, T w, T h) :
 	Size(w, h)
 {
 
-}
+};

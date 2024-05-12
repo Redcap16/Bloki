@@ -24,8 +24,8 @@ private:
 	ItemStack& m_Stack;
 	ItemQuad m_Picture;
 
-	const glm::ivec3 c_BackgroundColor = { 128, 128, 128 };
-	const glm::ivec3 c_BackgroundHighlightColor = { 196, 196, 196 };
+	const glm::ivec4 c_BackgroundColor = { 100, 100, 100, 255 };
+	const glm::ivec4 c_BackgroundHighlightColor = { 130, 130, 130, 255 };
 	graphics::Rectangle m_Background;
 
 	MouseHolder& m_MouseHolder;

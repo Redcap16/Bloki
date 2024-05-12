@@ -2,7 +2,7 @@
 
 const std::vector<VertexAttribute> Vertex2D::Attributes = { VertexAttribute(offsetof(Vertex2D, Position), 2, GL_INT),
 		VertexAttribute(offsetof(Vertex2D, TextureCoords), 2, GL_FLOAT),
-		VertexAttribute(offsetof(Vertex2D, Color), 3, GL_UNSIGNED_BYTE, GL_TRUE)};
+		VertexAttribute(offsetof(Vertex2D, Color), 4, GL_UNSIGNED_BYTE, GL_TRUE)};
 
 const std::vector<VertexAttribute> Vertex3D::Attributes = { VertexAttribute(offsetof(Vertex3D, Position), 3, GL_FLOAT),
 		VertexAttribute(offsetof(Vertex3D, TextureCoords), 2, GL_FLOAT),

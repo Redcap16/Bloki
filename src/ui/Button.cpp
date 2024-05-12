@@ -105,7 +105,7 @@ void Button::ButtonMesh::addRectangle(VertexBuffer<Vertex2D>& vbo, ElementBuffer
 void Button::ButtonMesh::addVertex(VertexBuffer<Vertex2D>& vbo, glm::ivec2 position, glm::vec2 textureCoords, glm::ivec3 color)
 {
 	Vertex2D vertex;
-	vertex.Color = color;
+	vertex.Color = glm::ivec4(color, 255);
 	vertex.Position = position;
 	vertex.TextureCoords = textureCoords;
 	vbo.AddVertex(vertex);

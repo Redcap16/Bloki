@@ -2,7 +2,7 @@
 
 using namespace graphics;
 
-Rectangle::Rectangle(glm::ivec2 position, glm::ivec2 size, glm::vec2 textureCoords, glm::vec2 textureSize, glm::ivec3 color) :
+Rectangle::Rectangle(glm::ivec2 position, glm::ivec2 size, glm::vec2 textureCoords, glm::vec2 textureSize, glm::ivec4 color) :
 	m_Position(position),
 	m_Size(size),
 	m_TextureCoords(textureCoords),
@@ -15,7 +15,7 @@ Rectangle::Rectangle(glm::ivec2 position, glm::ivec2 size, glm::vec2 textureCoor
 	update();
 }
 
-Rectangle::Rectangle(glm::ivec2 position, glm::ivec2 size, glm::ivec3 color) :
+Rectangle::Rectangle(glm::ivec2 position, glm::ivec2 size, glm::ivec4 color) :
 	Rectangle(position, size, glm::vec2(0), glm::vec2(0), color)
 {
 
@@ -40,7 +40,7 @@ void Rectangle::SetTextureCoords(glm::vec2 textureCoords, glm::vec2 textureSize)
 	update();
 }
 
-void Rectangle::SetColor(glm::ivec3 color)
+void Rectangle::SetColor(glm::ivec4 color)
 {
 	m_Color = color;
 	update();

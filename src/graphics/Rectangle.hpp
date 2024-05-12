@@ -9,8 +9,8 @@ namespace graphics
 	class Rectangle
 	{
 	public:
-		Rectangle(glm::ivec2 position, glm::ivec2 size, glm::vec2 textureCoords, glm::vec2 textureSize, glm::ivec3 color = { 255, 255, 255 });
-		Rectangle(glm::ivec2 position, glm::ivec2 size, glm::ivec3 color = { 255, 255, 255 });
+		Rectangle(glm::ivec2 position, glm::ivec2 size, glm::vec2 textureCoords, glm::vec2 textureSize, glm::ivec4 color = { 255, 255, 255, 255 });
+		Rectangle(glm::ivec2 position, glm::ivec2 size, glm::ivec4 color = { 255, 255, 255, 255 });
 		~Rectangle() = default;
 		Rectangle(const Rectangle&) = delete;
 		Rectangle& operator=(const Rectangle&) = delete;
@@ -20,7 +20,8 @@ namespace graphics
 		void SetPosition(glm::ivec2 position);
 		void SetSize(glm::ivec2 size);
 		void SetTextureCoords(glm::vec2 textureCoords, glm::vec2 textureSize);
-		void SetColor(glm::ivec3 color);
+		void SetColor(glm::ivec4 color);
+		void SetColor(glm::ivec3 color) { SetColor(glm::ivec4(color, 255)); };
 
 		void Render() const { m_VAO.Draw(); };
 	private:
@@ -33,7 +34,7 @@ namespace graphics
 		glm::vec2 m_TextureCoords,
 			m_TextureSize;
 
-		glm::ivec3 m_Color;
+		glm::ivec4 m_Color;
 
 		void update();
 	};

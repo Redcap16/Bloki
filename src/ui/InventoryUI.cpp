@@ -10,6 +10,8 @@ ItemPicture::ItemPicture(WidgetParent& parent, glm::ivec2 position, ItemStack& i
 
 void ItemPicture::SetHighlighted(bool highlighted) {
 	m_Background.SetColor(highlighted ? c_HighlightedBackgroundColor : c_DefaultBackgroundColor);
+	m_Background.SetSize(highlighted ? ItemQuad::c_Size + glm::ivec2(2 * c_HighlightedBackgroundSizeIncrease, 2 * c_HighlightedBackgroundSizeIncrease) : ItemQuad::c_Size);
+	m_Background.SetPosition(highlighted ? glm::ivec2{-c_HighlightedBackgroundSizeIncrease, -c_HighlightedBackgroundSizeIncrease} : glm::ivec2{0, 0});
 }
 
 void ItemPicture::render(RenderingParams& params)

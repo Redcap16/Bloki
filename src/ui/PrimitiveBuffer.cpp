@@ -19,10 +19,10 @@ PrimitiveRectangle::PrimitiveRectangle(irect dimensions, frect texDimensions, gl
 
 std::vector<Vertex2D> PrimitiveRectangle::GetVertices() const
 {
-	return {{ m_Dimensions.Position,										m_TexDimensions.Position,											m_Color },
-			{ m_Dimensions.Position + glm::ivec2(m_Dimensions.Size.x, 0),	m_TexDimensions.Position + glm::vec2(m_TexDimensions.Size.x, 0),	m_Color },
-			{ m_Dimensions.Position + m_Dimensions.Size,					m_TexDimensions.Position + m_TexDimensions.Size,					m_Color },
-			{ m_Dimensions.Position + glm::ivec2(0, m_Dimensions.Size.y),	m_TexDimensions.Position + glm::vec2(0, m_TexDimensions.Size.y),	m_Color }};
+	return {{ m_Dimensions.Position,										m_TexDimensions.Position,											glm::ivec4(m_Color, 255) },
+			{ m_Dimensions.Position + glm::ivec2(m_Dimensions.Size.x, 0),	m_TexDimensions.Position + glm::vec2(m_TexDimensions.Size.x, 0),	glm::ivec4(m_Color, 255) },
+			{ m_Dimensions.Position + m_Dimensions.Size,					m_TexDimensions.Position + m_TexDimensions.Size,					glm::ivec4(m_Color, 255) },
+			{ m_Dimensions.Position + glm::ivec2(0, m_Dimensions.Size.y),	m_TexDimensions.Position + glm::vec2(0, m_TexDimensions.Size.y),	glm::ivec4(m_Color, 255) }};
 }
 
 std::vector<ElementIndex> PrimitiveRectangle::GetIndices(ElementIndex lastIndex) const
