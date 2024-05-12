@@ -2,6 +2,13 @@
 #include <items/FoodItem.hpp>
 #include <items/BlockItem.hpp>
 
+using window::Window;
+using window::WindowListener;
+using window::Mouse;
+using window::MouseButtonEvent;
+using window::Keyboard;
+using window::KeyboardEvent;
+
 Application::Application() :
 	m_Window(glm::ivec2(1280, 720), "Bloki Alpha 2", true),
 	m_Camera(m_Window.GetSize()),
@@ -12,8 +19,8 @@ Application::Application() :
 	m_UIManager(m_Window, m_Inventory)
 {
 	m_Window.GetMouse().SetPosition(m_Window.GetSize() / 2);
-	m_Window.AddKeyboardListener(*this);
-	m_Window.AddMouseMoveListener(*this);
+	m_Window.GetKeyboard().AddKeyboardListener(*this);
+	m_Window.GetMouse().AddMouseListener(*this);
 	m_Window.AddWindowResizeListener(*this);
 
 	m_Player.SetPosition(glm::vec3(0, 40, 0));
@@ -28,17 +35,17 @@ Application::Application() :
 
 void Application::OnKeyboardEvent(const KeyboardEvent& event)
 {
-	if(event.m_Type == event.KeyPressed &&
-		event.m_Key == 'p')
+	if(event.EventType == event.KeyPressed &&
+		event.KeyCode == 'p')
 		m_Running = !m_Running;
-	else if (event.m_Type == event.KeyPressed &&
-		event.m_Key == 'e')
+	else if (event.EventType == event.KeyPressed &&
+		event.KeyCode == 'e')
 	{
 		m_UIManager.ShowInventory(!m_UIManager.IsInventoryVisible());
 		m_Window.GetMouse().SetPosition(m_Window.GetSize() / 2);
 	}
-	if (event.m_Type == event.KeyPressed &&
-		event.m_Key == Keyboard::Key::Escape)
+	if (event.EventType == KeyboardEvent::KeyPressed &&
+		event.KeyCode == Keyboard::Key::Escape)
 		m_Done = true;
 }
 
@@ -52,16 +59,16 @@ void Application::OnWindowResize(glm::ivec2 size)
 
 void Application::OnMouseButtonEvent(const MouseButtonEvent& event)
 {
-	if (event.m_Type == MouseButtonEvent::Pressed)
+	if (event.EventType == MouseButtonEvent::Pressed)
 	{
 		if (!m_UIManager.IsInventoryVisible())
-			m_Player.MouseClicked(glm::ivec2(0), event.m_Button == Mouse::Button::Left);
+			m_Player.MouseClicked(glm::ivec2(0), event.ButtonType == Mouse::Button::Left);
 
-		m_UIManager.MouseClicked(event.m_Button == Mouse::Button::Left);
+		m_UIManager.MouseClicked(event.ButtonType == Mouse::Button::Left);
 	}
-	else if (event.m_Type == MouseButtonEvent::Released)
+	else if (event.EventType == MouseButtonEvent::Released)
 	{
-		m_UIManager.MouseReleased(event.m_Button == Mouse::Button::Left);
+		m_UIManager.MouseReleased(event.ButtonType == Mouse::Button::Left);
 	}
 }
 

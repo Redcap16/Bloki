@@ -12,7 +12,7 @@
 class Player
 {
 public:
-	Player(BlockManager& world, Keyboard& keyboard, Mouse& mouse, glm::ivec2 windowSize);
+	Player(BlockManager& world, window::Keyboard& keyboard, window::Mouse& mouse, glm::ivec2 windowSize);
 	Player(const Player&) = delete;
 	Player& operator=(const Player&) = delete;
 
@@ -51,8 +51,8 @@ private:
 	BlockManager& m_World;
 	Camera3D* m_Camera;
 
-	Keyboard& m_Keyboard;
-	Mouse& m_Mouse;
+	window::Keyboard& m_Keyboard;
+	window::Mouse& m_Mouse;
 
 	struct
 	{

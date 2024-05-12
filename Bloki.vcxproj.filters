@@ -234,6 +234,12 @@
     <ClCompile Include="src\ui\MouseHolder.cpp">
       <Filter>Pliki źródłowe\ui</Filter>
     </ClCompile>
+    <ClCompile Include="src\window\WindowsMouse.cpp">
+      <Filter>Pliki źródłowe\window</Filter>
+    </ClCompile>
+    <ClCompile Include="src\window\WindowsKeyboard.cpp">
+      <Filter>Pliki źródłowe\window</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\graphics\Camera.hpp">
@@ -412,6 +418,12 @@
     </ClInclude>
     <ClInclude Include="src\ui\MouseHolder.hpp">
       <Filter>Pliki nagłówkowe\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\window\WindowsMouse.hpp">
+      <Filter>Pliki nagłówkowe\window</Filter>
+    </ClInclude>
+    <ClInclude Include="src\window\WindowsKeyboard.hpp">
+      <Filter>Pliki nagłówkowe\window</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

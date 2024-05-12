@@ -200,6 +200,8 @@
     <ClCompile Include="src\core\UIManager.cpp" />
     <ClCompile Include="src\ui\UIRender.cpp" />
     <ClCompile Include="src\world\WorldRenderer.cpp" />
+    <ClCompile Include="src\window\WindowsMouse.cpp" />
+    <ClCompile Include="src\window\WindowsKeyboard.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ui\MouseHolder.hpp" />
@@ -261,6 +263,8 @@
     <ClInclude Include="src\core\UIManager.hpp" />
     <ClInclude Include="src\ui\UIRender.hpp" />
     <ClInclude Include="src\world\WorldRenderer.hpp" />
+    <ClInclude Include="src\window\WindowsMouse.hpp" />
+    <ClInclude Include="src\window\WindowsKeyboard.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

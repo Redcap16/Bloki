@@ -86,20 +86,20 @@ private:
 	void prepareSlots();
 };
 
-class Hotbar : public WidgetGroup, public KeyboardListener
+class Hotbar : public WidgetGroup, public window::KeyboardListener
 {
 public:
-	Hotbar(WidgetParent& parent, Inventory& inventory, Window& window);
+	Hotbar(WidgetParent& parent, Inventory& inventory, window::Window& window);
 	~Hotbar();
 
-	void OnKeyboardEvent(const KeyboardEvent& event) override;
+	void OnKeyboardEvent(const window::KeyboardEvent& event) override;
 
 private:
 	static constexpr const char* c_TextureFilename = "hotbar.png";
 	static constexpr glm::ivec2 c_Position = { 0, 30 };
 	static const int c_ItemCount = 9;
 
-	Window& m_Window;
+	window::Window& m_Window;
 	Inventory& m_Inventory;
 	std::array<std::unique_ptr<ItemPicture>, c_ItemCount> m_Slots;
 

@@ -1,5 +1,6 @@
 #include <core/UIManager.hpp>
 
+using window::Window;
 
 UIManager::UIManager(Window& window, Inventory& inventory) :
 	m_Canvas(window.GetSize()),

@@ -1,5 +1,9 @@
 #include <ui/InventoryUI.hpp>
 
+using window::Window;
+using window::Keyboard;
+using window::KeyboardEvent;
+
 ItemPicture::ItemPicture(WidgetParent& parent, glm::ivec2 position, ItemStack& itemStack) :
 	Widget(parent, position, ItemQuad::c_Size),
 	m_Stack(itemStack),
@@ -116,7 +120,7 @@ Hotbar::Hotbar(WidgetParent& parent, Inventory& inventory, Window& window) :
 	m_Background(*this, c_TextureFilename, glm::ivec2(0)),
 	m_Window(window)
 {
-	m_Window.AddKeyboardListener(*this);
+	m_Window.GetKeyboard().AddKeyboardListener(*this);
 
 	SetAnchor(AnchorPoint::CenterBottom);
 	SetRelativeTo(AnchorPoint::CenterBottom);
@@ -128,12 +132,12 @@ Hotbar::Hotbar(WidgetParent& parent, Inventory& inventory, Window& window) :
 }
 
 Hotbar::~Hotbar() {
-	m_Window.RemoveKeyboardListener(*this);
+	m_Window.GetKeyboard().RemoveKeyboardListener(*this);
 }
 
 void Hotbar::OnKeyboardEvent(const KeyboardEvent& event) {
-	if (event.m_Type == KeyboardEvent::KeyPressed) {
-		switch (event.m_Key.Code()) {
+	if (event.EventType == KeyboardEvent::KeyPressed) {
+		switch (event.KeyCode.Code()) {
 		case Keyboard::Key::Left:
 			m_Slots[m_Inventory.GetSelectedItemIndex()]->SetHighlighted(false);
 			m_Inventory.ChangeSelectedItem(-1);

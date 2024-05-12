@@ -1,5 +1,8 @@
 #include <core/Player.hpp>
 
+using window::Keyboard;
+using window::Mouse;
+
 Player::Player(BlockManager& world, Keyboard& keyboard, Mouse& mouse, glm::ivec2 windowSize) :
 	m_Rigidbody(world, AABB(glm::vec3(0), c_BodyCenter, c_BodySize)),
 	m_World(world),

@@ -24,25 +24,27 @@
 #include <core/UIManager.hpp>
 #include <ui/Button.hpp>
 
-class Application : public KeyboardListener, 
-	public WindowListener, 
-	public MouseListener
+class Application : public window::KeyboardListener, 
+	public window::WindowListener, 
+	public window::MouseListener
 {
 public:
+
 	Application();
 	~Application() = default;
 	Application(const Application&) = delete;
 	Application& operator=(const Application&) = delete;
 
-	void OnKeyboardEvent(const KeyboardEvent& event) override;
+	void OnKeyboardEvent(const window::KeyboardEvent& event) override;
 	void OnWindowResize(glm::ivec2 size) override;
-	void OnMouseButtonEvent(const MouseButtonEvent& event) override;
+	void OnMouseButtonEvent(const window::MouseButtonEvent& event) override;
 	void OnMouseMove(glm::ivec2 position) override;
+	void OnMouseWheelMove(int movement) override {};
 
 	void SetChunksToRender(); //Move to WorldRenderer
 	void Start();
 private:
-	Window m_Window;
+	window::Window m_Window;
 	Renderer3D m_Renderer;
 	LoadedChunks m_World;
 	Player m_Player;
