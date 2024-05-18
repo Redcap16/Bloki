@@ -36,6 +36,8 @@ public:
 	void SwapContents(ItemStack& second);
 	void MoveTo(ItemStack& second, int count = 0);
 
+	bool Use(ItemUser& user, BlockManager& blockManager);
+
 	friend bool operator==(const ItemStack& lhs, const ItemStack& rhs);
 
 private:

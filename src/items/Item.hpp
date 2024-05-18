@@ -16,9 +16,9 @@ struct ItemTextureData {
 
 class ItemUser {
 public:
-	virtual void Heal(float health) = 0;
-	virtual WorldPos GetLookingAt() = 0;
-	virtual WorldPos GetPlacingAt() = 0;
+	virtual void ChangeHealth(float healthChange) = 0;
+	virtual WorldPos GetLookingAt() const = 0;
+	virtual bool GetPlacingAt(WorldPos &position) const = 0;
 };
 
 class ItemType {

@@ -1,6 +1,4 @@
 #include <core/Application.hpp>
-#include <items/FoodItem.hpp>
-#include <items/BlockItem.hpp>
 
 using window::Window;
 using window::WindowListener;
@@ -16,7 +14,7 @@ Application::Application() :
 	m_World(m_Renderer, "saves/first"),
 	m_Player(m_World, m_Window.GetKeyboard(), m_Window.GetMouse(), m_Window.GetSize()),
 	m_WorldRenderer(m_Renderer, m_World, m_Player),
-	m_UIManager(m_Window, m_Inventory)
+	m_UIManager(m_Window, m_Player.GetInventory())
 {
 	m_Window.GetMouse().SetPosition(m_Window.GetSize() / 2);
 	m_Window.GetKeyboard().AddKeyboardListener(*this);
@@ -26,11 +24,6 @@ Application::Application() :
 	m_Player.SetPosition(glm::vec3(0, 40, 0));
 	m_Player.SetEyeCamera(&m_Camera);
 	m_Renderer.SetCamera(&m_Camera);
-
-	m_Inventory.GetItemStack(2).Set(FoodItem(FoodItem::FoodType::Apple), 20);
-	m_Inventory.GetItemStack(3).Set(FoodItem(FoodItem::FoodType::Apple), 10);
-	m_Inventory.GetItemStack(5).Set(FoodItem(FoodItem::FoodType::Bread), 3);
-	m_Inventory.GetItemStack(6).Set(BlockItem(Block::Wood), 15);
 }
 
 void Application::OnKeyboardEvent(const KeyboardEvent& event)

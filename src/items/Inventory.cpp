@@ -13,11 +13,13 @@ void ItemStack::Set(const Item& item, unsigned int count) {
 	SetItemHeld(item);
 	SetCount(count);
 }
+
 void ItemStack::SetItemHeld(const Item& item) {
 	m_ItemHeld = item.Clone();
 
 	notifyListeners();
 }
+
 void ItemStack::SetCount(unsigned int count) {
 	if(m_ItemHeld)
 		m_Count = count;
@@ -67,6 +69,18 @@ void ItemStack::MoveTo(ItemStack& second, int count) {
 
 	notifyListeners();
 	second.notifyListeners();
+}
+
+bool ItemStack::Use(ItemUser& user, BlockManager& blockManager) {
+	if (Empty())
+		return false;
+
+	if (m_ItemHeld->Use(user, blockManager)) {
+		m_Count--;
+		notifyListeners();
+		return true;
+	}
+	return false;
 }
 
 void ItemStack::notifyListeners() {

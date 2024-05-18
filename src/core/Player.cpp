@@ -1,5 +1,8 @@
 #include <core/Player.hpp>
 
+#include <items/FoodItem.hpp>
+#include <items/BlockItem.hpp>
+
 using window::Keyboard;
 using window::Mouse;
 
@@ -12,6 +15,11 @@ Player::Player(BlockManager& world, Keyboard& keyboard, Mouse& mouse, glm::ivec2
 	m_Mouse(mouse)
 {
 	setFlying(false);
+
+	m_Inventory.GetItemStack(2).Set(FoodItem(FoodItem::FoodType::Apple), 20);
+	m_Inventory.GetItemStack(3).Set(FoodItem(FoodItem::FoodType::Apple), 10);
+	m_Inventory.GetItemStack(5).Set(FoodItem(FoodItem::FoodType::Bread), 3);
+	m_Inventory.GetItemStack(6).Set(BlockItem(Block::Wood), 15);
 }
 
 void Player::Update(float deltaTime)
@@ -117,13 +125,7 @@ void Player::MouseClicked(const glm::ivec2& position, bool leftButton)
 	}
 	else
 	{
-		if (m_Camera)
-		{
-			BlockRay ray(m_World, m_Rigidbody.GetPosition(), m_Camera->GetDirection());
-			glm::ivec3 placePosition;
-			if (ray.RaycastAhead(c_WorkingDistance, placePosition))
-				m_World.PlaceBlock(placePosition, Block::Stone, false);
-		}
+		m_Inventory.GetSelectedItem().Use(*this, m_World);
 	}
 }
 
@@ -133,6 +135,19 @@ glm::ivec3 Player::GetPointingAt() const {
 
 bool Player::IsPointingAtAnything() const {
 	return m_Highlight.AnythingHighlighted;
+}
+
+void Player::ChangeHealth(float healthChange) {
+	m_Health += healthChange;
+	m_Health = std::min(std::max(m_Health, 1.f), 0.f);
+}
+
+WorldPos Player::GetLookingAt() const {
+	return GetPointingAt();
+}
+
+bool Player::GetPlacingAt(WorldPos& position) const {
+	return getPlacePosition(position);
 }
 
 void Player::setFlying(bool flying)
@@ -150,4 +165,12 @@ void Player::updateHighlightment()
 
 	BlockRay ray(m_World, m_Rigidbody.GetPosition(), m_Camera->GetDirection());
 	m_Highlight.AnythingHighlighted = ray.Raycast(c_WorkingDistance, m_Highlight.HighlightedPos);
+}
+
+bool Player::getPlacePosition(WorldPos& position) const {
+	if (m_Camera == nullptr)
+		return false;
+
+	BlockRay ray(m_World, m_Rigidbody.GetPosition(), m_Camera->GetDirection());
+	return ray.RaycastAhead(c_WorkingDistance, position);
 }

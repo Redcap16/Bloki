@@ -51,7 +51,6 @@ private:
 	WorldRenderer m_WorldRenderer;
 
 	Camera3D m_Camera;
-	Inventory m_Inventory;
 	UIManager m_UIManager;
 
 	bool m_Running = false,

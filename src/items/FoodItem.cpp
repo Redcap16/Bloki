@@ -37,6 +37,6 @@ ItemTextureData FoodItem::GetTextureData() const {
 }
 
 bool FoodItem::Use(ItemUser& user, BlockManager& blockManager) {
-	user.Heal(0.4f);
+	user.ChangeHealth(0.4f);
 	return true;
 }

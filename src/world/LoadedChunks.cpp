@@ -118,8 +118,9 @@ Chunk* LoadedChunks::getLoadedChunk(ChunkPos position)
 
 Chunk* LoadedChunks::getChunk(ChunkPos position, bool force)
 {
-	if (!force)
-		return getLoadedChunk(position);
+	Chunk* loadedChunk = getLoadedChunk(position);
+	if (loadedChunk != nullptr || !force)
+		return loadedChunk;
 
 	if (m_SubsidiaryChunks.find(position) != m_SubsidiaryChunks.end())
 		return m_SubsidiaryChunks.at(position).get();

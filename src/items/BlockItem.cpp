@@ -20,5 +20,8 @@ ItemTextureData BlockItem::GetTextureData() const {
 }
 
 bool BlockItem::Use(ItemUser& user, BlockManager& blockManager) {
-	return blockManager.PlaceBlock(user.GetPlacingAt(), Block(m_BlockType), false);
+	WorldPos placingPosition;
+	if (user.GetPlacingAt(placingPosition))
+		return blockManager.PlaceBlock(placingPosition, Block(m_BlockType), false);
+	return false;
 }

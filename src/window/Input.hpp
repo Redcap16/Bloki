@@ -5,6 +5,7 @@
 #include <cctype>
 #include <assert.h>
 
+#define NOMINMAX
 #include <windows.h>
 
 namespace window {
