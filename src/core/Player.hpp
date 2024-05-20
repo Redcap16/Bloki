@@ -9,11 +9,12 @@
 #include <physics/BlockRay.hpp>
 #include <window/Input.hpp>
 #include <items/Inventory.hpp>
+#include <entity/DroppedItem.hpp>
 
 class Player : public ItemUser
 {
 public:
-	Player(BlockManager& world, window::Keyboard& keyboard, window::Mouse& mouse, glm::ivec2 windowSize);
+	Player(BlockManager& world, window::Keyboard& keyboard, window::Mouse& mouse, glm::ivec2 windowSize, DroppedItemRepository& droppedItemRepository);
 	Player(const Player&) = delete;
 	Player& operator=(const Player&) = delete;
 
@@ -51,7 +52,8 @@ private:
 		c_MoveSpeedInAir = 0.2f * c_MoveSpeed,
 		c_WorkingDistance = 3,
 		c_JumpSpeed = 1.7f,
-		c_FlyingSpeed = 0.5f;
+		c_FlyingSpeed = 0.5f,
+		c_PickupDistance = 1.7f;
 
 	float m_Health = 1.0f;
 
@@ -65,6 +67,8 @@ private:
 	Camera3D* m_Camera;
 	Inventory m_Inventory;
 
+	DroppedItemRepository& m_DroppedItemRepository;
+
 	window::Keyboard& m_Keyboard;
 	window::Mouse& m_Mouse;
 
@@ -77,4 +81,5 @@ private:
 	void setFlying(bool flying);
 	void updateHighlightment();
 	bool getPlacePosition(WorldPos& position) const;
+	void pickupItemsNearby();
 };

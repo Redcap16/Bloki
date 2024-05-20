@@ -7,20 +7,25 @@ using window::MouseButtonEvent;
 using window::Keyboard;
 using window::KeyboardEvent;
 
+#include <items/FoodItem.hpp>
+
 Application::Application() :
 	m_Window(glm::ivec2(1280, 720), "Bloki Alpha 2", true),
 	m_Camera(m_Window.GetSize()),
 	m_Renderer(m_Window.GetSize()),
 	m_World(m_Renderer, "saves/first"),
-	m_Player(m_World, m_Window.GetKeyboard(), m_Window.GetMouse(), m_Window.GetSize()),
+	m_Player(m_World, m_Window.GetKeyboard(), m_Window.GetMouse(), m_Window.GetSize(), m_DroppedItemRepository),
 	m_WorldRenderer(m_Renderer, m_World, m_Player),
-	m_UIManager(m_Window, m_Player.GetInventory())
+	m_UIManager(m_Window, m_Player.GetInventory()),
+	m_DroppedItemRepository(m_World),
+	m_DroppedItemsRenderer(m_Renderer, m_DroppedItemRepository)
 {
 	m_Window.GetMouse().SetPosition(m_Window.GetSize() / 2);
 	m_Window.GetKeyboard().AddKeyboardListener(*this);
 	m_Window.GetMouse().AddMouseListener(*this);
 	m_Window.AddWindowResizeListener(*this);
 
+	m_DroppedItemRepository.AddDroppedItem(ItemStack(FoodItem(FoodItem::FoodType::Apple), 3), { 3, 50, 0 });
 	m_Player.SetPosition(glm::vec3(0, 40, 0));
 	m_Player.SetEyeCamera(&m_Camera);
 	m_Renderer.SetCamera(&m_Camera);
@@ -85,6 +90,7 @@ void Application::SetChunksToRender() {
 			}
 
 	m_WorldRenderer.SetChunksToRender(chunksToRender);
+	m_DroppedItemRepository.SetCenterChunk(centerChunk);
 }
 
 void Application::Start()
@@ -105,8 +111,10 @@ void Application::Start()
 			if (m_Running)
 			{
 				const int parts = ceil(deltaTime / 200.0f); //Max 200ms per update, no more
-				for (int i = 0; i < parts; ++i)
+				for (int i = 0; i < parts; ++i) {
 					m_Player.Update(deltaTime / 1000.0f / parts);
+					m_DroppedItemRepository.Update(deltaTime / 1000.0f / parts);
+				}
 			}
 
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

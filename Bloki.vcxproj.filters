@@ -240,6 +240,9 @@
     <ClCompile Include="src\window\WindowsKeyboard.cpp">
       <Filter>Pliki źródłowe\window</Filter>
     </ClCompile>
+    <ClCompile Include="src\graphics\DroppedItemRenderer.cpp">
+      <Filter>Pliki źródłowe\graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\graphics\Camera.hpp">
@@ -424,6 +427,9 @@
     </ClInclude>
     <ClInclude Include="src\window\WindowsKeyboard.hpp">
       <Filter>Pliki nagłówkowe\window</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\DroppedItemRenderer.hpp">
+      <Filter>Pliki nagłówkowe\graphics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

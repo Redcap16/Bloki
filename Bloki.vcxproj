@@ -145,6 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\graphics\DroppedItemRenderer.cpp" />
     <ClCompile Include="src\ui\ItemSlot.cpp" />
     <ClCompile Include="src\ui\MouseHolder.cpp" />
     <ClCompile Include="src\items\BlockItem.cpp" />
@@ -204,6 +205,7 @@
     <ClCompile Include="src\window\WindowsKeyboard.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\graphics\DroppedItemRenderer.hpp" />
     <ClInclude Include="src\ui\MouseHolder.hpp" />
     <ClInclude Include="src\items\BlockItem.hpp" />
     <ClInclude Include="src\items\FoodItem.hpp" />

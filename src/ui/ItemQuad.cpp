@@ -78,16 +78,27 @@ void ItemQuad::Render(RenderingParams& params) const
 	m_CountText.Render(params);
 }
 
+glm::vec2 ItemQuad::GetItemTextureSize() {
+	constexpr glm::ivec2 atlasTextureSize = { 8, 8 };
+	constexpr glm::vec2 itemTextureSize = 1.f / (glm::vec2)atlasTextureSize;
+	return  itemTextureSize;
+}
+
+glm::vec2 ItemQuad::GetItemTexturePosition(const Item& item) {
+	constexpr glm::ivec2 atlasTextureSize = { 8, 8 };
+	constexpr glm::vec2 itemTextureSize = 1.f / (glm::vec2)atlasTextureSize;
+	ItemTextureData data = item.GetTextureData();
+	return (glm::vec2)data.Position * itemTextureSize;
+}
+
 void ItemQuad::update() {
 	if (m_Stack == nullptr || m_Stack->Empty())
 		return;
 
 	const Item& itemHeld = m_Stack->GetItemHeld();
 
-	constexpr glm::ivec2 atlasTextureSize = { 8, 8 };
-	constexpr glm::vec2 itemTextureSize = 1.f / (glm::vec2)atlasTextureSize;
-	ItemTextureData data = itemHeld.GetTextureData();
-	m_Rectangle.SetTextureCoords((glm::vec2)data.Position * itemTextureSize, itemTextureSize);
+	m_Rectangle.SetTextureCoords(GetItemTexturePosition(itemHeld),
+		GetItemTextureSize());
 	
 	m_CountText.SetText(std::to_string(m_Stack->GetCount()));
 }

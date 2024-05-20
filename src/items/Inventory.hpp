@@ -75,6 +75,8 @@ public:
 	ItemStack& GetItemStack(int index) { return m_Items.at(index); };
 	const ItemStack& GetItemStack(int index) const { return m_Items.at(index); };
 
+	bool AddItem(ItemStack& item);
+
 	void SetSelectedItem(int index);
 	void ChangeSelectedItem(int indexChange);
 	int GetSelectedItemIndex() const { return m_SelectedItemIndex; }

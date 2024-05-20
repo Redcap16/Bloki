@@ -28,6 +28,9 @@ public:
 	void StackUpdated() override;
 
 	void Render(RenderingParams& shader) const;
+
+	static glm::vec2 GetItemTextureSize();
+	static glm::vec2 GetItemTexturePosition(const Item& item);
 private:
 	ItemStack *m_Stack;
 	

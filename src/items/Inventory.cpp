@@ -101,6 +101,26 @@ Inventory::~Inventory() {
 	}
 }
 
+bool Inventory::AddItem(ItemStack& item) {
+	if (item.Empty())
+		return false;
+
+	for (auto& itemStack : m_Items) { //Try to find matching item stack first
+		if(!itemStack.Empty() &&
+			item.GetItemHeld() == itemStack.GetItemHeld())
+			item.MoveTo(itemStack);
+		if (item.Empty())
+			return true;
+	}
+	for (auto& itemStack : m_Items) { //If not found any matching stack, place it anywhere
+		item.MoveTo(itemStack);
+		if (item.Empty())
+			return true;
+	}
+
+	return false;
+}
+
 void Inventory::SetSelectedItem(int index) {
 	if (index < 0
 		&& index > c_SelectableItemCount)

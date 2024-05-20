@@ -23,6 +23,7 @@
 #include <world/WorldRenderer.hpp>
 #include <core/UIManager.hpp>
 #include <ui/Button.hpp>
+#include <graphics/DroppedItemRenderer.hpp>
 
 class Application : public window::KeyboardListener, 
 	public window::WindowListener, 
@@ -49,6 +50,8 @@ private:
 	LoadedChunks m_World;
 	Player m_Player;
 	WorldRenderer m_WorldRenderer;
+	DroppedItemRepository m_DroppedItemRepository;
+	DroppedItemRenderer m_DroppedItemsRenderer;
 
 	Camera3D m_Camera;
 	UIManager m_UIManager;

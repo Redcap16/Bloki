@@ -6,13 +6,14 @@
 using window::Keyboard;
 using window::Mouse;
 
-Player::Player(BlockManager& world, Keyboard& keyboard, Mouse& mouse, glm::ivec2 windowSize) :
+Player::Player(BlockManager& world, Keyboard& keyboard, Mouse& mouse, glm::ivec2 windowSize, DroppedItemRepository& droppedItemRepository) :
 	m_Rigidbody(world, AABB(glm::vec3(0), c_BodyCenter, c_BodySize)),
 	m_World(world),
 	m_Keyboard(keyboard),
 	m_Flying(false),
 	m_WindowSize(windowSize),
-	m_Mouse(mouse)
+	m_Mouse(mouse),
+	m_DroppedItemRepository(droppedItemRepository)
 {
 	setFlying(false);
 
@@ -81,6 +82,7 @@ void Player::Update(float deltaTime)
 	m_Rigidbody.Update(deltaTime);
 
 	m_Camera->SetPosition(m_Rigidbody.GetPosition());
+	pickupItemsNearby();
 }
 
 void Player::SetPosition(const glm::vec3& position) 
@@ -173,4 +175,12 @@ bool Player::getPlacePosition(WorldPos& position) const {
 
 	BlockRay ray(m_World, m_Rigidbody.GetPosition(), m_Camera->GetDirection());
 	return ray.RaycastAhead(c_WorkingDistance, position);
+}
+
+void Player::pickupItemsNearby() {
+	std::vector<DroppedItem*> itemsNearby = m_DroppedItemRepository.FindsItemNearby(m_Rigidbody.GetPosition(), c_PickupDistance);
+	for (auto item : itemsNearby) {
+		if (m_Inventory.AddItem(item->GetItemStack())) //Successfully transfered items to inventory
+			m_DroppedItemRepository.RemoveDroppedItem(item);
+	}
 }

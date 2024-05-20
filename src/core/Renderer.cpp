@@ -80,6 +80,7 @@ void Renderer3D::RenderScene()
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
+	m_Context.CurrentCamera3D = m_CurrentCamera3D;
 	for (RenderableRecord& record : m_Renderables)
 	{
 		if (lastParams == nullptr ||
@@ -110,7 +111,8 @@ void Renderer3D::setupGL()
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
 	//glEnable(GL_CULL_FACE);
-	glCullFace(GL_FRONT);
+	//glCullFace(GL_FRONT);
+	glDisable(GL_CULL_FACE);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
