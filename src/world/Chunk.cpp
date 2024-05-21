@@ -67,7 +67,6 @@ void Chunk::SwapBlockArray(BlockArray& blockArray)
 
 void Chunk::Update()
 {
-	checkItemsBoundaries();
 }
 
 void Chunk::UpdateNeighbors(const std::array<Chunk*, 6>& neighbors)
@@ -84,63 +83,6 @@ void Chunk::UpdateNeighbors(const std::array<Chunk*, 6>& neighbors)
 				m_Neighbors[i]->m_UpdateEvent.Invoke(&ChunkUpdateListener::ChunkUpdated, m_Neighbors[i]->m_Position);
 			m_UpdateEvent.Invoke(&ChunkUpdateListener::ChunkUpdated, m_Position);
 		}
-}
-
-void Chunk::AddDroppedItem(std::unique_ptr<DroppedItem> item)
-{
-	m_DroppedItems.push_back(std::move(item));
-}
-
-void Chunk::RemoveDroppedItem(const DroppedItem* item)
-{
-	for (std::vector<std::unique_ptr<DroppedItem>>::const_iterator it = m_DroppedItems.begin(); it != m_DroppedItems.end(); ++it)
-		if (it->get() == item)
-		{
-			m_DroppedItems.erase(it);
-			return;
-		}
-}
-
-void Chunk::GetDroppedItems(std::vector<DroppedItem*>& items)
-{
-	std::vector<DroppedItem*>().swap(items);
-	for (std::unique_ptr<DroppedItem>& item : m_DroppedItems)
-		items.push_back(item.get());
-}
-
-void Chunk::checkItemsBoundaries()
-{
-	for (int i = 0; i < m_DroppedItems.size();)
-	{
-		const glm::vec3& itemPosition = m_DroppedItems[i]->GetPosition();
-
-		if (itemPosition.x < m_Position.x
-			&& m_Neighbors[(unsigned int)Direction::Left] != nullptr)
-			moveItem(*(m_Neighbors[(unsigned int)Direction::Left]), m_DroppedItems.begin() + i);
-		else if (itemPosition.x > m_Position.x + BlockArray::ChunkSize.x 
-			&& m_Neighbors[(unsigned int)Direction::Right] != nullptr)
-			moveItem(*(m_Neighbors[(unsigned int)Direction::Right]), m_DroppedItems.begin() + i);
-		else if (itemPosition.y < m_Position.y
-			&& m_Neighbors[(unsigned int)Direction::Bottom] != nullptr)
-			moveItem(*(m_Neighbors[(unsigned int)Direction::Bottom]), m_DroppedItems.begin() + i);
-		else if (itemPosition.y > m_Position.y + BlockArray::ChunkSize.y
-			&& m_Neighbors[(unsigned int)Direction::Top] != nullptr)
-			moveItem(*(m_Neighbors[(unsigned int)Direction::Top]), m_DroppedItems.begin() + i);
-		else if (itemPosition.z < m_Position.z
-			&& m_Neighbors[(unsigned int)Direction::Back] != nullptr)
-			moveItem(*(m_Neighbors[(unsigned int)Direction::Back]), m_DroppedItems.begin() + i);
-		else if (itemPosition.z > m_Position.z + BlockArray::ChunkSize.z
-			&& m_Neighbors[(unsigned int)Direction::Front] != nullptr)
-			moveItem(*(m_Neighbors[(unsigned int)Direction::Front]), m_DroppedItems.begin() + i);
-		else
-			i++; //TODO: Rewrite
-	}
-}
-
-void Chunk::moveItem(Chunk& destination, std::vector<std::unique_ptr<DroppedItem>>::iterator it)
-{
-	destination.m_DroppedItems.push_back(std::move(*it));
-	m_DroppedItems.erase(it);
 }
 
 void Chunk::Deserialize(const std::vector<char>& data)

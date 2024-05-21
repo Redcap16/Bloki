@@ -74,10 +74,6 @@ public:
 	void UpdateNeighbors(const std::array<Chunk*, 6>& neighbors);
 	const std::array<const Chunk*, 6>& GetNeighbors() const { return reinterpret_cast<const std::array<const Chunk*, 6>&>(m_Neighbors); }
 
-	void AddDroppedItem(std::unique_ptr<DroppedItem> item);
-	void RemoveDroppedItem(const DroppedItem* item);
-	void GetDroppedItems(std::vector<DroppedItem*>& items);
-
 	inline static InChunkPos GetInChunkPosition(WorldPos position);
 	inline static ChunkPos GetChunkPosition(WorldPos position);
 
@@ -94,13 +90,8 @@ private:
 
 	std::array<Chunk*, 6> m_Neighbors;
 
-	std::vector<std::unique_ptr<DroppedItem>> m_DroppedItems;
-
 	bool m_Generated;
 	mutable std::mutex m_GeometryMutex;
-
-	void checkItemsBoundaries();
-	void moveItem(Chunk& destination, std::vector<std::unique_ptr<DroppedItem>>::iterator it);
 };
 
 template <class TBlockArray>
