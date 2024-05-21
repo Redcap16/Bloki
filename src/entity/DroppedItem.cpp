@@ -1,10 +1,10 @@
 #include <entity/DroppedItem.hpp>
 #include <world/Chunk.hpp>
 
-DroppedItem::DroppedItem(BlockManager& world, ItemStack&& item, glm::vec3 position) :
+DroppedItem::DroppedItem(BlockManager& world, ItemStack&& item, glm::vec3 position, glm::vec3 velocity) :
 	m_Rigidbody(world, {position, glm::vec3(0), glm::vec3(0.5, 0.5, 0.5)}),
-	m_ItemStack(std::move(item))
-{
+	m_ItemStack(std::move(item)) {
+	m_Rigidbody.SetVelocity(velocity);
 }
 
 void DroppedItem::Update(float deltaTime)
@@ -19,8 +19,11 @@ DroppedItemRepository::DroppedItemRepository(BlockManager& blockManager) :
 
 }
 
-std::weak_ptr<DroppedItem> DroppedItemRepository::AddDroppedItem(ItemStack&& item, glm::vec3 position) {
-	std::shared_ptr<DroppedItem> newDroppedItem = std::make_shared<DroppedItem>(m_BlockManager, std::move(item), position);
+std::weak_ptr<DroppedItem> DroppedItemRepository::AddDroppedItem(ItemStack&& item, glm::vec3 position, glm::vec3 velocity) {
+	if (item.Empty())
+		return std::weak_ptr<DroppedItem>();
+
+	std::shared_ptr<DroppedItem> newDroppedItem = std::make_shared<DroppedItem>(m_BlockManager, std::move(item), position, velocity);
 	std::weak_ptr<DroppedItem> result = newDroppedItem;
 	m_Items.emplace_back(std::move(newDroppedItem));
 
@@ -33,8 +36,7 @@ std::weak_ptr<DroppedItem> DroppedItemRepository::AddDroppedItem(ItemStack&& ite
 bool DroppedItemRepository::RemoveDroppedItem(const DroppedItem* item) {
 	for (auto it = m_Items.begin(); it != m_Items.end(); ++it)
 		if (it->get() == item) {
-			for (auto listener : m_Listeners)
-				listener->DestroyedDroppedItem(*it->get());
+			itemDestroyed(*it->get());
 
 			m_Items.erase(it);
 			return true;
@@ -56,12 +58,19 @@ void DroppedItemRepository::Update(float deltaTime) {
 	std::set<std::shared_ptr<DroppedItem>> itemsToUnload;
 	for (auto it = m_Items.begin(); it != m_Items.end();) {
 		(*it)->Update(deltaTime);
+		if ((*it)->GetItemStack().Empty()) {
+			itemDestroyed(*it->get());
+
+			it = m_Items.erase(it);
+			continue;
+		}
 		if (!inArea((*it)->GetPosition())) {
 			itemsToUnload.insert(std::move(*it));
 			it = m_Items.erase(it);
+			continue;
 		}
-		else
-			++it;
+		
+		++it;
 	}
 
 	for (auto listener : m_Listeners)
@@ -97,4 +106,9 @@ bool DroppedItemRepository::inArea(glm::ivec3 itemPosition) {
 void DroppedItemRepository::loadChunk(glm::ivec3 position) {
 	//TODO: some loading stuff
 	//TODO: Inform listeners about change
+}
+
+void DroppedItemRepository::itemDestroyed(DroppedItem& item) {
+	for (auto listener : m_Listeners)
+		listener->DestroyedDroppedItem(item);
 }

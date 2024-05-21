@@ -11,7 +11,7 @@
 class DroppedItem
 {
 public:
-	DroppedItem(BlockManager& world, ItemStack&& item, glm::vec3 position);
+	DroppedItem(BlockManager& world, ItemStack&& item, glm::vec3 position, glm::vec3 velocity = glm::vec3(0));
 
 	void Update(float deltaTime);
 	inline glm::vec3 GetPosition() const;
@@ -43,7 +43,7 @@ public:
 	void AddListener(DroppedItemRepositoryListener& listener) { m_Listeners.insert(&listener); };
 	void RemoveListener(DroppedItemRepositoryListener& listener) { m_Listeners.erase(&listener); };
 
-	std::weak_ptr<DroppedItem> AddDroppedItem(ItemStack&& item, glm::vec3 position);
+	std::weak_ptr<DroppedItem> AddDroppedItem(ItemStack&& item, glm::vec3 position, glm::vec3 velocity = glm::vec3(0));
 	bool RemoveDroppedItem(const DroppedItem* item);
 	const std::vector<std::shared_ptr<DroppedItem>> GetDroppedItems() const { return m_Items; }
 
@@ -62,4 +62,6 @@ private:
 
 	bool inArea(glm::ivec3 itemPosition);
 	void loadChunk(glm::ivec3 position);
+
+	void itemDestroyed(DroppedItem& item);
 };

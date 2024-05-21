@@ -27,4 +27,6 @@ uniform sampler2D textureAtlas;
 
 void main() {
 	FragColor = texture(textureAtlas, TexCoord);
+	if(FragColor.a < 0.1)
+		discard;
 }

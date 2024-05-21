@@ -11,10 +11,11 @@
 #include <items/Inventory.hpp>
 #include <entity/DroppedItem.hpp>
 
-class Player : public ItemUser
+class Player : public ItemUser, public window::KeyboardListener
 {
 public:
 	Player(BlockManager& world, window::Keyboard& keyboard, window::Mouse& mouse, glm::ivec2 windowSize, DroppedItemRepository& droppedItemRepository);
+	~Player();
 	Player(const Player&) = delete;
 	Player& operator=(const Player&) = delete;
 
@@ -22,6 +23,8 @@ public:
 
 	const glm::vec3& GetPosition() const { return m_Rigidbody.GetPosition(); };
 	void SetPosition(const glm::vec3& position);
+
+	void OnKeyboardEvent(const window::KeyboardEvent& event) override;
 
 	void SetWindowSize(const glm::ivec2& windowSize) { m_WindowSize = windowSize; };
 	void KeyPressed(char key);
@@ -53,7 +56,9 @@ private:
 		c_WorkingDistance = 3,
 		c_JumpSpeed = 1.7f,
 		c_FlyingSpeed = 0.5f,
-		c_PickupDistance = 1.7f;
+		c_PickupDistance = 1.7f,
+		c_DroppedItemSpeed = 2.f;
+	static constexpr int c_PickupCooldown = 5;
 
 	float m_Health = 1.0f;
 
@@ -68,6 +73,7 @@ private:
 	Inventory m_Inventory;
 
 	DroppedItemRepository& m_DroppedItemRepository;
+	std::vector<std::pair<std::shared_ptr<DroppedItem>, long long>> m_RecentlyDroppedItems;
 
 	window::Keyboard& m_Keyboard;
 	window::Mouse& m_Mouse;
@@ -82,4 +88,7 @@ private:
 	void updateHighlightment();
 	bool getPlacePosition(WorldPos& position) const;
 	void pickupItemsNearby();
+	void dropItem(int index);
+	bool wasItemDroppedRecently(DroppedItem* item);
+	long long getTimestamp() const;
 };

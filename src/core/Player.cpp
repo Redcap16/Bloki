@@ -4,6 +4,7 @@
 #include <items/BlockItem.hpp>
 
 using window::Keyboard;
+using window::KeyboardEvent;
 using window::Mouse;
 
 Player::Player(BlockManager& world, Keyboard& keyboard, Mouse& mouse, glm::ivec2 windowSize, DroppedItemRepository& droppedItemRepository) :
@@ -16,11 +17,16 @@ Player::Player(BlockManager& world, Keyboard& keyboard, Mouse& mouse, glm::ivec2
 	m_DroppedItemRepository(droppedItemRepository)
 {
 	setFlying(false);
+	m_Keyboard.AddKeyboardListener(*this);
 
 	m_Inventory.GetItemStack(2).Set(FoodItem(FoodItem::FoodType::Apple), 20);
 	m_Inventory.GetItemStack(3).Set(FoodItem(FoodItem::FoodType::Apple), 10);
 	m_Inventory.GetItemStack(5).Set(FoodItem(FoodItem::FoodType::Bread), 3);
 	m_Inventory.GetItemStack(6).Set(BlockItem(Block::Wood), 15);
+}
+
+Player::~Player() {
+	m_Keyboard.RemoveKeyboardListener(*this);
 }
 
 void Player::Update(float deltaTime)
@@ -83,6 +89,13 @@ void Player::Update(float deltaTime)
 
 	m_Camera->SetPosition(m_Rigidbody.GetPosition());
 	pickupItemsNearby();
+	
+	for (auto it = m_RecentlyDroppedItems.begin(); it != m_RecentlyDroppedItems.end();) {
+		if (getTimestamp() - it->second >= c_PickupCooldown)
+			it = m_RecentlyDroppedItems.erase(it);
+		else
+			++it;
+	}
 }
 
 void Player::SetPosition(const glm::vec3& position) 
@@ -91,10 +104,18 @@ void Player::SetPosition(const glm::vec3& position)
 	m_Rigidbody.SetVelocity(glm::vec3(0)); 
 }
 
+void Player::OnKeyboardEvent(const KeyboardEvent& event) {
+	if(event.EventType == KeyboardEvent::KeyPressed &&
+		event.KeyCode.IsChar())
+		KeyPressed(event.KeyCode.GetCharValue());
+}
+
 void Player::KeyPressed(char key)
 {
 	if (key == 'F')
 		setFlying(!m_Flying);
+	else if (key == 'Q')
+		dropItem(m_Inventory.GetSelectedItemIndex());
 }
 
 void Player::KeyReleased(char key)
@@ -180,7 +201,37 @@ bool Player::getPlacePosition(WorldPos& position) const {
 void Player::pickupItemsNearby() {
 	std::vector<DroppedItem*> itemsNearby = m_DroppedItemRepository.FindsItemNearby(m_Rigidbody.GetPosition(), c_PickupDistance);
 	for (auto item : itemsNearby) {
+		if (wasItemDroppedRecently(item))
+			continue;
+
 		if (m_Inventory.AddItem(item->GetItemStack())) //Successfully transfered items to inventory
 			m_DroppedItemRepository.RemoveDroppedItem(item);
 	}
+}
+
+void Player::dropItem(int index) {
+	ItemStack& source = m_Inventory.GetItemStack(index);
+	if (source.Empty())
+		return;
+
+	ItemStack droppedStack;
+	m_Inventory.GetItemStack(index).MoveTo(droppedStack, 1);
+
+	std::shared_ptr<DroppedItem> itemDropped = m_DroppedItemRepository.AddDroppedItem(std::move(droppedStack), 
+		m_Rigidbody.GetPosition(), 
+		c_DroppedItemSpeed * m_Camera->GetDirection()).lock();
+
+	m_RecentlyDroppedItems.push_back({ std::move(itemDropped), getTimestamp()});
+}
+
+bool Player::wasItemDroppedRecently(DroppedItem* item) {
+	for (auto recentlyDroppedItem : m_RecentlyDroppedItems)
+		if (item == recentlyDroppedItem.first.get())
+			return true;
+
+	return false;
+}
+
+long long Player::getTimestamp() const {
+	return std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 }
