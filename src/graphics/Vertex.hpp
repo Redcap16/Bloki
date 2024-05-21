@@ -11,13 +11,13 @@ struct Vertex2D
 {
 	glm::ivec2 Position;
 	glm::vec2 TextureCoords;
-	glm::vec<3, uint8_t> Color;
+	glm::vec<4, uint8_t> Color;
 
 	Vertex2D() : 
 		Position(0),
 		TextureCoords(0),
 		Color(0) {}
-	Vertex2D(glm::ivec2 pos, glm::vec2 texCoords, glm::vec<3, uint8_t> color) :
+	Vertex2D(glm::ivec2 pos, glm::vec2 texCoords, glm::vec<4, uint8_t> color) :
 		Position(pos),
 		TextureCoords(texCoords),
 		Color(color) { }

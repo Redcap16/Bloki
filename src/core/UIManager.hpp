@@ -8,7 +8,7 @@
 class UIManager
 {
 public:
-	UIManager(Window& window, Inventory& inventory);
+	UIManager(window::Window& window, Inventory& inventory);
 
 	void ShowInventory(bool visible);
 	bool IsInventoryVisible() const { return m_Inventory.IsVisible(); }
@@ -24,7 +24,7 @@ public:
 	void Update();
 private:
 	Canvas m_Canvas;
-	Window& m_Window;
+	window::Window& m_Window;
 
 	InventoryUI m_Inventory;
 	Hotbar m_Hotbar;

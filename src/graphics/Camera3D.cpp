@@ -71,9 +71,9 @@ void Camera3D::updateProjectionMatrix()
 
 void Camera3D::updateViewMatrix()
 {
-	const glm::vec3 rightVec = glm::normalize(glm::cross(glm::vec3(0, 1, 0), m_Direction));
-	const glm::vec3 upVec = glm::cross(m_Direction, rightVec);
+	m_Right = glm::normalize(glm::cross(glm::vec3(0, 1, 0), m_Direction));
+	m_Up = glm::cross(m_Direction, m_Right);
 
-	m_ViewMatrix = glm::lookAt(m_Position, m_Position + m_Direction, upVec);
+	m_ViewMatrix = glm::lookAt(m_Position, m_Position + m_Direction, m_Up);
 	m_CameraMatrix = m_ProjectionMatrix * m_ViewMatrix;
 }

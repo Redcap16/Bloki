@@ -1,10 +1,10 @@
 #include <entity/DroppedItem.hpp>
+#include <world/Chunk.hpp>
 
-DroppedItem::DroppedItem(BlockManager& world, glm::vec3 position) :
+DroppedItem::DroppedItem(BlockManager& world, ItemStack&& item, glm::vec3 position, glm::vec3 velocity) :
 	m_Rigidbody(world, {position, glm::vec3(0), glm::vec3(0.5, 0.5, 0.5)}),
-	m_Mesh(false)
-{
-	setupMesh();
+	m_ItemStack(std::move(item)) {
+	m_Rigidbody.SetVelocity(velocity);
 }
 
 void DroppedItem::Update(float deltaTime)
@@ -12,74 +12,103 @@ void DroppedItem::Update(float deltaTime)
 	m_Rigidbody.Update(deltaTime);
 }
 
-void DroppedItem::Render()
-{
-	//m_Mesh.Render();
+
+DroppedItemRepository::DroppedItemRepository(BlockManager& blockManager) :
+	m_BlockManager(blockManager),
+	m_CenterChunkPosition(0) {
+
 }
 
-void DroppedItem::setupMesh()
-{
-	for(int i = 0; i < 6; ++i)
-		setupFace((Direction)i);
+std::weak_ptr<DroppedItem> DroppedItemRepository::AddDroppedItem(ItemStack&& item, glm::vec3 position, glm::vec3 velocity) {
+	if (item.Empty())
+		return std::weak_ptr<DroppedItem>();
+
+	std::shared_ptr<DroppedItem> newDroppedItem = std::make_shared<DroppedItem>(m_BlockManager, std::move(item), position, velocity);
+	std::weak_ptr<DroppedItem> result = newDroppedItem;
+	m_Items.emplace_back(std::move(newDroppedItem));
+
+	for (auto listener : m_Listeners)
+		listener->CreatedDroppedItem(*m_Items.back());
+
+	return result;
 }
 
-void DroppedItem::setupFace(Direction direction)
-{
-	/*
-	static constexpr unsigned int faceIndices[6][4] = {
-		{ 5, 6, 1, 2 }, //Top
-		{ 4, 8, 7, 9 }, //Bottom
-		{ 2, 6, 12, 13 }, //Right
-		{ 5, 1, 11, 10 }, //Left
-		{ 5, 4, 6, 7 }, //Front
-		{ 0, 1, 3, 2 } /*Back*/ /* };
-	static constexpr float faceVertices[14 * 5] = {
-	   0, 0, 0, 0, 0.333333333f,
-	   0, 1, 0, 0.25f, 0.333333f,
-	   1, 1, 0, 0.25f, 0.66666f,
-	   1, 0, 0, 0, 0.666666f,
-	   0, 0, 1, 0.75f, 0.33333f,
-	   0, 1, 1, 0.5f, 0.33333f,
-	   1, 1, 1, 0.5f, 0.66666f,
-	   1, 0, 1, 0.75, 0.66666f,
-	   0, 0, 0, 1, 0.333333f,
-	   1, 0, 0, 1, 0.666666f,
-	   0, 0, 0, 0.25f, 0,
-	   0, 0, 1, 0.5f, 0,
-	   1, 0, 0, 0.25f, 1,
-	   1, 0, 1, 0.5f, 1 };
+bool DroppedItemRepository::RemoveDroppedItem(const DroppedItem* item) {
+	for (auto it = m_Items.begin(); it != m_Items.end(); ++it)
+		if (it->get() == item) {
+			itemDestroyed(*it->get());
 
-	static constexpr glm::vec3 faceNormals[6] = {
-		{0, 1, 0},
-		{0, -1, 0},
-		{1, 0, 0},
-		{-1, 0, 0},
-		{0, 0, 1},
-		{0, 0, -1} };
+			m_Items.erase(it);
+			return true;
+		}
 
-	Vertex3D vertex;
+	return false;
+}
 
-	for (int i = 0; i < 4; i++)
-	{
-		const unsigned int vertexIndex = faceIndices[(unsigned int)direction][i];
+std::vector<DroppedItem*> DroppedItemRepository::FindsItemNearby(glm::vec3 position, float range) {
+	std::vector<DroppedItem*> result;
+	for (auto& item : m_Items)
+		if (glm::length(item->GetPosition() - position) < range)
+			result.push_back(item.get());
 
-		vertex.Position.x = faceVertices[5 * vertexIndex + 0] * 0.3;
-		vertex.Position.y = faceVertices[5 * vertexIndex + 1] * 0.3;
-		vertex.Position.z = faceVertices[5 * vertexIndex + 2] * 0.3;
+	return result;
+}
 
-		vertex.Normal = faceNormals[(int)direction];
+void DroppedItemRepository::Update(float deltaTime) {
+	std::set<std::shared_ptr<DroppedItem>> itemsToUnload;
+	for (auto it = m_Items.begin(); it != m_Items.end();) {
+		(*it)->Update(deltaTime);
+		if ((*it)->GetItemStack().Empty()) {
+			itemDestroyed(*it->get());
 
-		m_Mesh.AddVertex(vertex);
+			it = m_Items.erase(it);
+			continue;
+		}
+		if (!inArea((*it)->GetPosition())) {
+			itemsToUnload.insert(std::move(*it));
+			it = m_Items.erase(it);
+			continue;
+		}
+		
+		++it;
 	}
 
-	const unsigned int index = m_Mesh.GetCurrentIndex();
+	for (auto listener : m_Listeners)
+		for(auto& item : itemsToUnload)
+			listener->UnloadedDroppedItem(*item);
 
-	//Add two faces
-	m_Mesh.AddIndex(index - 4);
-	m_Mesh.AddIndex(index - 2);
-	m_Mesh.AddIndex(index - 3);
+	//TODO: Save unloaded items
+}
 
-	m_Mesh.AddIndex(index - 2);
-	m_Mesh.AddIndex(index - 1);
-	m_Mesh.AddIndex(index - 3);*/
+void DroppedItemRepository::SetCenterChunk(glm::ivec3 chunkPos) {
+	if (chunkPos == m_CenterChunkPosition)
+		return;
+
+	for(int x = chunkPos.x - c_WorkingArea.x; x <= chunkPos.x + c_WorkingArea.x; x++)
+		for(int y = chunkPos.y - c_WorkingArea.y; y <= chunkPos.y + c_WorkingArea.y; y++)
+			for (int z = chunkPos.z - c_WorkingArea.z; z <= chunkPos.z + c_WorkingArea.z; z++) {
+				if (!inArea({ x, y, z }))
+					loadChunk({ x, y, z });
+			}
+	m_CenterChunkPosition = chunkPos;
+}
+
+bool DroppedItemRepository::inArea(glm::ivec3 itemPosition) {
+	glm::ivec3 chunkPosition = Chunk::GetChunkPosition(itemPosition) - m_CenterChunkPosition;
+	return chunkPosition.x >= -c_WorkingArea.x &&
+		chunkPosition.x <= c_WorkingArea.x &&
+		chunkPosition.y >= -c_WorkingArea.y &&
+		chunkPosition.y <= c_WorkingArea.y &&
+		chunkPosition.z >= -c_WorkingArea.z &&
+		chunkPosition.z <= c_WorkingArea.z;
+}
+
+void DroppedItemRepository::loadChunk(glm::ivec3 position) {
+	//TODO: some loading stuff
+	//TODO: Inform listeners about change
+}
+
+void DroppedItemRepository::itemDestroyed(DroppedItem& item) {
+	for (auto listener : m_Listeners)
+		listener->DestroyedDroppedItem(item);
 }

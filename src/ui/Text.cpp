@@ -31,6 +31,9 @@ void Text::Render(RenderingParams& params) const
 
 void Text::updateMesh()
 {
+	m_Letters.clear();
+	m_Buffer.Clear();
+
 	int offset = 0;
 	for (char c : m_Text)
 		addLetterQuad(offset, c);

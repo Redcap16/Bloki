@@ -8,11 +8,14 @@
 #include <physics/Rigidbody.hpp>
 #include <physics/BlockRay.hpp>
 #include <window/Input.hpp>
+#include <items/Inventory.hpp>
+#include <entity/DroppedItem.hpp>
 
-class Player
+class Player : public ItemUser, public window::KeyboardListener
 {
 public:
-	Player(BlockManager& world, Keyboard& keyboard, Mouse& mouse, glm::ivec2 windowSize);
+	Player(BlockManager& world, window::Keyboard& keyboard, window::Mouse& mouse, glm::ivec2 windowSize, DroppedItemRepository& droppedItemRepository);
+	~Player();
 	Player(const Player&) = delete;
 	Player& operator=(const Player&) = delete;
 
@@ -20,6 +23,8 @@ public:
 
 	const glm::vec3& GetPosition() const { return m_Rigidbody.GetPosition(); };
 	void SetPosition(const glm::vec3& position);
+
+	void OnKeyboardEvent(const window::KeyboardEvent& event) override;
 
 	void SetWindowSize(const glm::ivec2& windowSize) { m_WindowSize = windowSize; };
 	void KeyPressed(char key);
@@ -29,8 +34,18 @@ public:
 
 	void SetEyeCamera(Camera3D* camera) { m_Camera = camera; };
 
+	Inventory& GetInventory() { return m_Inventory; }
+	const Inventory& GetInventory() const { return m_Inventory; }
+
 	glm::ivec3 GetPointingAt() const;
 	bool IsPointingAtAnything() const;
+	
+	float GetHealth() const { return m_Health; }
+
+	//ItemUser
+	void ChangeHealth(float healthChange) override;
+	WorldPos GetLookingAt() const override;
+	bool GetPlacingAt(WorldPos& position) const override;
 
 private:
 	static constexpr glm::vec3 c_BodySize = {0.8f, 1.8f, 0.8f};
@@ -40,7 +55,12 @@ private:
 		c_MoveSpeedInAir = 0.2f * c_MoveSpeed,
 		c_WorkingDistance = 3,
 		c_JumpSpeed = 1.7f,
-		c_FlyingSpeed = 0.5f;
+		c_FlyingSpeed = 0.5f,
+		c_PickupDistance = 1.7f,
+		c_DroppedItemSpeed = 2.f;
+	static constexpr int c_PickupCooldown = 5;
+
+	float m_Health = 1.0f;
 
 	Rigidbody m_Rigidbody;
 	glm::vec2 m_Rotation;
@@ -50,9 +70,13 @@ private:
 
 	BlockManager& m_World;
 	Camera3D* m_Camera;
+	Inventory m_Inventory;
 
-	Keyboard& m_Keyboard;
-	Mouse& m_Mouse;
+	DroppedItemRepository& m_DroppedItemRepository;
+	std::vector<std::pair<std::shared_ptr<DroppedItem>, long long>> m_RecentlyDroppedItems;
+
+	window::Keyboard& m_Keyboard;
+	window::Mouse& m_Mouse;
 
 	struct
 	{
@@ -62,4 +86,9 @@ private:
 
 	void setFlying(bool flying);
 	void updateHighlightment();
+	bool getPlacePosition(WorldPos& position) const;
+	void pickupItemsNearby();
+	void dropItem(int index);
+	bool wasItemDroppedRecently(DroppedItem* item);
+	long long getTimestamp() const;
 };

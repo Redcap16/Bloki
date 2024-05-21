@@ -27,6 +27,9 @@ public:
 
 	const glm::vec3& GetDirection() const { return m_Direction; }
 	const glm::mat4& GetCameraMatrix() const override { return m_CameraMatrix; }
+	
+	const glm::vec3& GetRightVector() const { return m_Right; };
+	const glm::vec3& GetUpVector() const { return m_Up; };
 
 private:
 	static constexpr float c_FOV = 45.0f,
@@ -36,7 +39,9 @@ private:
 	glm::vec3 m_Position = glm::vec3(0.0);
 	float m_HorizontalRotation = 0,
 		m_VerticalRotation = 0;
-	glm::vec3 m_Direction;
+	glm::vec3 m_Direction, 
+		m_Up,
+		m_Right;
 
 	float m_AspectRatio;
 
