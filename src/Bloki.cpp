@@ -1,4 +1,4 @@
-﻿#include <core/Application.hpp>
+﻿#include <game/core/Application.hpp>
 
 /*
 	 ________  ___  ___        ___   _______          _______
