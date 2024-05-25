@@ -145,6 +145,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\game\graphics\ConcreteItemTextureLoader.cpp" />
+    <ClCompile Include="src\game\graphics\ItemTextureProvider.cpp" />
+    <ClCompile Include="src\engine\graphics\Framebuffer.cpp" />
     <ClCompile Include="src\game\graphics\DroppedItemRenderer.cpp" />
     <ClCompile Include="src\game\ui\ItemSlot.cpp" />
     <ClCompile Include="src\game\ui\MouseHolder.cpp" />
@@ -205,6 +208,9 @@
     <ClCompile Include="src\engine\window\WindowsKeyboard.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\game\graphics\ConcreteItemTextureLaoder.hpp" />
+    <ClInclude Include="src\game\graphics\ItemTextureProvider.hpp" />
+    <ClInclude Include="src\engine\graphics\Framebuffer.hpp" />
     <ClInclude Include="src\game\graphics\DroppedItemRenderer.hpp" />
     <ClInclude Include="src\game\ui\MouseHolder.hpp" />
     <ClInclude Include="src\game\items\BlockItem.hpp" />

@@ -28,6 +28,16 @@ public:
 };
 
 template <>
+class std::hash<glm::vec2>
+{
+public:
+	size_t operator()(const glm::vec2& key) const noexcept
+	{
+		return (long long)(key.x * 42600713LL) ^ (long long)(key.y * 69498817LL) % SIZE_MAX;
+	}
+};
+
+template <>
 class std::hash<glm::vec<3, uint8_t>>
 {
 public:

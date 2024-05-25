@@ -1,11 +1,20 @@
 #include <engine/graphics/AtlasTexture.hpp>
 
-AtlasTexture::SubTexture::SubTexture(glm::vec2 uv, glm::vec2 size) :
+AtlasTexture::SubTexture::SubTexture(glm::vec2 uv, glm::vec2 size, GLuint handle) :
 	UV(uv),
-	Size(size) { }
+	Size(size),
+	m_Handle(handle) { }
 
 AtlasTexture::SubTexture::SubTexture() :
 	SubTexture(glm::vec2(0), glm::vec2(1.0f)) { }
+
+void AtlasTexture::SubTexture::Bind(GLuint textureUnit) const {
+	if (m_Handle == NULL)
+		return;
+
+	glActiveTexture(GL_TEXTURE0 + textureUnit);
+	glBindTexture(GL_TEXTURE_2D, m_Handle);
+}
 
 AtlasTexture::AtlasTexture(const std::string& filename) :
 	m_Handle(0),
@@ -29,6 +38,12 @@ const AtlasTexture::SubTexture* AtlasTexture::GetSubTexture(const std::string& n
 	}
 
 	return &(it->second);
+}
+
+const AtlasTexture::SubTexture* AtlasTexture::GetSubTexture(glm::vec2 position, glm::vec2 size) {
+	AtlasTexture::SubTexture newSubtexture(position, size, m_Handle);
+	auto result = m_CustomSubtextures.insert(newSubtexture);
+	return &*result.first;
 }
 
 void AtlasTexture::Bind(GLuint textureUnit) const
@@ -212,11 +227,23 @@ void AtlasTexture::load()
 
 	glm::vec2 subSize = (glm::vec2)descFile.GetDefaultSize() / glm::vec2(width, height);
 	for (const std::pair<const std::string, glm::ivec2>& coords : descFile.GetTextureCoords())
-		m_SubTextures[coords.first] = SubTexture(glm::vec2((float)coords.second.x / width, (float)coords.second.y / height), subSize);
+		m_SubTextures[coords.first] = SubTexture(glm::vec2((float)coords.second.x / width, (float)coords.second.y / height), subSize, m_Handle);
 }
 
 void AtlasTexture::unload()
 {
 	glDeleteTextures(1, &m_Handle);
 	CHECK_GL_ERROR();
+}
+
+size_t AtlasTexture::SubTextureHash::operator()(const AtlasTexture::SubTexture& key) const {
+	size_t result = 0;
+	hash_combine(result, key.Size, key.UV, key.m_Handle);
+	return result;
+}
+
+bool operator==(const AtlasTexture::SubTexture& lhs, const AtlasTexture::SubTexture& rhs) {
+	return lhs.m_Handle == rhs.m_Handle &&
+		lhs.UV == rhs.UV &&
+		lhs.Size == rhs.Size;
 }

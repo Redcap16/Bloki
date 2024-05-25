@@ -4,6 +4,7 @@
 #include <GL/GL.h>
 #include <GL/GLU.h>
 
+#include <glm/glm.hpp>
 #include <string>
 #include <engine/util/Debug.hpp>
 #include <engine/graphics/ErrorCheck.hpp>
@@ -16,6 +17,8 @@ public:
 	static constexpr GLenum GetFormatFromChannelCount(unsigned short channelCount);
 	virtual void Bind(GLuint textureUnit) const = 0;
 	virtual TextureHandle GetHandle() const = 0;
+	virtual glm::vec2 GetUVSize() const { return { 1, 1 }; };
+	virtual glm::vec2 GetUVPosition() const { return { 0, 0 }; };
 
 protected:
 	static constexpr short c_MaxTextureIndex = 16;

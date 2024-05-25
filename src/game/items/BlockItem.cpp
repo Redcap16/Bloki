@@ -1,4 +1,5 @@
 #include <game/items/BlockItem.hpp>
+#include <game/graphics/ItemTextureProvider.hpp>
 
 ItemTypeArray<Block::BlockType> BlockItem::m_ItemTypes;
 
@@ -15,8 +16,8 @@ std::string BlockItem::GetName() const {
 	return "Block name goes here";
 }
 
-ItemTextureData BlockItem::GetTextureData() const {
-	return ItemTextureData({ 4, 0 });
+const Texture& BlockItem::GetTexture() const {
+	return game::graphics::ItemTextureProvider::GetLoader().GetTextureForBlock(m_BlockType);
 }
 
 bool BlockItem::Use(ItemUser& user, BlockManager& blockManager) {

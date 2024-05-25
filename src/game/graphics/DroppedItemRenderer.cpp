@@ -1,4 +1,5 @@
 #include <game/graphics/DroppedItemRenderer.hpp>
+#include <game/graphics/ItemTextureProvider.hpp>
 
 DroppedItemMesh::DroppedItemMesh(const DroppedItem& item, Renderer3D& renderer) :
 	m_Item(item),
@@ -33,8 +34,9 @@ void DroppedItemMesh::Render(const RenderingContext& context) {
 }
 
 void DroppedItemMesh::setupMesh() {
-	const glm::vec2 texPos = ItemQuad::GetItemTexturePosition(m_Item.GetItemStack().GetItemHeld()),
-		texSize = ItemQuad::GetItemTextureSize();
+	auto& texture = m_Item.GetItemStack().GetItemHeld().GetTexture();
+	const glm::vec2 texPos = texture.GetUVPosition(),
+		texSize = texture.GetUVSize();
 	m_VBO.AddVertex({ c_Size / 2 * glm::vec3{-1, -1, 0},
 		texPos + texSize * glm::vec2(0.f, 1.f), 
 		{0, 0, 0} });

@@ -4,15 +4,7 @@
 #include <memory>
 #include <array>
 #include <map>
-
-struct ItemTextureData {
-	glm::ivec2 Position;
-
-	ItemTextureData(glm::ivec2 position) :
-		Position(position) {
-
-	}
-};
+#include <engine/graphics/Texture.hpp>
 
 class ItemUser {
 public:
@@ -71,7 +63,7 @@ public:
 
 	virtual ItemType GetType() const = 0;
 	virtual std::string GetName() const = 0;
-	virtual ItemTextureData GetTextureData() const = 0;
+	virtual const Texture& GetTexture() const = 0;
 	virtual bool Use(ItemUser& user, BlockManager& blockManager) = 0;
 };
 

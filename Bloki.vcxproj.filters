@@ -273,6 +273,15 @@
     <ClCompile Include="src\engine\core\Renderer.cpp">
       <Filter>Pliki źródłowe\engine\core</Filter>
     </ClCompile>
+    <ClCompile Include="src\engine\graphics\Framebuffer.cpp">
+      <Filter>Pliki źródłowe\engine\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\graphics\ItemTextureProvider.cpp">
+      <Filter>Pliki źródłowe\game\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\graphics\ConcreteItemTextureLoader.cpp">
+      <Filter>Pliki źródłowe\game\graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\engine\util\Debug.hpp">
@@ -459,6 +468,15 @@
       <Filter>Pliki nagłówkowe\game\graphics</Filter>
     </ClInclude>
     <ClInclude Include="src\game\graphics\ChunkMesh.hpp">
+      <Filter>Pliki nagłówkowe\game\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\graphics\Framebuffer.hpp">
+      <Filter>Pliki nagłówkowe\engine\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\graphics\ItemTextureProvider.hpp">
+      <Filter>Pliki nagłówkowe\game\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\graphics\ConcreteItemTextureLaoder.hpp">
       <Filter>Pliki nagłówkowe\game\graphics</Filter>
     </ClInclude>
   </ItemGroup>

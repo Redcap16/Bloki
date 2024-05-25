@@ -1,4 +1,5 @@
 #include <game/items/FoodItem.hpp>
+#include <game/graphics/ItemTextureProvider.hpp>
 
 ItemTypeArray<FoodItem::FoodType> FoodItem::m_ItemTypes;
 
@@ -24,16 +25,17 @@ std::string FoodItem::GetName() const {
 	}
 }
 
-ItemTextureData FoodItem::GetTextureData() const {
+const Texture& FoodItem::GetTexture() const {
+	auto& loader = game::graphics::ItemTextureProvider::GetLoader();
 	switch (m_FoodType) {
 	case FoodType::Apple:
-		return ItemTextureData({ 2, 0 });
+		return loader.GetTextureForFlat({ 2, 0 });
 	case FoodType::Bread:
-		return ItemTextureData({ 1, 0 });
+		return loader.GetTextureForFlat({ 1, 0 });
 	case FoodType::Meat:
-		return ItemTextureData({ 3, 0 });
+		return loader.GetTextureForFlat({ 3, 0 });
 	}
-	return ItemTextureData({0, 0});
+	return loader.GetTextureForFlat({0, 0});
 }
 
 bool FoodItem::Use(ItemUser& user, BlockManager& blockManager) {

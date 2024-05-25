@@ -148,6 +148,7 @@ void ChunkRenderer::loadTextureCoords()
 		if (subTexture == nullptr)
 		{
 			DEBUG_LOG("Error: cant load sub textures");
+			continue;
 		}
 		s_TextureCoords[i] = *subTexture;
 	}
