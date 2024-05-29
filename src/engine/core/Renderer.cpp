@@ -1,6 +1,6 @@
 #include <engine/core/Renderer.hpp>
 
-RenderableParameters::RenderableParameters(bool transparent, ShaderProgram* usedShader, Texture* texture) :
+RenderableParameters::RenderableParameters(bool transparent, ShaderProgram* usedShader, const Texture* texture) :
 	Transparent(transparent),
 	UsedShader(usedShader),
 	UsedTexture(texture)

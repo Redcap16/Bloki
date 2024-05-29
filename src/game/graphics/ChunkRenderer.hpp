@@ -25,16 +25,12 @@ public:
 
 	void ChunkUpdated(const ChunkPos& chunkPosition) override;
 private:
-	const char* c_TextureFilename = "block.td";
 	const char* c_OpaqueShaderFilename = "chunk-solid.shader";
 	const char* c_TransparentShaderFilename = "chunk-transparent.shader";
 
-	Resource<AtlasTexture> m_BlockTexture;
+	const Texture* m_BlockTexture;
 	Resource<ShaderProgram> m_OpaqueShader,
 		m_TransparentShader;
-
-	static AtlasTexture::SubTexture s_TextureCoords[Block::c_BlockCount];
-	static bool s_TextureCoordsCreated;
 
 	Renderer3D& m_Renderer;
 
@@ -54,6 +50,4 @@ private:
 	void processBlock(const InChunkPos& position);
 	bool isBlockVisible(Block block, const InChunkPos& position, Direction direction);
 	const Chunk* getNeighbor(const glm::ivec3& position) const;
-
-	void loadTextureCoords();
 };

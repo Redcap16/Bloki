@@ -4,7 +4,6 @@
 #include <engine/ui/Canvas.hpp>
 #include <engine/window/Window.hpp>
 #include <game/ui/Crosshair.hpp>
-#include <game/graphics/ConcreteItemTextureLaoder.hpp>
 
 class UIManager
 {
@@ -24,17 +23,9 @@ public:
 
 	void Update();
 private:
-	class ItemTextureProviderSetter { //TODO: Remove it please...
-	public:
-		ItemTextureProviderSetter() { game::graphics::ItemTextureProvider::SetLoader(&m_ItemTextureLoader); }
-	private:
-		game::graphics::ConcreteItemTextureLoader m_ItemTextureLoader;
-	};
-
 	Canvas m_Canvas;
 	window::Window& m_Window;
 
-	ItemTextureProviderSetter m_Itps;
 	InventoryUI m_Inventory;
 	Hotbar m_Hotbar;
 	Crosshair m_Crosshair;

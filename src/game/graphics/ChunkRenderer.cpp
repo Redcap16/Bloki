@@ -1,27 +1,23 @@
 #include <game/graphics/ChunkRenderer.hpp>
-
-AtlasTexture::SubTexture ChunkRenderer::s_TextureCoords[Block::c_BlockCount];
-bool ChunkRenderer::s_TextureCoordsCreated = false;
+#include <game/graphics/BlockTextureProvider.hpp>
 
 ChunkRenderer::ChunkRenderer(Renderer3D& renderer, const Chunk& chunk) :
 	m_Chunk(&chunk),
 	m_Position(chunk.GetPosition()* BlockArray::ChunkSize),
-	m_OpaqueMesh(m_Position, s_TextureCoords),
-	m_TransparentMesh(m_Position, s_TextureCoords),
+	m_BlockTexture(&game::graphics::BlockTextureProvider::GetLoader().GetWholeTexture()),
+	m_OpaqueMesh(m_Position),
+	m_TransparentMesh(m_Position),
 	m_AnythingHighlighted(false),
 	m_HighlightedPosition(glm::ivec3(0)),
 	m_Neighbors(chunk.GetNeighbors()),
 	m_CurrentBlockAccess(nullptr),
 	m_Renderer(renderer),
-	m_BlockTexture(c_TextureFilename),
 	m_OpaqueShader(c_OpaqueShaderFilename),
 	m_TransparentShader(c_TransparentShaderFilename),
 	m_MeshNeedUpdate(true)
 {
-	loadTextureCoords();
-
-	renderer.RegisterRenderable(&m_OpaqueMesh, RenderableParameters(false, m_OpaqueShader.Get(), m_BlockTexture.Get()));
-	renderer.RegisterRenderable(&m_TransparentMesh, RenderableParameters(true, m_TransparentShader.Get(), m_BlockTexture.Get()));
+	renderer.RegisterRenderable(&m_OpaqueMesh, RenderableParameters(false, m_OpaqueShader.Get(), m_BlockTexture));
+	renderer.RegisterRenderable(&m_TransparentMesh, RenderableParameters(true, m_TransparentShader.Get(), m_BlockTexture));
 
 	m_Chunk->AddUpdateListener(this);
 }
@@ -131,27 +127,4 @@ const Chunk* ChunkRenderer::getNeighbor(const glm::ivec3& position) const
 	if (position.z < 0)
 		return m_Neighbors[(unsigned int)Direction::Back];
 	return nullptr;
-}
-
-void ChunkRenderer::loadTextureCoords()
-{
-	if (s_TextureCoordsCreated)
-		return;
-
-	for (int i = 0; i < Block::c_BlockCount; ++i)
-	{
-		if (i == Block::Air)
-			continue;
-
-		const std::string& blockName = Block::GetBlockName((Block::BlockType)i);
-		const AtlasTexture::SubTexture* subTexture = m_BlockTexture->GetSubTexture(blockName);
-		if (subTexture == nullptr)
-		{
-			DEBUG_LOG("Error: cant load sub textures");
-			continue;
-		}
-		s_TextureCoords[i] = *subTexture;
-	}
-
-	s_TextureCoordsCreated = true;
 }

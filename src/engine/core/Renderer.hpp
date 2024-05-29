@@ -16,9 +16,9 @@ struct RenderableParameters
 {
 	bool Transparent;
 	ShaderProgram* UsedShader;
-	Texture* UsedTexture;
+	const Texture* UsedTexture;
 
-	RenderableParameters(bool transparent, ShaderProgram* usedShader, Texture* texture);
+	RenderableParameters(bool transparent, ShaderProgram* usedShader, const Texture* texture);
 };
 
 class Renderable

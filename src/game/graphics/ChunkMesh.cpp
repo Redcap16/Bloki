@@ -1,12 +1,11 @@
 #include <game/graphics/ChunkMesh.hpp>
+#include <game/graphics/BlockTextureProvider.hpp>
 
-ChunkMesh::ChunkMesh(glm::vec3& position, const AtlasTexture::SubTexture(&textureCoords)[Block::c_BlockCount]) :
+ChunkMesh::ChunkMesh(glm::vec3& position) :
 	m_MeshVAO(true),
 	m_Position(position),
-	m_TextureCoords(textureCoords),
 	m_MeshVBO(m_MeshVAO.CreateVertexBuffer<Vertex3DS>(true)),
-	m_MeshEBO(m_MeshVAO.GetElementBuffer())
-{
+	m_MeshEBO(m_MeshVAO.GetElementBuffer()) {
 }
 
 void ChunkMesh::AddFace(Direction dir, InChunkPos position, Block block, BlockState state)
@@ -47,7 +46,7 @@ void ChunkMesh::AddFace(Direction dir, InChunkPos position, Block block, BlockSt
 		{0, 0, 1},
 		{0, 0, -1} };
 
-	const AtlasTexture::SubTexture& subTexture = m_TextureCoords[(int)block.Type];
+	const Texture& subTexture = game::graphics::BlockTextureProvider::GetLoader().GetBlockTexture(block.Type);
 
 	Vertex3DS vertex;
 
@@ -56,8 +55,8 @@ void ChunkMesh::AddFace(Direction dir, InChunkPos position, Block block, BlockSt
 		const unsigned int vertexIndex = faceIndices[(unsigned int)dir][i];
 		vertex.Position = (InChunkPos)faceVertices[vertexIndex].Position + position;
 
-		vertex.TextureCoords = subTexture.UV;
-		vertex.TextureCoords += faceVertices[vertexIndex].TexCoords * subTexture.Size;
+		vertex.TextureCoords = subTexture.GetUVPosition();
+		vertex.TextureCoords += faceVertices[vertexIndex].TexCoords * subTexture.GetUVSize();
 		//vertex.TextureCoords = glm::ivec2(1, 1);
 
 		vertex.Normal = faceNormals[(unsigned int)dir];

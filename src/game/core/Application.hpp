@@ -24,6 +24,8 @@
 #include <game/core/UIManager.hpp>
 #include <engine/ui/Button.hpp>
 #include <game/graphics/DroppedItemRenderer.hpp>
+#include <game/graphics/ConcreteItemTextureLoader.hpp>
+#include <game/graphics/ConcreteBlockTextureLoader.hpp>
 
 class Application : public window::KeyboardListener, 
 	public window::WindowListener, 
@@ -45,8 +47,22 @@ public:
 	void SetChunksToRender(); //Move to WorldRenderer
 	void Start();
 private:
+	class TextureProviderSetup { //TODO: Remove it please...
+	public:
+		TextureProviderSetup() : m_ItemTextureLoader(m_BlockTextureLoader) {
+			game::graphics::BlockTextureProvider::SetLoader(&m_BlockTextureLoader);
+			game::graphics::ItemTextureProvider::SetLoader(&m_ItemTextureLoader);
+		}
+	private:
+		game::graphics::ConcreteBlockTextureLoader m_BlockTextureLoader;
+		game::graphics::ConcreteItemTextureLoader m_ItemTextureLoader;
+	};
+
 	window::Window m_Window;
 	Renderer3D m_Renderer;
+
+	TextureProviderSetup m_TPS;
+
 	LoadedChunks m_World;
 	Player m_Player;
 	WorldRenderer m_WorldRenderer;
