@@ -1,4 +1,5 @@
 #include <engine/graphics/Framebuffer.hpp>
+#include <engine/graphics/ErrorCheck.hpp>
 
 namespace eng {
 	namespace graphics {
@@ -19,6 +20,7 @@ namespace eng {
 
 		void Framebuffer::Bind() {
 			glBindFramebuffer(GL_FRAMEBUFFER, m_FramebufferHandle);
+			glViewport(0, 0, m_Size.x, m_Size.y);
 		}
 
 		void Framebuffer::Unbind() {
@@ -33,6 +35,7 @@ namespace eng {
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 			glTexImage2D(GL_TEXTURE_2D, 0, format, size.x, size.y, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
+			CHECK_GL_ERROR();
 		}
 
 		void Framebuffer::FramebufferTexture::Bind(GLuint textureUnit) const {
@@ -53,6 +56,7 @@ namespace eng {
 				glBindRenderbuffer(GL_RENDERBUFFER, m_RenderbufferHandle);
 				glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_Size.x, m_Size.y);
 				glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_RenderbufferHandle);
+				CHECK_GL_ERROR();
 			}
 
 			glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_Texture.GetHandle(), 0);
@@ -62,6 +66,9 @@ namespace eng {
 			
 			if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 				return false;
+
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			CHECK_GL_ERROR();
 
 			return true;
 		}

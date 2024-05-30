@@ -28,11 +28,11 @@ namespace eng {
 			private:
 				GLuint m_Handle;
 			};
-			
+
+			GLuint m_TextureFormat;
 			FramebufferTexture m_Texture;
 			glm::ivec2 m_Size;
 			bool m_UsingDepth;
-			GLuint m_TextureFormat;
 
 			GLuint m_FramebufferHandle,
 				m_RenderbufferHandle;

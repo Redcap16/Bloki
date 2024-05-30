@@ -49,6 +49,7 @@ public:
 	//Uniform setters
 	void SetUniform(UniformLocation location, const glm::mat4& value);
 	void SetUniform(UniformLocation location, const glm::vec3& value);
+	void SetUniform(UniformLocation location, const glm::vec2& value);
 	void SetUniform(UniformLocation location, int value);
 	void SetUniform(UniformLocation location, float value);
 

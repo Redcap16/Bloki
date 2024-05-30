@@ -20,8 +20,8 @@ protected:
 	void handleMouseEvent(const MouseEvent& event) override { };
 	void render(RenderingParams& params) override;
 
-	const glm::ivec4 c_DefaultBackgroundColor = { 50, 50, 50, 90 }, 
-		c_HighlightedBackgroundColor = { 20, 20, 20, 90 };
+	const glm::ivec4 c_DefaultBackgroundColor = { 80, 80, 80, 130 }, 
+		c_HighlightedBackgroundColor = { 50, 50, 50, 130 };
 	const int c_HighlightedBackgroundSizeIncrease = 5;
 	graphics::Rectangle m_Background;
 	ItemStack& m_Stack;

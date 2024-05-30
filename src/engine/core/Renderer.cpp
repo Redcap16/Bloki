@@ -63,13 +63,14 @@ bool Renderer3D::RemoveRenderable(Renderable* renderable)
 
 void Renderer3D::Resize(glm::ivec2 windowSize)
 {
-	glViewport(0, 0, (GLsizei)windowSize.x, (GLsizei)windowSize.y);
-	CHECK_GL_ERROR();
 	m_WindowSize = windowSize;
 }
 
 void Renderer3D::RenderScene()
 {
+	glViewport(0, 0, (GLsizei)m_WindowSize.x, (GLsizei)m_WindowSize.y);
+	CHECK_GL_ERROR();
+
 	if (m_CurrentCamera3D == nullptr)
 		return;
 

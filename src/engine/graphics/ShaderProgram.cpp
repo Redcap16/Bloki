@@ -119,6 +119,18 @@ void ShaderProgram::SetUniform(UniformLocation location, const glm::vec3& value)
 	CHECK_GL_ERROR();
 }
 
+void ShaderProgram::SetUniform(UniformLocation location, const glm::vec2& value)
+{
+	if (m_ProgramHandle == 0)
+		return;
+
+	if (location == INVALID_UNIFORM_LOCATION)
+		return;
+
+	glUniform2fv(location, 1, glm::value_ptr(value));
+	CHECK_GL_ERROR();
+}
+
 void ShaderProgram::SetUniform(UniformLocation location, int value)
 {
 	if (m_ProgramHandle == 0)

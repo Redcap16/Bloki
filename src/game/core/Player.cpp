@@ -23,6 +23,7 @@ Player::Player(BlockManager& world, Keyboard& keyboard, Mouse& mouse, glm::ivec2
 	m_Inventory.GetItemStack(3).Set(FoodItem(FoodItem::FoodType::Apple), 10);
 	m_Inventory.GetItemStack(5).Set(FoodItem(FoodItem::FoodType::Bread), 3);
 	m_Inventory.GetItemStack(6).Set(BlockItem(Block::Wood), 15);
+	m_Inventory.GetItemStack(7).Set(BlockItem(Block::Stone), 15);
 }
 
 Player::~Player() {
