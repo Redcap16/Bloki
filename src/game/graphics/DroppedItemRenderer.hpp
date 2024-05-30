@@ -21,13 +21,14 @@ private:
 	const float c_Size = 0.7f;
 	const std::string c_ShaderPath = "items.shader";
 
-	static constexpr const char* c_TextureFilepath = "items.td";
-	Resource<AtlasTexture> m_Texture;
-
 	const DroppedItem& m_Item;
+	const Texture& m_Texture;
+
 	Resource<ShaderProgram> m_Shader;
 	UniformLocation m_CameraUpLocation,
-		m_CameraRightLocation;
+		m_CameraRightLocation,
+		m_TexturePositionLoc,
+		m_TextureSizeLoc;
 
 	Renderer3D& m_Renderer;
 

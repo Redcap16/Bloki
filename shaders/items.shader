@@ -24,9 +24,11 @@ in vec2 TexCoord;
 out vec4 FragColor;
 
 uniform sampler2D textureAtlas;
+uniform vec2 TexturePosition,
+	TextureSize;
 
 void main() {
-	FragColor = texture(textureAtlas, TexCoord);
+	FragColor = texture(textureAtlas, TexturePosition + TextureSize * TexCoord);
 	if(FragColor.a < 0.1)
 		discard;
 }

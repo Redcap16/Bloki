@@ -7,15 +7,21 @@ DroppedItemMesh::DroppedItemMesh(const DroppedItem& item, Renderer3D& renderer) 
 	m_EBO(m_VAO.GetElementBuffer()),
 	m_VBO(m_VAO.CreateVertexBuffer<Vertex3D>(false)),
 	m_Shader(c_ShaderPath),
-	m_Texture(c_TextureFilepath),
+	m_Texture(m_Item.GetItemStack().GetItemHeld().GetTexture()),
 	m_Renderer(renderer) {
 	setupMesh();
 	
 	m_Shader->UseProgram();
 	m_CameraUpLocation = m_Shader->GetUniformLocation("cameraUp");
 	m_CameraRightLocation = m_Shader->GetUniformLocation("cameraRight");
+	m_TexturePositionLoc = m_Shader->GetUniformLocation("TexturePosition");
+	m_TextureSizeLoc = m_Shader->GetUniformLocation("TextureSize");
 
-	m_Renderer.RegisterRenderable(this, { true, m_Shader.Get(), m_Texture.Get()});
+	m_Shader->UseProgram();
+
+	m_Shader->SetUniform(m_Shader->GetUniformLocation("textureAtlas"), 0);
+
+	m_Renderer.RegisterRenderable(this, { true, m_Shader.Get(), &m_Texture});
 }
 
 DroppedItemMesh::~DroppedItemMesh() {
@@ -29,25 +35,25 @@ glm::mat4 DroppedItemMesh::GetModelMatrix() const {
 void DroppedItemMesh::Render(const RenderingContext& context) {
 	m_Shader->SetUniform(m_CameraUpLocation, context.CurrentCamera3D->GetUpVector());
 	m_Shader->SetUniform(m_CameraRightLocation, context.CurrentCamera3D->GetRightVector());
+	m_Shader->SetUniform(m_TexturePositionLoc, m_Texture.GetUVPosition());
+	m_Shader->SetUniform(m_TextureSizeLoc, m_Texture.GetUVSize());
 
+	m_Texture.Bind(0);
 	m_VAO.Draw();
 }
 
 void DroppedItemMesh::setupMesh() {
-	auto& texture = m_Item.GetItemStack().GetItemHeld().GetTexture();
-	const glm::vec2 texPos = texture.GetUVPosition(),
-		texSize = texture.GetUVSize();
 	m_VBO.AddVertex({ c_Size / 2 * glm::vec3{-1, -1, 0},
-		texPos + texSize * glm::vec2(0.f, 1.f), 
+		{0.f, 1.},
 		{0, 0, 0} });
 	m_VBO.AddVertex({ c_Size / 2 * glm::vec3{1, -1, 0},
-		texPos + texSize * glm::vec2(1.f, 1.f),
+		{1.f, 1.f},
 		{0, 0, 0} });
 	m_VBO.AddVertex({ c_Size / 2 * glm::vec3{1, 1, 0},
-		texPos + texSize * glm::vec2(1.f, 0.f),
+		{1.f, 0.f},
 		{0, 0, 0} });
 	m_VBO.AddVertex({ c_Size / 2 * glm::vec3{-1, 1, 0},
-		texPos + texSize * glm::vec2(0.f, 0.f),
+		{0.f, 0.f},
 		{0, 0, 0} });
 
 	m_EBO.AddIndices({ 0, 1, 2 });
