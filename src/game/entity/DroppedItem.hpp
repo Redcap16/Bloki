@@ -15,6 +15,7 @@ public:
 
 	void Update(float deltaTime);
 	inline glm::vec3 GetPosition() const;
+	void ChangeVelocity(glm::vec3 velocity) { m_Rigidbody.ChangeVelocity(velocity); }
 	
 	ItemStack& GetItemStack() { return m_ItemStack; }
 	const ItemStack& GetItemStack() const { return m_ItemStack; }

@@ -56,7 +56,9 @@ private:
 		c_WorkingDistance = 3,
 		c_JumpSpeed = 1.7f,
 		c_FlyingSpeed = 0.5f,
-		c_PickupDistance = 1.7f,
+		c_PickupDistance = 1.0f,
+		c_AttractionDistance = 2.0f,
+		c_AttractionSpeed = 0.1f,
 		c_DroppedItemSpeed = 2.f;
 	static constexpr int c_PickupCooldown = 5;
 
@@ -88,6 +90,7 @@ private:
 	void updateHighlightment();
 	bool getPlacePosition(WorldPos& position) const;
 	void pickupItemsNearby();
+	void attractItemsNearby();
 	void dropItem(int index);
 	bool wasItemDroppedRecently(DroppedItem* item);
 	long long getTimestamp() const;

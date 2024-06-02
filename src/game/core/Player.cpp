@@ -89,6 +89,8 @@ void Player::Update(float deltaTime)
 	m_Rigidbody.Update(deltaTime);
 
 	m_Camera->SetPosition(m_Rigidbody.GetPosition());
+
+	attractItemsNearby();
 	pickupItemsNearby();
 	
 	for (auto it = m_RecentlyDroppedItems.begin(); it != m_RecentlyDroppedItems.end();) {
@@ -207,6 +209,16 @@ void Player::pickupItemsNearby() {
 
 		if (m_Inventory.AddItem(item->GetItemStack())) //Successfully transfered items to inventory
 			m_DroppedItemRepository.RemoveDroppedItem(item);
+	}
+}
+
+void Player::attractItemsNearby() {
+	std::vector<DroppedItem*> itemsNearby = m_DroppedItemRepository.FindsItemNearby(m_Rigidbody.GetPosition(), c_AttractionDistance);
+	for (auto item : itemsNearby) {
+		if (wasItemDroppedRecently(item))
+			continue;
+
+		item->ChangeVelocity(glm::normalize(m_Rigidbody.GetPosition() - item->GetPosition()) * c_AttractionSpeed);
 	}
 }
 
