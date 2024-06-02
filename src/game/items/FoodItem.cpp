@@ -1,5 +1,6 @@
 #include <game/items/FoodItem.hpp>
 #include <game/graphics/ItemTextureProvider.hpp>
+#include <game/graphics/ConcreteItemMesh.hpp>
 
 ItemTypeArray<FoodItem::FoodType> FoodItem::m_ItemTypes;
 
@@ -36,6 +37,11 @@ const Texture& FoodItem::GetTexture() const {
 		return loader.GetTextureForFlat({ 3, 0 });
 	}
 	return loader.GetTextureForFlat({0, 0});
+}
+
+std::unique_ptr<game::graphics::DroppedItemMesh> FoodItem::GetMesh() const {
+	using namespace game::graphics;
+	return std::make_unique<FlatItemMesh>(GetTexture());
 }
 
 bool FoodItem::Use(ItemUser& user, BlockManager& blockManager) {

@@ -285,7 +285,10 @@
     <ClCompile Include="src\game\graphics\BlockTextureProvider.cpp">
       <Filter>Pliki źródłowe\game\graphics</Filter>
     </ClCompile>
-    <ClCompile Include="ConcreteBlockTextureLoader.cpp">
+    <ClCompile Include="src\game\graphics\ConcreteBlockTextureLoader.cpp">
+      <Filter>Pliki źródłowe\game\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\graphics\ConcreteItemMesh.cpp">
       <Filter>Pliki źródłowe\game\graphics</Filter>
     </ClCompile>
   </ItemGroup>
@@ -489,6 +492,12 @@
       <Filter>Pliki nagłówkowe\game\graphics</Filter>
     </ClInclude>
     <ClInclude Include="src\game\graphics\ConcreteBlockTextureLoader.hpp">
+      <Filter>Pliki nagłówkowe\game\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\graphics\DroppedItemMesh.hpp">
+      <Filter>Pliki nagłówkowe\game\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\graphics\ConcreteItemMesh.hpp">
       <Filter>Pliki nagłówkowe\game\graphics</Filter>
     </ClInclude>
   </ItemGroup>

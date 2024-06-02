@@ -4,35 +4,20 @@
 #include <game/entity/DroppedItem.hpp>
 #include <game/ui/ItemQuad.hpp>
 
-class DroppedItemMesh : Renderable {
+class DroppedItemRenderable : Renderable {
 public:
-	DroppedItemMesh(const DroppedItem& item, Renderer3D& renderer);
-	~DroppedItemMesh();
+	DroppedItemRenderable(const DroppedItem& item, Renderer3D& renderer);
+	~DroppedItemRenderable();
 	
 	const DroppedItem* GetDroppedItem() const { return &m_Item; }
 
 	glm::mat4 GetModelMatrix() const override;
 	void Render(const RenderingContext& context) override;
 private:
-	VertexArray m_VAO;
-	VertexBuffer<Vertex3D>& m_VBO;
-	ElementBuffer& m_EBO;
-
-	const float c_Size = 0.7f;
-	const std::string c_ShaderPath = "items.shader";
-
 	const DroppedItem& m_Item;
-	const Texture& m_Texture;
-
-	Resource<ShaderProgram> m_Shader;
-	UniformLocation m_CameraUpLocation,
-		m_CameraRightLocation,
-		m_TexturePositionLoc,
-		m_TextureSizeLoc;
-
 	Renderer3D& m_Renderer;
 
-	void setupMesh();
+	std::unique_ptr<game::graphics::DroppedItemMesh> m_Mesh;
 };
 
 class DroppedItemRenderer : public DroppedItemRepositoryListener {
@@ -47,7 +32,7 @@ public:
 private:
 	Renderer3D& m_Renderer;
 	DroppedItemRepository& m_Repository;
-	std::vector<std::unique_ptr<DroppedItemMesh>> m_Meshes;
+	std::vector<std::unique_ptr<DroppedItemRenderable>> m_Meshes;
 
 	void createMesh(DroppedItem& item);
 	void removeMesh(DroppedItem& item);

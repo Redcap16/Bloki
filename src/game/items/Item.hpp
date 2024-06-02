@@ -5,6 +5,7 @@
 #include <array>
 #include <map>
 #include <engine/graphics/Texture.hpp>
+#include <game/graphics/DroppedItemMesh.hpp>
 
 class ItemUser {
 public:
@@ -64,6 +65,7 @@ public:
 	virtual ItemType GetType() const = 0;
 	virtual std::string GetName() const = 0;
 	virtual const Texture& GetTexture() const = 0;
+	virtual std::unique_ptr<game::graphics::DroppedItemMesh> GetMesh() const = 0;
 	virtual bool Use(ItemUser& user, BlockManager& blockManager) = 0;
 };
 

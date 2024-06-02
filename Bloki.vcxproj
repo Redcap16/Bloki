@@ -145,7 +145,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ConcreteBlockTextureLoader.cpp" />
+    <ClCompile Include="src\game\graphics\ConcreteBlockTextureLoader.cpp" />
+    <ClCompile Include="src\game\graphics\ConcreteItemMesh.cpp" />
     <ClCompile Include="src\game\graphics\BlockTextureProvider.cpp" />
     <ClCompile Include="src\game\graphics\ConcreteItemTextureLoader.cpp" />
     <ClCompile Include="src\game\graphics\ItemTextureProvider.cpp" />
@@ -210,6 +211,8 @@
     <ClCompile Include="src\engine\window\WindowsKeyboard.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\game\graphics\ConcreteItemMesh.hpp" />
+    <ClInclude Include="src\game\graphics\DroppedItemMesh.hpp" />
     <ClInclude Include="src\game\graphics\ConcreteBlockTextureLoader.hpp" />
     <ClInclude Include="src\game\graphics\BlockTextureProvider.hpp" />
     <ClInclude Include="src\game\graphics\ConcreteItemTextureLoader.hpp" />

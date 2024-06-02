@@ -1,5 +1,7 @@
 #include <game/items/BlockItem.hpp>
 #include <game/graphics/ItemTextureProvider.hpp>
+#include <game/graphics/BlockTextureProvider.hpp>
+#include <game/graphics/ConcreteItemMesh.hpp>
 
 ItemTypeArray<Block::BlockType> BlockItem::m_ItemTypes;
 
@@ -18,6 +20,11 @@ std::string BlockItem::GetName() const {
 
 const Texture& BlockItem::GetTexture() const {
 	return game::graphics::ItemTextureProvider::GetLoader().GetTextureForBlock(m_BlockType);
+}
+
+std::unique_ptr<game::graphics::DroppedItemMesh> BlockItem::GetMesh() const {
+	using namespace game::graphics;
+	return std::make_unique<BlockItemMesh>(BlockTextureProvider::GetLoader().GetBlockTexture(m_BlockType));
 }
 
 bool BlockItem::Use(ItemUser& user, BlockManager& blockManager) {

@@ -12,6 +12,7 @@ public:
 	ItemType GetType() const override { return m_ItemTypes[m_BlockType]; }
 	std::string GetName() const override;
 	const Texture& GetTexture() const override;
+	std::unique_ptr<game::graphics::DroppedItemMesh> GetMesh() const override;
 	bool Use(ItemUser& user, BlockManager& blockManager) override;
 
 private:
