@@ -146,8 +146,12 @@ void Player::MouseClicked(const glm::ivec2& position, bool leftButton)
 {
 	if (leftButton)
 	{
-		if (m_Highlight.AnythingHighlighted)
+		if (m_Highlight.AnythingHighlighted) {
+			Block destroyedBlock = m_World.GetBlock(m_Highlight.HighlightedPos);
+			m_DroppedItemRepository.AddDroppedItem(ItemStack(BlockItem(destroyedBlock.Type), 1), 
+				(glm::vec3)m_Highlight.HighlightedPos + glm::vec3(rand() % 10 / 10.f * 0.4 + 0.3, 0.5, rand() % 10 / 10.f * 0.4 + 0.3));
 			m_World.DestroyBlock(m_Highlight.HighlightedPos);
+		}
 	}
 	else
 	{
