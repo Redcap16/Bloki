@@ -12,6 +12,7 @@ public:
 	const DroppedItem* GetDroppedItem() const { return &m_Item; }
 
 	glm::mat4 GetModelMatrix() const override;
+	glm::vec3 GetRenderPosition() const override { return m_Item.GetPosition(); }
 	void Render(const RenderingContext& context) override;
 private:
 	const DroppedItem& m_Item;

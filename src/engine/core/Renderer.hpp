@@ -25,6 +25,7 @@ class Renderable
 {
 public:
 	virtual glm::mat4 GetModelMatrix() const = 0;
+	virtual glm::vec3 GetRenderPosition() const = 0;
 	virtual void Render(const RenderingContext& context) = 0;
 };
 
@@ -54,6 +55,8 @@ private:
 
 	struct RenderableCompare
 	{
+		const glm::vec3 CameraPosition;
+		RenderableCompare(glm::vec3 camPos) : CameraPosition(camPos) {}
 		bool operator()(const RenderableRecord& a, const RenderableRecord& b) const;
 	};
 

@@ -21,6 +21,8 @@ bool Renderer3D::RenderableCompare::operator()(const RenderableRecord& a, const 
 		return true;
 	else if (a.Params.Transparent && !b.Params.Transparent)
 		return false;
+	else if (a.Params.Transparent && b.Params.Transparent)
+		return glm::distance(CameraPosition, a.Object->GetRenderPosition()) < glm::distance(CameraPosition, b.Object->GetRenderPosition());
 	else
 	{
 		return a.Params.UsedShader->GetHandle() < a.Params.UsedShader->GetHandle();
@@ -74,8 +76,8 @@ void Renderer3D::RenderScene()
 	if (m_CurrentCamera3D == nullptr)
 		return;
 
-	if (!m_ListSorted)
-		sortRenderList();
+	//if (!m_ListSorted)
+	sortRenderList(); //With transparency its crucial to sort renderables every frame
 		
 	RenderableParameters* lastParams = nullptr;
 
@@ -125,6 +127,6 @@ void Renderer3D::sortRenderList()
 	if (m_ListSorted)
 		return;
 
-	std::sort(m_Renderables.begin(), m_Renderables.end(), RenderableCompare());
+	std::sort(m_Renderables.begin(), m_Renderables.end(), RenderableCompare(m_CurrentCamera3D->GetPosition()));
 	m_ListSorted = true;
 }
