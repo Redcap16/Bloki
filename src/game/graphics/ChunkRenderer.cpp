@@ -5,8 +5,8 @@ ChunkRenderer::ChunkRenderer(Renderer3D& renderer, const Chunk& chunk) :
 	m_Chunk(&chunk),
 	m_Position(chunk.GetPosition()* BlockArray::ChunkSize),
 	m_BlockTexture(&game::graphics::BlockTextureProvider::GetLoader().GetWholeTexture()),
-	m_OpaqueMesh(m_Position),
-	m_TransparentMesh(m_Position),
+	m_OpaqueMesh(m_Position, false),
+	m_TransparentMesh(m_Position, true),
 	m_AnythingHighlighted(false),
 	m_HighlightedPosition(glm::ivec3(0)),
 	m_Neighbors(chunk.GetNeighbors()),
@@ -52,6 +52,9 @@ void ChunkRenderer::UpdateGeometry()
 
 	Chunk::BlockAccess<const BlockArray> blockAccess = m_Chunk->GetBlockAccess();
 	m_CurrentBlockAccess = &blockAccess;
+
+	m_OpaqueMesh.ClearMesh();
+	m_TransparentMesh.ClearMesh();
 
 	for (int x = 0; x < BlockArray::ChunkSize.x; ++x)
 		for (int y = 0; y < BlockArray::ChunkSize.y; ++y)
