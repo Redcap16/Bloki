@@ -7,6 +7,27 @@
 
 #include <zlib.h>
 
+/*
+*	Region file structure
+*	Header section (fixed size)
+*		Header for chunk 0, 0, 0
+*			Record address (offset)
+*			Record size
+*		Header for chunk 0, 0, 1...
+*	Data section (variable)
+*		Chunk record
+*			Chunk record header (fixed size)
+*				Block data size
+*				Items 
+* 
+*	<chunk>
+*		<blockdata raw=SIZE>SERIALIZED DATA</blockdata>
+*		<items>
+*			<item raw=SIZE>SERIALIZED DATA</item>
+*		</items>
+*	</chunk>
+*/
+
 class ChunkFileLoader
 {
 public:

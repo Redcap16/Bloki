@@ -97,6 +97,12 @@
     <Filter Include="Pliki źródłowe\engine\ui">
       <UniqueIdentifier>{0e3940fd-13ff-4cc9-813b-70d52db59433}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Pliki nagłówkowe\engine\qxml">
+      <UniqueIdentifier>{96872601-c250-48cd-bf5f-937eec810f6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pliki źródłowe\engine\qxml">
+      <UniqueIdentifier>{c6273c8e-fab7-4730-8a03-58ef962a70da}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Bloki.cpp">
@@ -290,6 +296,12 @@
     </ClCompile>
     <ClCompile Include="src\game\graphics\ConcreteItemMesh.cpp">
       <Filter>Pliki źródłowe\game\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\qxml\QXMLReader.cpp">
+      <Filter>Pliki źródłowe\engine\qxml</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\qxml\Element.cpp">
+      <Filter>Pliki źródłowe\engine\qxml</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -499,6 +511,12 @@
     </ClInclude>
     <ClInclude Include="src\game\graphics\ConcreteItemMesh.hpp">
       <Filter>Pliki nagłówkowe\game\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\qxml\QXMLReader.hpp">
+      <Filter>Pliki nagłówkowe\engine\qxml</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\qxml\Element.hpp">
+      <Filter>Pliki nagłówkowe\engine\qxml</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
