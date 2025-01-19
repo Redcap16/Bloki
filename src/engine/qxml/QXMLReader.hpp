@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <fstream>
 #include "engine/qxml/Element.hpp"
 
 namespace QXML {
@@ -58,6 +59,8 @@ namespace QXML {
 	public:
 		QXMLReader(const std::vector<char>& contents);
 		QXMLReader(const std::string& contents);
+
+		static QXMLReader OpenFile(std::string filename);
 		
 		std::string GetErrorStack() const {
 			std::string result;

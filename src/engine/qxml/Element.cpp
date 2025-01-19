@@ -22,7 +22,7 @@ namespace QXML {
 	std::vector<Element> Element::GetAllElements() const {
 		std::vector<Element> result;
 		for (auto& pair : m_InnerElements)
-			result.insert(result.begin(), pair.second.begin(), pair.second.end());
+			result.insert(result.end(), pair.second.begin(), pair.second.end());
 
 		return result;
 	}
@@ -52,5 +52,10 @@ namespace QXML {
 
 	bool Element::HasAtribute(std::string attribute) const {
 		return m_Attributes.find(attribute) != m_Attributes.end();
+	}
+
+	void Element::SetAsRaw() {
+		m_Raw = true;
+		AddAttribute(Attribute("raw", m_Data.size()));
 	}
 }

@@ -247,7 +247,6 @@ namespace QXML {
 		return;
 	}
 
-
 	QXMLReader::QXMLReader(const std::vector<char>& contents) :
 		m_Content(contents),
 		m_Base("") {
@@ -260,5 +259,19 @@ namespace QXML {
 		m_Base("") {
 
 		parseDocument();
+	}
+
+	QXMLReader QXML::QXMLReader::OpenFile(std::string filename) {
+		std::ifstream file(filename, std::ios_base::in | std::ios_base::binary | std::ios_base::ate);
+		if (file.is_open()) {
+			size_t filesize = file.tellg();
+			file.seekg(0, std::ios::beg);
+			std::vector<char> filedata(filesize);
+			file.read(&filedata[0], filesize);
+			file.close();
+
+			return QXMLReader(filedata);
+		}
+		return QXMLReader("");
 	}
 }
