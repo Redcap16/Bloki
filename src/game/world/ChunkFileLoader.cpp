@@ -60,10 +60,8 @@ void ChunkFileLoader::Flush()
 ChunkFileLoader::RegionFile::RegionFile(const std::string filename) :
 	m_Filename(filename),
 	m_Changed(false)
-{
-	std::fill_n((ChunkHeaderData*)m_ChunkHeaderData, c_RegionSize.x * c_RegionSize.y * c_RegionSize.z, ChunkHeaderData{ 0, 0 });
-	
-	readHeaders();
+{	
+	loadIntoCache();
 }
 
 ChunkFileLoader::RegionFile::~RegionFile()
@@ -88,10 +86,6 @@ bool ChunkFileLoader::RegionFile::LoadChunk(const InRegionPosition position, std
 		return true;
 	}
 
-
-	if (!loadIntoCache(position))
-		return false;
-
 	data = m_ChunkCache[position];
 	return true;
 }
@@ -104,8 +98,6 @@ bool ChunkFileLoader::RegionFile::IsPresent(const InRegionPosition& position)
 	std::lock_guard<std::mutex> lock(m_AccessMutex);
 
 	if (m_ChunkCache.find(position) != m_ChunkCache.end())
-		return true;
-	if (getHeaderData(position) != nullptr)
 		return true;
 
 	return false;
@@ -134,126 +126,47 @@ void ChunkFileLoader::RegionFile::flush()
 		return;
 
 	//Prepare data
-	for (int x = 0; x < c_RegionSize.x; ++x)
-		for (int y = 0; y < c_RegionSize.y; ++y)
-			for (int z = 0; z < c_RegionSize.z; ++z)
-				loadIntoCache({ x, y, z });
-
-	std::ofstream file(m_Filename, std::ios_base::out | std::ios_base::binary);
-	size_t currentAddress = sizeof(ChunkHeaderData) * c_RegionSize.x * c_RegionSize.y * c_RegionSize.z;
-	file.seekp(0, std::ios_base::beg);
-	{
-		std::vector<char> headerSection(currentAddress);
-		file.write(headerSection.data(), currentAddress);
-	}
+	QXML::QXMLWriter qxmlWriter(m_Filename);
 
 	for (int x = 0; x < c_RegionSize.x; ++x)
 		for (int y = 0; y < c_RegionSize.y; ++y)
 			for (int z = 0; z < c_RegionSize.z; ++z)
 			{
 				const InRegionPosition position{ x, y, z };
+
 				if (m_ChunkCache.find(position) == m_ChunkCache.end()) //Nothing to save
 					continue;
 
-				if (!file.good())
-				{
-					DEBUG_LOG("Error: Cant access file in " + m_Filename);
-					return;
-				}
+				QXML::Element chunkEl("chunk");
+				chunkEl.AddAttribute(QXML::Attribute("x", x));
+				chunkEl.AddAttribute(QXML::Attribute("y", y));
+				chunkEl.AddAttribute(QXML::Attribute("z", z));
 
-				//Write the data
-				file.seekp(currentAddress, std::ios_base::beg);
-				if (!file.good())
-				{
-					DEBUG_LOG("Error: Cant access file in " + m_Filename);
-					return;
-				}
+				QXML::Element blockdataEl("blockdata");
+				blockdataEl.SetAsRaw();
+				blockdataEl.AddData(m_ChunkCache[position]);
 
-				file.write(m_ChunkCache[position].data(), m_ChunkCache[position].size());
-
-				//Write the header
-				const size_t currentHeaderAddress = ((size_t)x * c_RegionSize.y * c_RegionSize.z + (size_t)y * c_RegionSize.z + z) * sizeof(ChunkHeaderData);
-				file.seekp(currentHeaderAddress, std::ios_base::beg);
-				if (!file.good())
-				{
-					DEBUG_LOG("Error: Cant access file in " + m_Filename);
-					return;
-				}
-
-				ChunkHeaderData buffer = { (uint32_t)currentAddress, (uint32_t)m_ChunkCache[position].size() };
-
-				file.write((char*)&buffer, sizeof(buffer));
-				currentAddress += m_ChunkCache[position].size();
+				chunkEl.AddInnerElement(blockdataEl);
+				qxmlWriter.AddElement(chunkEl);
 			}
 }
 
-void ChunkFileLoader::RegionFile::readHeaders()
+void ChunkFileLoader::RegionFile::loadIntoCache()
 {
-	std::ifstream file(m_Filename, std::ios_base::in | std::ios_base::binary);
-	if (!file.is_open())
-		return;
+	QXML::QXMLReader reader = QXML::QXMLReader::OpenFile(m_Filename);
+	std::vector<QXML::Element> chunks = reader.GetBase().GetElementsByTag("chunk");
 
-	ChunkHeaderData buffer{ 0 };
-	for(int x = 0; x < c_RegionSize.x; ++x)
-		for(int y = 0; y < c_RegionSize.y; ++y)
-			for (int z = 0; z < c_RegionSize.z; ++z)
-			{
-				if (!file.good())
-				{
-					DEBUG_LOG("Error: cant read chunk headers");
-					return;
-				}
+	for (auto& chunk : chunks) {
+		int x = chunk.GetAttributeValue("x").m_Value,
+			y = chunk.GetAttributeValue("y").m_Value,
+			z = chunk.GetAttributeValue("z").m_Value;
 
-				file.read((char*)&buffer, sizeof(buffer));
-				m_ChunkHeaderData[x][y][z] = buffer;
-			}
-}
+		auto insides = chunk.GetElementsByTag("blockdata");
+		if (insides.size() != 1)
+			continue;
 
-const ChunkFileLoader::RegionFile::ChunkHeaderData* ChunkFileLoader::RegionFile::getHeaderData(const InRegionPosition& position)
-{
-	if (position.x >= c_RegionSize.x ||
-		position.y >= c_RegionSize.y ||
-		position.z >= c_RegionSize.z)
-		return nullptr;
-	if(m_ChunkHeaderData[position.x][position.y][position.z].Address != 0)
-		return &m_ChunkHeaderData[position.x][position.y][position.z];
-	return nullptr;
-}
-
-bool ChunkFileLoader::RegionFile::loadIntoCache(const InRegionPosition& position)
-{
-	if (m_ChunkCache.find(position) != m_ChunkCache.end())
-		return true; //It is there, so it dont have to be loaded
-
-	const ChunkHeaderData* header = getHeaderData(position);
-	if (header == nullptr)
-		return false;
-
-	std::ifstream file(m_Filename, std::ios_base::in | std::ios_base::binary);
-	
-	if (!file.is_open())
-		return false;
-
-	file.seekg(header->Address, std::ios_base::beg);
-
-	if (!file.good())
-	{
-		DEBUG_LOG("Error: Cant access file in " + m_Filename);
-		return false;
+		m_ChunkCache[{x, y, z}] = insides[0].GetData();
 	}
-
-	std::vector<char>& data = m_ChunkCache[position];
-	data.resize(header->Size);
-	file.read(data.data(), header->Size);
-
-	if (file.gcount() != header->Size)
-	{
-		DEBUG_LOG("Error: Cant read all of bytes of a chunk in " + m_Filename);
-		m_ChunkCache.erase(position);
-		return false;
-	}
-
-	return true;
 }
 
 std::shared_ptr<ChunkFileLoader::RegionFile> ChunkFileLoader::getRegion(const RegionPosition& position)

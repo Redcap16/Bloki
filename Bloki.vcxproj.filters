@@ -303,6 +303,9 @@
     <ClCompile Include="src\engine\qxml\Element.cpp">
       <Filter>Pliki źródłowe\engine\qxml</Filter>
     </ClCompile>
+    <ClCompile Include="src\engine\qxml\QXMLWriter.cpp">
+      <Filter>Pliki źródłowe\engine\qxml</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\engine\util\Debug.hpp">
@@ -516,6 +519,9 @@
       <Filter>Pliki nagłówkowe\engine\qxml</Filter>
     </ClInclude>
     <ClInclude Include="src\engine\qxml\Element.hpp">
+      <Filter>Pliki nagłówkowe\engine\qxml</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\qxml\QXMLWriter.hpp">
       <Filter>Pliki nagłówkowe\engine\qxml</Filter>
     </ClInclude>
   </ItemGroup>

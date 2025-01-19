@@ -145,6 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\engine\qxml\QXMLWriter.cpp" />
     <ClCompile Include="src\engine\qxml\Element.cpp" />
     <ClCompile Include="src\engine\qxml\QXMLReader.cpp" />
     <ClCompile Include="src\game\graphics\ConcreteBlockTextureLoader.cpp" />
@@ -213,6 +214,7 @@
     <ClCompile Include="src\engine\window\WindowsKeyboard.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\engine\qxml\QXMLWriter.hpp" />
     <ClInclude Include="src\engine\qxml\Element.hpp" />
     <ClInclude Include="src\engine\qxml\QXMLReader.hpp" />
     <ClInclude Include="src\game\graphics\ConcreteItemMesh.hpp" />

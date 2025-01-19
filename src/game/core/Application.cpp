@@ -13,7 +13,7 @@ Application::Application() :
 	m_Window(glm::ivec2(1280, 720), "Bloki Alpha 2", true),
 	m_Camera(m_Window.GetSize()),
 	m_Renderer(m_Window.GetSize()),
-	m_World(m_Renderer, "saves/first"),
+	m_World(m_Renderer, "saves/second"),
 	m_Player(m_World, m_Window.GetKeyboard(), m_Window.GetMouse(), m_Window.GetSize(), m_DroppedItemRepository),
 	m_WorldRenderer(m_Renderer, m_World, m_Player),
 	m_UIManager(m_Window, m_Player.GetInventory()),

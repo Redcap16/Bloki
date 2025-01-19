@@ -6,21 +6,12 @@
 #include <unordered_map>
 
 #include <zlib.h>
+#include <engine/qxml/Element.hpp>
+#include <engine/qxml/QXMLReader.hpp>
+#include <engine/qxml/QXMLWriter.hpp>
 
-/*
-*	Region file structure
-*	Header section (fixed size)
-*		Header for chunk 0, 0, 0
-*			Record address (offset)
-*			Record size
-*		Header for chunk 0, 0, 1...
-*	Data section (variable)
-*		Chunk record
-*			Chunk record header (fixed size)
-*				Block data size
-*				Items 
-* 
-*	<chunk>
+/* 
+*	<chunk x= y= z=>
 *		<blockdata raw=SIZE>SERIALIZED DATA</blockdata>
 *		<items>
 *			<item raw=SIZE>SERIALIZED DATA</item>
@@ -58,24 +49,15 @@ private:
 		inline static RegionPosition GetRegionPosition(const ChunkPos& chunkPosition);
 		inline static ChunkPos GetChunkPos(const RegionPosition& regionPosition, const InRegionPosition& inRegionPosition);
 	private:
-		struct ChunkHeaderData
-		{
-			uint32_t Address,
-				Size;
-		};
-		ChunkHeaderData m_ChunkHeaderData[c_RegionSize.x][c_RegionSize.y][c_RegionSize.z];
 		std::unordered_map<InRegionPosition, std::vector<char>> m_ChunkCache;
 
 		std::string m_Filename;
-
 		std::mutex m_AccessMutex;
 
 		bool m_Changed;
 
 		void flush();
-		void readHeaders();
-		const ChunkHeaderData* getHeaderData(const InRegionPosition& position);
-		bool loadIntoCache(const InRegionPosition& position);
+		void loadIntoCache();
 	};
 
 	std::mutex m_OpenedRegionsMutex;
