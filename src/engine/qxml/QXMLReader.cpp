@@ -31,7 +31,7 @@ namespace QXML {
 
 	void QXMLReader::ContentManager::Move(int count) {
 		m_CurrentCharIndex += count;
-		if (m_CurrentCharIndex + count >= m_Content.size())
+		if (m_CurrentCharIndex >= m_Content.size())
 			m_CurrentCharIndex = static_cast<int>(m_Content.size() - 1);
 	}
 
