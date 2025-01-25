@@ -56,6 +56,6 @@ namespace QXML {
 
 	void Element::SetAsRaw() {
 		m_Raw = true;
-		AddAttribute(Attribute("raw", m_Data.size()));
+		AddAttribute(Attribute("raw", static_cast<int>(m_Data.size())));
 	}
 }

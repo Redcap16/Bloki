@@ -32,11 +32,11 @@ namespace QXML {
 	void QXMLReader::ContentManager::Move(int count) {
 		m_CurrentCharIndex += count;
 		if (m_CurrentCharIndex + count >= m_Content.size())
-			m_CurrentCharIndex = m_Content.size() - 1;
+			m_CurrentCharIndex = static_cast<int>(m_Content.size() - 1);
 	}
 
 	void QXMLReader::ContentManager::MoveTo(int position) {
-		m_CurrentCharIndex = position < 0 ? 0 : (position >= m_Content.size() ? m_Content.size() - 1 : position);
+		m_CurrentCharIndex = position < 0 ? 0 : (position >= m_Content.size() ? static_cast<int>(m_Content.size()) - 1 : position);
 	}
 
 	bool QXMLReader::ContentManager::End() {

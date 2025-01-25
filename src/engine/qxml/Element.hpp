@@ -42,13 +42,13 @@ namespace QXML {
 		void AddData(const std::string& data) {
 			m_Data.insert(m_Data.end(), data.begin(), data.end());
 			if (m_Raw)
-				m_Attributes.at("raw").m_Value = m_Data.size();
+				m_Attributes.at("raw").m_Value = static_cast<int>(m_Data.size());
 		}
 
 		void AddData(const std::vector<char>& data) {
 			m_Data.insert(m_Data.end(), data.begin(), data.end());
 			if(m_Raw)
-				m_Attributes.at("raw").m_Value = m_Data.size();
+				m_Attributes.at("raw").m_Value = static_cast<int>(m_Data.size());
 		}
 
 		const std::vector<Element>* GetElementsByTag(std::string tag) const;
