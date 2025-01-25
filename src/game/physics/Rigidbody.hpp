@@ -2,6 +2,7 @@
 
 #include <game/physics/AABB.hpp>
 #include <game/world/BlockManager.hpp>
+#include <memory>
 
 class Rigidbody
 {
@@ -23,6 +24,9 @@ public:
 	void EnableGravity(bool gravity) { m_GravityEnabled = gravity; }
 	void EnableCollision(bool collision) { m_CollisionEnabled = collision; }
 	void EnableDrag(bool drag) { m_DragEnabled = drag; }
+
+	void Serialize(std::vector<char>& data) const;
+	static std::unique_ptr<Rigidbody> Deserialize(const std::vector<char>& data, const BlockManager& world);
 private:
 	AABB m_Collider;
 	glm::vec3 m_Velocity;

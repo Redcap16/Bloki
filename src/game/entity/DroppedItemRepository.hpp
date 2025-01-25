@@ -46,6 +46,7 @@ private:
 	void loadChunk(ChunkPos position);
 	void unloadChunk(ChunkPos chunkPosition, std::set<std::shared_ptr<DroppedItem>>& items);
 
+	void itemCreated(DroppedItem& item);
 	void itemUnloaded(DroppedItem& item);
 	void itemDestroyed(DroppedItem& item);
 };

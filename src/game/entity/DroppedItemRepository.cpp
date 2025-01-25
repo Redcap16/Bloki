@@ -19,8 +19,7 @@ std::weak_ptr<DroppedItem> DroppedItemRepository::AddDroppedItem(ItemStack&& ite
 	std::weak_ptr<DroppedItem> result = newDroppedItem;
 	m_Items.insert(newDroppedItem);
 
-	for (auto listener : m_Listeners)
-		listener->CreatedDroppedItem(*newDroppedItem);
+	itemCreated(*newDroppedItem);
 
 	return result;
 }
@@ -94,6 +93,9 @@ void DroppedItemRepository::loadChunk(ChunkPos position) {
 	m_ItemDataLoader.GetDroppedItems(position, m_BlockManager, itemsLoaded);
 
 	m_Items.insert(itemsLoaded.begin(), itemsLoaded.end());
+
+	for (auto& item : itemsLoaded)
+		itemCreated(*item);
 }
 
 void DroppedItemRepository::unloadChunk(ChunkPos chunkPosition, std::set<std::shared_ptr<DroppedItem>>& items) {
@@ -101,6 +103,11 @@ void DroppedItemRepository::unloadChunk(ChunkPos chunkPosition, std::set<std::sh
 		m_Items.erase(item);
 
 	m_ItemDataLoader.SaveDroppedItems(chunkPosition, items);
+}
+
+void DroppedItemRepository::itemCreated(DroppedItem& item) {
+	for (auto listener : m_Listeners)
+		listener->CreatedDroppedItem(item);
 }
 
 void DroppedItemRepository::itemUnloaded(DroppedItem& item) {

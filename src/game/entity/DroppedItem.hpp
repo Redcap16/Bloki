@@ -16,6 +16,7 @@ class DroppedItem
 {
 public:
 	DroppedItem(BlockManager& world, ItemStack&& item, glm::vec3 position, glm::vec3 velocity = glm::vec3(0));
+	DroppedItem(ItemStack&& stack, const Rigidbody& rigidbody);
 
 	void Update(float deltaTime);
 	inline glm::vec3 GetPosition() const;
@@ -26,7 +27,12 @@ public:
 
 	void Serialize(std::vector<char>& data);
 	static std::unique_ptr<DroppedItem> Deserialize(const std::vector<char>& data, BlockManager& world);
+
 private:
+	static const std::string c_RigidbodyTag,
+		c_ItemStackTag,
+		c_CountAttribute;
+
 	Rigidbody m_Rigidbody;
 	ItemStack m_ItemStack;
 };
