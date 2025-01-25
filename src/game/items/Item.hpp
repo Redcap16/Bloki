@@ -21,6 +21,11 @@ public:
 	ItemType(const std::string& itemClass, const std::string& itemType) :
 		m_ID(itemClass + "." + itemType) {
 	}
+	ItemType(const std::string& ID) :
+		m_ID(ID) {
+	}
+
+	std::string GetRawID() { return m_ID; }
 
 	friend bool operator==(const ItemType& lhs, const ItemType& rhs);
 	friend bool operator<(const ItemType& lhs, const ItemType& rhs);
@@ -38,6 +43,14 @@ public:
 	virtual const Texture& GetTexture() const = 0;
 	virtual std::unique_ptr<game::graphics::DroppedItemMesh> GetMesh() const = 0;
 	virtual bool Use(ItemUser& user, BlockManager& blockManager) = 0;
+
+	static std::unique_ptr<Item> GetByType(ItemType type);
+
+protected:
+	static void RegisterItem(const Item& item);
+
+private:
+	static std::map<ItemType, std::unique_ptr<Item>> s_RegisteredItems;
 };
 
 inline bool operator==(const ItemType& lhs, const ItemType& rhs) {

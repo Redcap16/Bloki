@@ -61,3 +61,9 @@ bool FoodItem::Use(ItemUser& user, BlockManager& blockManager) {
 	user.ChangeHealth(0.4f);
 	return true;
 }
+
+void FoodItem::RegisterTypes() {
+	Item::RegisterItem(FoodItem(FoodType::Bread));
+	Item::RegisterItem(FoodItem(FoodType::Apple));
+	Item::RegisterItem(FoodItem(FoodType::Meat));
+}

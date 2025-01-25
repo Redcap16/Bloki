@@ -31,7 +31,7 @@ public:
 		Wood,
 		Leaves
 	};
-	static constexpr unsigned int c_BlockCount = 7;
+	static constexpr unsigned int c_BlockCount = 7; //TODO: Add block type list. Then one can use vector.size() instead of c_BlockCount
 
 	BlockType Type;
 

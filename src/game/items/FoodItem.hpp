@@ -20,6 +20,7 @@ public:
 	std::unique_ptr<game::graphics::DroppedItemMesh> GetMesh() const override;
 	bool Use(ItemUser& user, BlockManager& blockManager) override;
 
+	static void RegisterTypes();
 private:
 	static const std::string c_ItemClass;
 

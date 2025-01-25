@@ -29,6 +29,9 @@
 #include <game/graphics/ConcreteBlockTextureLoader.hpp>
 #include <game/core/AreaLoader.hpp>
 
+#include <game/items/FoodItem.hpp>
+#include <game/items/BlockItem.hpp>
+
 class Application : public window::KeyboardListener, 
 	public window::WindowListener, 
 	public window::MouseListener

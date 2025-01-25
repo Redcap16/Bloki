@@ -37,3 +37,8 @@ bool BlockItem::Use(ItemUser& user, BlockManager& blockManager) {
 		return blockManager.PlaceBlock(placingPosition, Block(m_BlockType), false);
 	return false;
 }
+
+void BlockItem::RegisterTypes() {
+	for (int blockType = 0; blockType < Block::c_BlockCount; blockType++)
+		Item::RegisterItem(BlockItem((Block::BlockType)blockType));
+}
