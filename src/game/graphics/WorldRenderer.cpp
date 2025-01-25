@@ -113,12 +113,19 @@ void WorldRenderer::updateHighlight() {
 	if (m_LastHighlighted != m_Player.IsPointingAtAnything() ||
 		m_LastHighlightedPosition != m_Player.GetPointingAt()) {
 
-		if (m_LastHighlighted)
-			m_ChunkRenderers[Chunk::GetChunkPosition(m_LastHighlightedPosition)]->ResetHighlight();
+		if (m_LastHighlighted) {
+			auto renderer = m_ChunkRenderers.find(Chunk::GetChunkPosition(m_LastHighlightedPosition));
+			if(renderer != m_ChunkRenderers.end())
+				renderer->second->ResetHighlight();
+		}
 
 		m_LastHighlighted = m_Player.IsPointingAtAnything();
 		m_LastHighlightedPosition = m_Player.GetPointingAt();
-		if (m_LastHighlighted)
-			m_ChunkRenderers[Chunk::GetChunkPosition(m_LastHighlightedPosition)]->SetHighlight(Chunk::GetInChunkPosition(m_LastHighlightedPosition));
+
+		if (m_LastHighlighted) {
+			auto renderer = m_ChunkRenderers.find(Chunk::GetChunkPosition(m_LastHighlightedPosition));
+			if(renderer != m_ChunkRenderers.end())
+				renderer->second->SetHighlight(Chunk::GetInChunkPosition(m_LastHighlightedPosition));
+		}
 	}
 }
