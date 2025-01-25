@@ -67,6 +67,8 @@ namespace QXML {
 		for (int i = m_CurrentCharIndex; i < m_Content.size(); ++i)
 			if (m_Content[i] == c)
 				return i;
+
+		return -1;
 	}
 
 	std::vector<char> QXMLReader::ContentManager::GetSubstring(int from, int length) {
@@ -265,6 +267,9 @@ namespace QXML {
 		std::ifstream file(filename, std::ios_base::in | std::ios_base::binary | std::ios_base::ate);
 		if (file.is_open()) {
 			size_t filesize = file.tellg();
+			if (filesize == 0)
+				return QXMLReader("");
+
 			file.seekg(0, std::ios::beg);
 			std::vector<char> filedata(filesize);
 			file.read(&filedata[0], filesize);

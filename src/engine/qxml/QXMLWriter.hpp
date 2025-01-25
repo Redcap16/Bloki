@@ -14,14 +14,14 @@ namespace QXML {
 		QXMLWriter(std::string filename);
 		~QXMLWriter();
 
-		void AddElement(Element element);
+		void AddElement(const Element& element);
 		const std::vector<char>& GetResult();
 
 	private:
 		std::ofstream m_OutputFile;
 		std::vector<char> m_OutputData;
 
-		std::vector<char> processElement(Element element);
+		std::vector<char> processElement(const Element& element);
 		void pushString(std::vector<char>& data, const std::string& str);
 	};
 }

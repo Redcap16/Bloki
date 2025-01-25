@@ -12,7 +12,7 @@ QXML::QXMLWriter::~QXMLWriter() {
 	m_OutputFile.close();
 }
 
-void QXML::QXMLWriter::AddElement(Element element) {
+void QXML::QXMLWriter::AddElement(const Element& element) {
 	std::vector<char> data = processElement(element);
 
 	m_OutputData.insert(m_OutputData.end(), data.begin(), data.end());
@@ -25,7 +25,7 @@ const std::vector<char>& QXML::QXMLWriter::GetResult() {
 	return m_OutputData;
 }
 
-std::vector<char> QXML::QXMLWriter::processElement(Element element) {
+std::vector<char> QXML::QXMLWriter::processElement(const Element& element) {
 	std::vector<char> result;
 
 	result.push_back('<');
