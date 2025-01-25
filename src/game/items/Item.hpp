@@ -16,44 +16,15 @@ public:
 
 class ItemType {
 private:
-	unsigned int m_Id;
-
-	ItemType(unsigned int id) :
-		m_Id(id) {
-	}
+	std::string m_ID;
 public:
-	static ItemType Create() {
-		static unsigned int lastId = 1;
-		return { lastId++ };
+	ItemType(const std::string& itemClass, const std::string& itemType) :
+		m_ID(itemClass + "." + itemType) {
 	}
 
 	friend bool operator==(const ItemType& lhs, const ItemType& rhs);
 	friend bool operator<(const ItemType& lhs, const ItemType& rhs);
 };
-
-template <class TSubType>
-class ItemTypeArray {
-public:
-	ItemType GetType(TSubType subType);
-	ItemType operator[](TSubType subType);
-
-private:
-	std::map<TSubType, ItemType> m_Types;
-};
-
-template <class TSubType>
-ItemType ItemTypeArray<TSubType>::GetType(TSubType subType) {
-	if (m_Types.find(subType) == m_Types.end()) {
-		return m_Types.insert({ subType, ItemType::Create() }).first->second;
-	}
-
-	return m_Types.at(subType);
-}
-
-template <class TSubType>
-ItemType ItemTypeArray<TSubType>::operator[](TSubType subType) {
-	return GetType(subType);
-}
 
 class Item
 {
@@ -70,7 +41,7 @@ public:
 };
 
 inline bool operator==(const ItemType& lhs, const ItemType& rhs) {
-	return lhs.m_Id == rhs.m_Id;
+	return lhs.m_ID == rhs.m_ID;
 }
 
 inline bool operator!=(const ItemType& lhs, const ItemType& rhs) {
@@ -78,7 +49,7 @@ inline bool operator!=(const ItemType& lhs, const ItemType& rhs) {
 }
 
 inline bool operator<(const ItemType& lhs, const ItemType& rhs) {
-	return lhs.m_Id < rhs.m_Id;
+	return lhs.m_ID < rhs.m_ID;
 }
 
 bool operator==(const Item& lhs, const Item& rhs);

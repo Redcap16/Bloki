@@ -1,13 +1,14 @@
 #include <game/world/Block.hpp>
 
 Block::BlockData::BlockData() :
-	BlockData("")
+	BlockData("", "")
 {
 
 }
 
-Block::BlockData::BlockData(const std::string& name, TransparencyType transparencyType) :
+Block::BlockData::BlockData(const std::string& name, const std::string& displayName, TransparencyType transparencyType) :
 	Name(name),
+	DisplayName(displayName),
 	TransType(transparencyType)
 {
 
@@ -98,11 +99,11 @@ Block::Block(BlockType type) :
 
 void Block::SetupBlockData()
 {
-	c_BlockData[(int)Block::BlockType::Air] = BlockData("Air", TransparencyType::FullTransparency);
-	c_BlockData[(int)Block::BlockType::Grass] = BlockData("Grass");
-	c_BlockData[(int)Block::BlockType::Mud] = BlockData("Mud");
-	c_BlockData[(int)Block::BlockType::Stone] = BlockData("Stone");
-	c_BlockData[(int)Block::BlockType::Water] = BlockData("Water", TransparencyType::PartialTransparency);
-	c_BlockData[(int)Block::BlockType::Wood] = BlockData("Wood");
-	c_BlockData[(int)Block::BlockType::Leaves] = BlockData("Leaves", TransparencyType::FullTransparency);
+	c_BlockData[(int)Block::BlockType::Air] = BlockData("air", "Air", TransparencyType::FullTransparency);
+	c_BlockData[(int)Block::BlockType::Grass] = BlockData("grass", "Grass");
+	c_BlockData[(int)Block::BlockType::Mud] = BlockData("mud", "Mud");
+	c_BlockData[(int)Block::BlockType::Stone] = BlockData("stone", "Stone");
+	c_BlockData[(int)Block::BlockType::Water] = BlockData("water", "Water", TransparencyType::PartialTransparency);
+	c_BlockData[(int)Block::BlockType::Wood] = BlockData("wood", "Wood");
+	c_BlockData[(int)Block::BlockType::Leaves] = BlockData("leaves", "Leaves", TransparencyType::FullTransparency);
 }

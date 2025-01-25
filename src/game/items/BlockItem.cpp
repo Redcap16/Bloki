@@ -3,7 +3,7 @@
 #include <game/graphics/BlockTextureProvider.hpp>
 #include <game/graphics/ConcreteItemMesh.hpp>
 
-ItemTypeArray<Block::BlockType> BlockItem::m_ItemTypes;
+const std::string BlockItem::c_ItemClass = "blockitem";
 
 BlockItem::BlockItem(Block::BlockType blockType) :
 	m_BlockType(blockType) {
@@ -14,8 +14,12 @@ std::unique_ptr<Item> BlockItem::Clone() const {
 	return std::make_unique<BlockItem>(*this);
 }
 
+ItemType BlockItem::GetType() const {
+	return ItemType(c_ItemClass, Block::GetBlockName(m_BlockType));
+}
+
 std::string BlockItem::GetName() const {
-	return "Block name goes here";
+	return Block::GetBlockDisplayName(m_BlockType);
 }
 
 const Texture& BlockItem::GetTexture() const {
