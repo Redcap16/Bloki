@@ -9,7 +9,7 @@
 #include <game/physics/BlockRay.hpp>
 #include <engine/window/Input.hpp>
 #include <game/items/Inventory.hpp>
-#include <game/entity/DroppedItem.hpp>
+#include <game/entity/DroppedItemRepository.hpp>
 
 class Player : public ItemUser, public window::KeyboardListener
 {

@@ -24,8 +24,10 @@
 #include <game/core/UIManager.hpp>
 #include <engine/ui/Button.hpp>
 #include <game/graphics/DroppedItemRenderer.hpp>
+#include <game/entity/DroppedItemRepository.hpp>
 #include <game/graphics/ConcreteItemTextureLoader.hpp>
 #include <game/graphics/ConcreteBlockTextureLoader.hpp>
+#include <game/core/AreaLoader.hpp>
 
 class Application : public window::KeyboardListener, 
 	public window::WindowListener, 
@@ -44,7 +46,6 @@ public:
 	void OnMouseMove(glm::ivec2 position) override;
 	void OnMouseWheelMove(int movement) override {};
 
-	void SetChunksToRender(); //Move to WorldRenderer
 	void Start();
 private:
 	class TextureProviderSetup { //TODO: Remove it please...
@@ -63,11 +64,14 @@ private:
 
 	TextureProviderSetup m_TPS;
 
+	WholeSaveLoader m_SaveLoader;
+	ItemDataLoader m_ItemDataLoader;
 	LoadedChunks m_World;
 	Player m_Player;
 	WorldRenderer m_WorldRenderer;
 	DroppedItemRepository m_DroppedItemRepository;
 	DroppedItemRenderer m_DroppedItemsRenderer;
+	AreaLoader m_AreaLoader;
 
 	Camera3D m_Camera;
 	UIManager m_UIManager;

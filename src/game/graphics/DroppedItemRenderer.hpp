@@ -1,7 +1,7 @@
 #pragma once
 
 #include <engine/core/Renderer.hpp>
-#include <game/entity/DroppedItem.hpp>
+#include <game/entity/DroppedItemRepository.hpp>
 #include <game/ui/ItemQuad.hpp>
 
 class DroppedItemRenderable : Renderable {

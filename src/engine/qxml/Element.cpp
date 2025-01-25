@@ -13,10 +13,10 @@ namespace QXML {
 
 	}
 
-	const std::vector<Element>& Element::GetElementsByTag(std::string tag) const {
+	const std::vector<Element>* Element::GetElementsByTag(std::string tag) const {
 		if (m_InnerElements.find(tag) != m_InnerElements.end())
-			return m_InnerElements.at(tag);
-		return std::vector<Element>();
+			return &m_InnerElements.at(tag);
+		return nullptr;
 	}
 
 	std::vector<Element> Element::GetAllElements() const {

@@ -206,7 +206,7 @@ bool Player::getPlacePosition(WorldPos& position) const {
 }
 
 void Player::pickupItemsNearby() {
-	std::vector<DroppedItem*> itemsNearby = m_DroppedItemRepository.FindsItemNearby(m_Rigidbody.GetPosition(), c_PickupDistance);
+	std::set<DroppedItem*> itemsNearby = m_DroppedItemRepository.FindsItemNearby(m_Rigidbody.GetPosition(), c_PickupDistance);
 	for (auto item : itemsNearby) {
 		if (wasItemDroppedRecently(item))
 			continue;
@@ -217,7 +217,7 @@ void Player::pickupItemsNearby() {
 }
 
 void Player::attractItemsNearby() {
-	std::vector<DroppedItem*> itemsNearby = m_DroppedItemRepository.FindsItemNearby(m_Rigidbody.GetPosition(), c_AttractionDistance);
+	std::set<DroppedItem*> itemsNearby = m_DroppedItemRepository.FindsItemNearby(m_Rigidbody.GetPosition(), c_AttractionDistance);
 	for (auto item : itemsNearby) {
 		if (wasItemDroppedRecently(item))
 			continue;

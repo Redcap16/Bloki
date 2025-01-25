@@ -1,182 +1,282 @@
 #include <game/world/ChunkFileLoader.hpp>
 
-ChunkFileLoader::ChunkFileLoader(const std::string& savePath) :
-	m_SavePath(savePath)
-{
+const std::string WholeSaveLoader::c_BaseTag = "chunk",
+WholeSaveLoader::c_BlockdataTag = "blockdata",
+WholeSaveLoader::c_ItemdataTag = "itemdata";
+
+WholeSaveLoader::WholeSaveLoader(const std::string& saveName) :
+	m_SavePath(saveName) {
 
 }
 
-bool ChunkFileLoader::LoadChunk(Chunk& chunk)
-{
-	//Get region
-	//Load data from it
-	//Deserailize data in chunk
-	RegionPosition regionPos = RegionFile::GetRegionPosition(chunk.GetPosition());
-	InRegionPosition inRegionPos = RegionFile::GetInRegionPosition(chunk.GetPosition());
+WholeSaveLoader::ChunkRecordAccess::ChunkRecordAccess(std::map<RawDataType, std::vector<char>>& data, std::mutex& regionMutex) : 
+	m_Data(data),
+	m_Lock(regionMutex) {
 
-	std::shared_ptr<RegionFile> region = getRegion(regionPos);
-	std::vector<char> data;
-	if (!region->LoadChunk(inRegionPos, data))
+}
+
+bool WholeSaveLoader::ChunkRecordAccess::GetRawBlockData(std::vector<char>& data) {
+	if (!IsDataPresent(RawDataType::BlockData))
 		return false;
 
-	chunk.Deserialize(data);
-
+	data = m_Data[RawDataType::BlockData];
 	return true;
 }
 
-bool ChunkFileLoader::IsPresent(const ChunkPos& position)
-{
-	//Get region
-	//Check if it's present
-	RegionPosition regionPos = RegionFile::GetRegionPosition(position);
-	InRegionPosition inRegionPos = RegionFile::GetInRegionPosition(position);
-
-	std::shared_ptr<RegionFile> region = getRegion(regionPos);
-
-	return region->IsPresent(inRegionPos);
+bool WholeSaveLoader::ChunkRecordAccess::SaveRawBlockData(std::vector<char>&& data) {
+	m_Data[RawDataType::BlockData] = std::move(data);
+	return true;
 }
 
-void ChunkFileLoader::SaveChunk(const Chunk& chunk)
-{
-	//Get region
-	//Serialize data
-	//Save data in there
-	std::vector<char> data;
-	chunk.Serialize(data);
+bool WholeSaveLoader::ChunkRecordAccess::GetRawDroppedItemData(std::vector<char>&data) {
+	if (!IsDataPresent(RawDataType::DroppedItemData))
+		return false;
 
-	RegionPosition regionPos = RegionFile::GetRegionPosition(chunk.GetPosition());
-	InRegionPosition inRegionPos = RegionFile::GetInRegionPosition(chunk.GetPosition());
-
-	std::shared_ptr<RegionFile> region = getRegion(regionPos);
-	region->SaveChunk(inRegionPos, std::move(data));
+	data = m_Data[RawDataType::DroppedItemData];
+	return true;
 }
 
-void ChunkFileLoader::Flush()
-{
-	m_OpenedRegions.clear();
-	//Clear opened regions, they will flush automatically
+bool WholeSaveLoader::ChunkRecordAccess::SaveRawDroppedItemData(std::vector<char>&& data) {
+	m_Data[RawDataType::DroppedItemData] = std::move(data); //Raw saving, DroppedItemLoader is responsible for concatenation
+	return true;
 }
 
-ChunkFileLoader::RegionFile::RegionFile(const std::string filename) :
-	m_Filename(filename),
-	m_Changed(false)
-{	
+bool WholeSaveLoader::ChunkRecordAccess::IsDataPresent(RawDataType dataType) {
+	return m_Data.find(dataType) != m_Data.end();
+}
+
+WholeSaveLoader::ChunkRecord::ChunkRecord(InRegionPosition position, std::mutex &regionMutex) :
+	m_RegionMutex(regionMutex),
+	m_Position(position) {
+}
+
+std::unique_ptr<WholeSaveLoader::ChunkRecord> WholeSaveLoader::ChunkRecord::ReadElement(const QXML::Element& record, std::mutex &regionMutex) {
+	if (!record.HasAtribute("x") ||
+		!record.HasAtribute("y") ||
+		!record.HasAtribute("z"))
+		return nullptr;
+
+	InRegionPosition position = { record.GetAttributeValue("x").m_Value,
+		record.GetAttributeValue("y").m_Value,
+		record.GetAttributeValue("z").m_Value };
+
+	std::unique_ptr<ChunkRecord> result = std::make_unique<ChunkRecord>(position, regionMutex);
+
+	auto* blockdata = record.GetElementsByTag(c_BlockdataTag),
+		* itemdata = record.GetElementsByTag(c_ItemdataTag);
+
+	if (blockdata != nullptr && blockdata->size() == 1)
+		result->m_Data[RawDataType::BlockData] = (*blockdata)[0].GetData();
+	else
+		return nullptr;
+
+	if (itemdata != nullptr) {
+		if (itemdata->size() == 1)
+			result->m_Data[RawDataType::DroppedItemData] = (*itemdata)[0].GetData();
+		else if(itemdata->size() > 1)
+			return nullptr;
+	}
+
+	return result;
+}
+
+bool WholeSaveLoader::ChunkRecord::Empty() const {
+	for (auto& data : m_Data)
+		if (!data.second.empty())
+			return false;
+	return true;
+}
+
+std::unique_ptr<WholeSaveLoader::ChunkRecordAccess> WholeSaveLoader::ChunkRecord::GetAccess() {
+	return std::make_unique<ChunkRecordAccess>(m_Data, m_RegionMutex);
+}
+
+QXML::Element WholeSaveLoader::ChunkRecord::GenerateElement() {
+	QXML::Element result(c_BaseTag);
+	result.AddAttribute(QXML::Attribute("x", m_Position.x));
+	result.AddAttribute(QXML::Attribute("y", m_Position.y));
+	result.AddAttribute(QXML::Attribute("z", m_Position.z));
+
+	QXML::Element blockdata(c_BlockdataTag);
+	blockdata.SetAsRaw();
+	blockdata.AddData(m_Data[RawDataType::BlockData]);
+	result.AddInnerElement(blockdata);
+
+	if (!m_Data[RawDataType::DroppedItemData].empty()) {
+		QXML::Element itemdata(c_ItemdataTag);
+		itemdata.SetAsRaw();
+		itemdata.AddData(m_Data[RawDataType::DroppedItemData]);
+		result.AddInnerElement(itemdata);
+	}
+
+	return result;
+}
+
+WholeSaveLoader::RegionFile::RegionFile(const std::string filename) :
+	m_Filename(filename) {
 	loadIntoCache();
 }
 
-ChunkFileLoader::RegionFile::~RegionFile()
-{
+WholeSaveLoader::RegionFile::~RegionFile() {
 	flush();
 }
 
-bool ChunkFileLoader::RegionFile::LoadChunk(const InRegionPosition position, std::vector<char>& data)
-{	
-	//Check if theres something in cache
-	//If there is load it
-	//If there's not
-	//Check if there's something in headers
-	//If there is, load it from headers and save it in cache
-	//If it's not, then
-	//Return false
+WholeSaveLoader::ChunkRecord& WholeSaveLoader::RegionFile::GetChunkRecord(const InRegionPosition& position) {
 	std::lock_guard<std::mutex> lock(m_AccessMutex);
 
-	if (m_ChunkCache.find(position) != m_ChunkCache.end())
-	{
-		data = m_ChunkCache[position];
-		return true;
-	}
-
-	data = m_ChunkCache[position];
-	return true;
+	if (m_ChunkCache.find(position) == m_ChunkCache.end())
+		m_ChunkCache[position] = std::make_unique<ChunkRecord>(position, m_AccessMutex);
+	return *m_ChunkCache.at(position);
 }
 
-bool ChunkFileLoader::RegionFile::IsPresent(const InRegionPosition& position)
-{
-	//Firstly check in cache
-	//If there's nothing
-	//Check in headers
+bool WholeSaveLoader::RegionFile::IsChunkPresent(const InRegionPosition& position) const {
 	std::lock_guard<std::mutex> lock(m_AccessMutex);
 
 	if (m_ChunkCache.find(position) != m_ChunkCache.end())
-		return true;
+		return !m_ChunkCache.at(position)->Empty();
 
 	return false;
 }
 
-void ChunkFileLoader::RegionFile::SaveChunk(const InRegionPosition& position, std::vector<char>&& data)
-{
-	//Save it to cache
-	//Dont create any headers
-	//Mark file as changed
+void WholeSaveLoader::RegionFile::flush() {
 	std::lock_guard<std::mutex> lock(m_AccessMutex);
 
-	m_ChunkCache[position] = std::move(data);
-	m_Changed = true;
-}
-
-void ChunkFileLoader::RegionFile::flush()
-{
-	//If changed
-	//For every header that dont have cache ready, load its contents into a cache
-	//For every cache load it into new, clear file and save its new header
-	//Save all new headers on the beggining of the file
-	std::lock_guard<std::mutex> lock(m_AccessMutex);
-
-	if (!m_Changed)
-		return;
-
-	//Prepare data
 	QXML::QXMLWriter qxmlWriter(m_Filename);
 
-	for (int x = 0; x < c_RegionSize.x; ++x)
-		for (int y = 0; y < c_RegionSize.y; ++y)
-			for (int z = 0; z < c_RegionSize.z; ++z)
-			{
-				const InRegionPosition position{ x, y, z };
-
-				if (m_ChunkCache.find(position) == m_ChunkCache.end()) //Nothing to save
-					continue;
-
-				QXML::Element chunkEl("chunk");
-				chunkEl.AddAttribute(QXML::Attribute("x", x));
-				chunkEl.AddAttribute(QXML::Attribute("y", y));
-				chunkEl.AddAttribute(QXML::Attribute("z", z));
-
-				QXML::Element blockdataEl("blockdata");
-				blockdataEl.SetAsRaw();
-				blockdataEl.AddData(m_ChunkCache[position]);
-
-				chunkEl.AddInnerElement(blockdataEl);
-				qxmlWriter.AddElement(chunkEl);
-			}
+	for (auto& chunk : m_ChunkCache) {
+		qxmlWriter.AddElement(chunk.second->GenerateElement());
+	}
 }
 
-void ChunkFileLoader::RegionFile::loadIntoCache()
-{
+bool WholeSaveLoader::RegionFile::loadIntoCache() {
+	std::lock_guard<std::mutex> lock(m_AccessMutex);
+
 	QXML::QXMLReader reader = QXML::QXMLReader::OpenFile(m_Filename);
-	std::vector<QXML::Element> chunks = reader.GetBase().GetElementsByTag("chunk");
+	const std::vector<QXML::Element>* chunks = reader.GetBase().GetElementsByTag(c_BaseTag);
 
-	for (auto& chunk : chunks) {
-		int x = chunk.GetAttributeValue("x").m_Value,
-			y = chunk.GetAttributeValue("y").m_Value,
-			z = chunk.GetAttributeValue("z").m_Value;
+	if (chunks == nullptr)
+		return true; //No chunks to load
 
-		auto insides = chunk.GetElementsByTag("blockdata");
-		if (insides.size() != 1)
-			continue;
+	for (auto& chunk : *chunks) {
+		std::unique_ptr<ChunkRecord> record = ChunkRecord::ReadElement(chunk, m_AccessMutex);
+		if (record == nullptr)
+			return false;
 
-		m_ChunkCache[{x, y, z}] = insides[0].GetData();
+		m_ChunkCache[record->GetPosition()] = std::move(record);
 	}
+	return true;
 }
 
-std::shared_ptr<ChunkFileLoader::RegionFile> ChunkFileLoader::getRegion(const RegionPosition& position)
-{
+std::string WholeSaveLoader::getRegionFilename(const RegionPosition& position) {
+	return c_SavesPath + m_SavePath + "/" +
+		std::to_string(position.x) + "'" +
+		std::to_string(position.y) + "'" +
+		std::to_string(position.z) + ".reg";
+}
+
+std::shared_ptr<WholeSaveLoader::RegionFile> WholeSaveLoader::GetRegion(const RegionPosition& position) {
 	std::lock_guard<std::mutex> lock(m_OpenedRegionsMutex);
+
 	if (m_OpenedRegions.find(position) == m_OpenedRegions.end())
-	{
-		std::string filename = m_SavePath + "/" + std::to_string(position.x) + "'" + std::to_string(position.y) + "'" + std::to_string(position.z) + ".reg";
-		m_OpenedRegions[position] = std::make_shared<RegionFile>(filename);
-	}
+		m_OpenedRegions[position] = std::make_shared<RegionFile>(getRegionFilename(position));
 
 	return m_OpenedRegions.at(position);
+}
+
+void WholeSaveLoader::Flush() {
+	m_OpenedRegions.clear();
+}
+
+BlockDataLoader::BlockDataLoader(WholeSaveLoader& loader) :
+	m_Loader(loader) {
+	
+}
+
+bool BlockDataLoader::LoadChunk(Chunk& chunk) {
+	std::shared_ptr<WholeSaveLoader::RegionFile> region = m_Loader.GetRegion(WholeSaveLoader::GetRegionPosition(chunk.GetPosition()));
+
+	auto inRegPos = WholeSaveLoader::GetInRegionPosition(chunk.GetPosition());
+	if (!region->IsChunkPresent(inRegPos))
+		return false;
+
+	WholeSaveLoader::ChunkRecord& chunkRecord = region->GetChunkRecord(inRegPos);
+
+	std::vector<char> blockdata;
+	if (!chunkRecord.GetAccess()->GetRawBlockData(blockdata))
+		return false;
+
+	chunk.Deserialize(blockdata);
+	return true;
+}
+
+bool BlockDataLoader::IsPresent(const ChunkPos& position) {
+	std::shared_ptr<WholeSaveLoader::RegionFile> region = m_Loader.GetRegion(WholeSaveLoader::GetRegionPosition(position));
+	return region->IsChunkPresent(WholeSaveLoader::GetInRegionPosition(position));
+}
+
+void BlockDataLoader::SaveChunk(const Chunk& chunk) {
+	std::shared_ptr<WholeSaveLoader::RegionFile> region = m_Loader.GetRegion(WholeSaveLoader::GetRegionPosition(chunk.GetPosition()));
+
+	WholeSaveLoader::ChunkRecord& chunkRecord = region->GetChunkRecord(WholeSaveLoader::GetInRegionPosition(chunk.GetPosition()));
+	std::vector<char> blockdata;
+	chunk.Serialize(blockdata);
+
+	chunkRecord.GetAccess()->SaveRawBlockData(std::move(blockdata));
+}
+
+ItemDataLoader::ItemDataLoader(WholeSaveLoader& loader) : 
+	m_Loader(loader) {
+
+}
+
+void ItemDataLoader::GetDroppedItems(const ChunkPos& position, BlockManager& world, std::set<std::shared_ptr<DroppedItem>>& items) {
+	std::shared_ptr<WholeSaveLoader::RegionFile> region = m_Loader.GetRegion(WholeSaveLoader::GetRegionPosition(position));
+	WholeSaveLoader::ChunkRecord& chunkRecord = region->GetChunkRecord(WholeSaveLoader::GetInRegionPosition(position));
+
+	std::vector<char> itemdata;
+	if (!chunkRecord.GetAccess()->GetRawDroppedItemData(itemdata))
+		return;
+
+	deserializeItems(items, world, itemdata);
+}
+
+void ItemDataLoader::SaveDroppedItems(const ChunkPos& position, const std::set<std::shared_ptr<DroppedItem>>& items) {
+	std::shared_ptr<WholeSaveLoader::RegionFile> region = m_Loader.GetRegion(WholeSaveLoader::GetRegionPosition(position));
+	WholeSaveLoader::ChunkRecord& chunkRecord = region->GetChunkRecord(WholeSaveLoader::GetInRegionPosition(position));
+
+	std::vector<char> itemdata;
+	serializeItems(items, itemdata);
+
+	chunkRecord.GetAccess()->SaveRawDroppedItemData(std::move(itemdata));
+}
+
+void ItemDataLoader::serializeItems(const std::set<std::shared_ptr<DroppedItem>>& items, std::vector<char>& data) {
+	QXML::QXMLWriter writer;
+
+	for (auto& item : items) {
+		QXML::Element itemElement(c_ItemTag);
+		std::vector<char> itemData;
+		item->Serialize(itemData);
+
+		itemElement.SetAsRaw();
+		itemElement.AddData(itemData);
+		writer.AddElement(itemElement);
+	}
+
+	data = writer.GetResult();
+}
+
+void ItemDataLoader::deserializeItems(std::set<std::shared_ptr<DroppedItem>>& items, BlockManager& world, const std::vector<char>& data) {
+	QXML::QXMLReader reader(data);
+
+	auto* itemElements = reader.GetBase().GetElementsByTag(c_ItemTag);
+	if (itemElements == nullptr)
+		return;
+
+	for (auto& item : *itemElements) {
+		std::vector<char> itemData;
+		itemData = item.GetData();
+
+		items.insert(DroppedItem::Deserialize(itemData, world));
+	}
 }

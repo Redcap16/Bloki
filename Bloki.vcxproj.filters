@@ -306,6 +306,12 @@
     <ClCompile Include="src\engine\qxml\QXMLWriter.cpp">
       <Filter>Pliki źródłowe\engine\qxml</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\core\AreaLoader.cpp">
+      <Filter>Pliki źródłowe\game\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\entity\DroppedItemRepository.cpp">
+      <Filter>Pliki źródłowe\game\entity</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\engine\util\Debug.hpp">
@@ -523,6 +529,12 @@
     </ClInclude>
     <ClInclude Include="src\engine\qxml\QXMLWriter.hpp">
       <Filter>Pliki nagłówkowe\engine\qxml</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\core\AreaLoader.hpp">
+      <Filter>Pliki nagłówkowe\game\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\entity\DroppedItemRepository.hpp">
+      <Filter>Pliki nagłówkowe\game\entity</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

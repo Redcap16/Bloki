@@ -51,7 +51,7 @@ namespace QXML {
 				m_Attributes.at("raw").m_Value = m_Data.size();
 		}
 
-		const std::vector<Element>& GetElementsByTag(std::string tag) const;
+		const std::vector<Element>* GetElementsByTag(std::string tag) const;
 		std::vector<Element> GetAllElements() const;
 		std::vector<std::string> GetAllInnerTags() const;
 

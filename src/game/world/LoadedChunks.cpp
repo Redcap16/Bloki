@@ -1,8 +1,9 @@
 #include <game/world/LoadedChunks.hpp>
 
-LoadedChunks::LoadedChunks(Renderer3D& renderer, const std::string& savePath) :
+LoadedChunks::LoadedChunks(Renderer3D& renderer, WholeSaveLoader& loader) :
 	m_Renderer(renderer),
-	m_FileLoader(savePath),
+	m_FileLoader(loader),
+	m_BlockDataLoader(m_FileLoader),
 	m_ChunkGenerator(*this),
 	m_ManagementThreadDone(true)
 {
@@ -128,8 +129,8 @@ Chunk* LoadedChunks::getChunk(ChunkPos position, bool force)
 	//It not exits, it should be created
 	m_SubsidiaryChunks[position] = std::make_unique<Chunk>(position);
 
-	if (m_FileLoader.IsPresent(position))
-		m_FileLoader.LoadChunk(*m_SubsidiaryChunks[position]);
+	if (m_BlockDataLoader.IsPresent(position))
+		m_BlockDataLoader.LoadChunk(*m_SubsidiaryChunks[position]);
 
 	return m_SubsidiaryChunks[position].get();
 }
@@ -279,8 +280,8 @@ void LoadedChunks::managementThreadLoop()
 				continue;
 
 			ChunkPos position = chunk->GetPosition();
-			if (m_FileLoader.IsPresent(position))
-				m_FileLoader.LoadChunk(*chunk);
+			if (m_BlockDataLoader.IsPresent(position))
+				m_BlockDataLoader.LoadChunk(*chunk);
 
 			if (!chunk->IsGenerated())
 				m_ChunkGenerator.GenerateChunk(*chunk);
@@ -289,7 +290,7 @@ void LoadedChunks::managementThreadLoop()
 		case ManagementTask::Save:
 			if (!task.ToSave)
 				continue;
-			m_FileLoader.SaveChunk(*task.ToSave);
+			m_BlockDataLoader.SaveChunk(*task.ToSave);
 			break;
 		case ManagementTask::Flush:
 			m_FileLoader.Flush();
