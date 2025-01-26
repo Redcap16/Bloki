@@ -1,8 +1,12 @@
 #include <game/world/ChunkFileLoader.hpp>
 
-const std::string WholeSaveLoader::c_BaseTag = "chunk",
-WholeSaveLoader::c_BlockdataTag = "blockdata",
-WholeSaveLoader::c_ItemdataTag = "itemdata";
+#include <game/core/Player.hpp> //TODO: Remove after file seperation
+
+const std::string WholeSaveLoader::c_SavesPath = "saves/",
+	WholeSaveLoader::c_GeneralFileName = "general.dat", 
+	WholeSaveLoader::c_BaseTag = "chunk",
+	WholeSaveLoader::c_BlockdataTag = "blockdata",
+	WholeSaveLoader::c_ItemdataTag = "itemdata";
 
 WholeSaveLoader::WholeSaveLoader(const std::string& saveName) :
 	m_SavePath(saveName) {
@@ -167,6 +171,47 @@ bool WholeSaveLoader::RegionFile::loadIntoCache() {
 	return true;
 }
 
+const std::string WholeSaveLoader::GeneralFile::c_PlayerdataTag = "playerdata";
+
+WholeSaveLoader::GeneralFile::GeneralFile(const std::string& filename) :
+	m_Filename(filename) {
+	readFile();
+}
+
+WholeSaveLoader::GeneralFile::~GeneralFile() {
+	saveFile();
+}
+
+bool WholeSaveLoader::GeneralFile::GetRawPlayerData(std::vector<char>& data) {
+	data = m_PlayerData;
+	return true;
+}
+
+void WholeSaveLoader::GeneralFile::SaveRawPlayerData(const std::vector<char>& data) {
+	m_PlayerData = data;
+}
+
+bool WholeSaveLoader::GeneralFile::readFile() {
+	QXML::QXMLReader reader = QXML::QXMLReader::OpenFile(m_Filename);
+
+	auto* playerdataElement = reader.GetBase().GetElementsByTag(c_PlayerdataTag);
+	if (playerdataElement == nullptr ||
+		playerdataElement->size() != 1)
+		return false;
+
+	m_PlayerData = (*playerdataElement)[0].GetData();
+	return true;
+}
+
+void WholeSaveLoader::GeneralFile::saveFile() {
+	QXML::QXMLWriter writer(m_Filename);
+
+	QXML::Element playerdataElement(c_PlayerdataTag);
+	playerdataElement.SetAsRaw();
+	playerdataElement.AddData(m_PlayerData);
+	writer.AddElement(playerdataElement);
+}
+
 std::string WholeSaveLoader::getRegionFilename(const RegionPosition& position) {
 	return c_SavesPath + m_SavePath + "/" +
 		std::to_string(position.x) + "'" +
@@ -183,8 +228,16 @@ std::shared_ptr<WholeSaveLoader::RegionFile> WholeSaveLoader::GetRegion(const Re
 	return m_OpenedRegions.at(position);
 }
 
+std::shared_ptr<WholeSaveLoader::GeneralFile> WholeSaveLoader::GetGeneral() {
+	if (m_GeneralFile == nullptr)
+		m_GeneralFile = std::make_shared<GeneralFile>(c_SavesPath + m_SavePath + "/" + c_GeneralFileName);
+
+	return m_GeneralFile;
+}
+
 void WholeSaveLoader::Flush() {
 	m_OpenedRegions.clear();
+	m_GeneralFile = nullptr;
 }
 
 BlockDataLoader::BlockDataLoader(WholeSaveLoader& loader) :
@@ -279,4 +332,30 @@ void ItemDataLoader::deserializeItems(std::set<std::shared_ptr<DroppedItem>>& it
 
 		items.insert(DroppedItem::Deserialize(itemData, world));
 	}
+}
+
+
+PlayerDataLoader::PlayerDataLoader(WholeSaveLoader& loader) :
+	m_Loader(loader) {
+
+}
+
+std::unique_ptr<Player> PlayerDataLoader::LoadPlayer(BlockManager& world, window::Keyboard& keyboard, window::Mouse& mouse, glm::ivec2 windowSize, DroppedItemRepository& droppedItemRepository) {
+	auto generalFile = m_Loader.GetGeneral();
+	if (generalFile == nullptr)
+		return nullptr;
+
+	std::vector<char> playerdata;
+	generalFile->GetRawPlayerData(playerdata);
+	return std::move(Player::Deserialize(playerdata, world, keyboard, mouse, windowSize, droppedItemRepository));
+}
+
+void PlayerDataLoader::SavePlayer(const Player& player) {
+	auto generalFile = m_Loader.GetGeneral();
+	if (generalFile == nullptr)
+		return;
+
+	std::vector<char> playerdata;
+	player.Serialize(playerdata);
+	generalFile->SaveRawPlayerData(playerdata);
 }

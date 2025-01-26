@@ -24,9 +24,9 @@ public:
 	WholeSaveLoader(const std::string& saveName);
 
 private:
-	const std::string c_SavesPath = "saves/";
-
-	static const std::string c_BaseTag,
+	static const std::string c_SavesPath,
+		c_GeneralFileName,
+		c_BaseTag,
 		c_BlockdataTag,
 		c_ItemdataTag;
 
@@ -103,9 +103,31 @@ public:
 		bool loadIntoCache();
 	};
 
+	class GeneralFile {
+	public:
+		GeneralFile(const std::string& filename);
+		~GeneralFile();
+		GeneralFile(const GeneralFile&) = delete;
+		GeneralFile& operator=(const GeneralFile&) = delete;
+
+		bool GetRawPlayerData(std::vector<char>& data);
+		void SaveRawPlayerData(const std::vector<char>& data);
+
+	private:
+		static const std::string c_PlayerdataTag;
+		std::string m_Filename;
+
+		std::vector<char> m_PlayerData;
+
+		bool readFile();
+		void saveFile();
+	};
+
+
 private:
 	std::mutex m_OpenedRegionsMutex;
 	std::unordered_map<RegionPosition, std::shared_ptr<RegionFile>> m_OpenedRegions;
+	std::shared_ptr<GeneralFile> m_GeneralFile;
 
 	const std::string m_SavePath;
 
@@ -113,6 +135,7 @@ private:
 
 public:
 	std::shared_ptr<RegionFile> GetRegion(const RegionPosition& position);
+	std::shared_ptr<GeneralFile> GetGeneral();
 	void Flush();
 
 	inline static InRegionPosition GetInRegionPosition(const ChunkPos& chunkPosition);
@@ -163,4 +186,21 @@ private:
 	void deserializeItems(std::set<std::shared_ptr<DroppedItem>>& items, BlockManager& world, const std::vector<char>& data);
 };
 
-//class PlayerDataLoader...
+class DroppedItemRepository;
+class Player; //Remove after file seperation 
+#include <engine/window/Input.hpp>
+
+class PlayerDataLoader {
+public:
+	PlayerDataLoader(WholeSaveLoader& loader);
+
+	std::unique_ptr<Player> LoadPlayer(BlockManager& world, window::Keyboard& keyboard, window::Mouse& mouse, glm::ivec2 windowSize, DroppedItemRepository& droppedItemRepository);
+	void SavePlayer(const Player& player);
+
+private:
+	WholeSaveLoader& m_Loader;
+
+};
+
+
+//TODO:  fix chunkfileloader filename

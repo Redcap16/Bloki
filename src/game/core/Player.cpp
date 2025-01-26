@@ -8,22 +8,21 @@ using window::KeyboardEvent;
 using window::Mouse;
 
 Player::Player(BlockManager& world, Keyboard& keyboard, Mouse& mouse, glm::ivec2 windowSize, DroppedItemRepository& droppedItemRepository) :
-	m_Rigidbody(world, AABB(glm::vec3(0), c_BodyCenter, c_BodySize)),
+	Player(world, keyboard, mouse, windowSize, droppedItemRepository, Rigidbody(world, AABB(glm::vec3(0), c_BodyCenter, c_BodySize))) {
+}
+
+Player::Player(BlockManager& world, Keyboard& keyboard, Mouse& mouse, glm::ivec2 windowSize, DroppedItemRepository& droppedItemRepository, Rigidbody rigidbody) :
+	m_Rigidbody(rigidbody),
 	m_World(world),
 	m_Keyboard(keyboard),
 	m_Flying(false),
 	m_WindowSize(windowSize),
 	m_Mouse(mouse),
-	m_DroppedItemRepository(droppedItemRepository)
-{
+	m_DroppedItemRepository(droppedItemRepository),
+	m_Inventory(std::make_unique<Inventory>()){
+
 	setFlying(false);
 	m_Keyboard.AddKeyboardListener(*this);
-
-	m_Inventory.GetItemStack(2).Set(FoodItem(FoodItem::FoodType::Apple), 20);
-	m_Inventory.GetItemStack(3).Set(FoodItem(FoodItem::FoodType::Apple), 10);
-	m_Inventory.GetItemStack(5).Set(FoodItem(FoodItem::FoodType::Bread), 3);
-	m_Inventory.GetItemStack(6).Set(BlockItem(Block::Wood), 15);
-	m_Inventory.GetItemStack(7).Set(BlockItem(Block::Stone), 15);
 }
 
 Player::~Player() {
@@ -118,7 +117,7 @@ void Player::KeyPressed(char key)
 	if (key == 'F')
 		setFlying(!m_Flying);
 	else if (key == 'Q')
-		dropItem(m_Inventory.GetSelectedItemIndex());
+		dropItem(m_Inventory->GetSelectedItemIndex());
 }
 
 void Player::KeyReleased(char key)
@@ -155,7 +154,7 @@ void Player::MouseClicked(const glm::ivec2& position, bool leftButton)
 	}
 	else
 	{
-		m_Inventory.GetSelectedItem().Use(*this, m_World);
+		m_Inventory->GetSelectedItem().Use(*this, m_World);
 	}
 }
 
@@ -178,6 +177,61 @@ WorldPos Player::GetLookingAt() const {
 
 bool Player::GetPlacingAt(WorldPos& position) const {
 	return getPlacePosition(position);
+}
+
+void Player::Serialize(std::vector<char>& data) const {
+	QXML::QXMLWriter writer;
+
+	QXML::Element rigidbodyElement("rigidbody");
+	rigidbodyElement.SetAsRaw();
+	std::vector<char> rigidbodyData;
+	m_Rigidbody.Serialize(rigidbodyData);
+	rigidbodyElement.AddData(rigidbodyData);
+	rigidbodyElement.AddAttribute(QXML::Attribute("flying", m_Flying));
+	writer.AddElement(rigidbodyElement);
+
+	QXML::Element rotationElement("rotation");
+	rotationElement.SetAsRaw();
+	const char* rotationPtr = reinterpret_cast<const char*>(&m_Rotation);
+	std::vector<char> rotationData(rotationPtr, rotationPtr + sizeof(m_Rotation));
+	rotationElement.AddData(rotationData);
+	writer.AddElement(rotationElement);
+
+	QXML::Element inventoryElement("inventory");
+	inventoryElement.SetAsRaw();
+	std::vector<char> inventoryData;
+	m_Inventory->Serialize(inventoryData);
+	inventoryElement.AddData(inventoryData);
+	writer.AddElement(inventoryElement);
+
+	data = writer.GetResult();
+}
+
+std::unique_ptr<Player> Player::Deserialize(const std::vector<char>& data, BlockManager& world, window::Keyboard& keyboard, window::Mouse& mouse, glm::ivec2 windowSize, DroppedItemRepository& droppedItemRepository) {
+	QXML::QXMLReader reader(data);
+	auto* rigidbodyElement = reader.GetBase().GetElementsByTag("rigidbody"),
+		* rotationElement = reader.GetBase().GetElementsByTag("rotation"),
+		* inventoryElement = reader.GetBase().GetElementsByTag("inventory");
+
+	if (rigidbodyElement == nullptr || 
+		rigidbodyElement->size() != 1 ||
+		rotationElement == nullptr ||
+		rotationElement->size() != 1 ||
+		inventoryElement == nullptr ||
+		inventoryElement->size() != 1)
+		return nullptr;
+
+	auto rigidbodyData = (*rigidbodyElement)[0].GetData(),
+		rotationData = (*rotationElement)[0].GetData(),
+		inventoryData = (*inventoryElement)[0].GetData();
+
+	std::unique_ptr<Player> player = std::make_unique<Player>(world, keyboard, mouse, windowSize, droppedItemRepository, *Rigidbody::Deserialize(rigidbodyData, world));
+	player->m_Flying = (*rigidbodyElement)[0].GetAttributeValue("flying").m_Value;
+	player->m_Rotation = *reinterpret_cast<glm::vec2*>(&rotationData[0]);
+
+	player->m_Inventory = std::move(Inventory::Deserialize(inventoryData));
+
+	return std::move(player);
 }
 
 void Player::setFlying(bool flying)
@@ -211,7 +265,7 @@ void Player::pickupItemsNearby() {
 		if (wasItemDroppedRecently(item))
 			continue;
 
-		if (m_Inventory.AddItem(item->GetItemStack())) //Successfully transfered items to inventory
+		if (m_Inventory->AddItem(item->GetItemStack())) //Successfully transfered items to inventory
 			m_DroppedItemRepository.RemoveDroppedItem(item);
 	}
 }
@@ -227,12 +281,12 @@ void Player::attractItemsNearby() {
 }
 
 void Player::dropItem(int index) {
-	ItemStack& source = m_Inventory.GetItemStack(index);
+	ItemStack& source = m_Inventory->GetItemStack(index);
 	if (source.Empty())
 		return;
 
 	ItemStack droppedStack;
-	m_Inventory.GetItemStack(index).MoveTo(droppedStack, 1);
+	m_Inventory->GetItemStack(index).MoveTo(droppedStack, 1);
 
 	std::shared_ptr<DroppedItem> itemDropped = m_DroppedItemRepository.AddDroppedItem(std::move(droppedStack), 
 		m_Rigidbody.GetPosition(), 

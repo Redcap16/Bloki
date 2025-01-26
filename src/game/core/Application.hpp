@@ -69,8 +69,9 @@ private:
 
 	WholeSaveLoader m_SaveLoader;
 	ItemDataLoader m_ItemDataLoader;
+	PlayerDataLoader m_PlayerDataLoader;
 	LoadedChunks m_World;
-	Player m_Player;
+	std::unique_ptr<Player> m_Player;
 	WorldRenderer m_WorldRenderer;
 	DroppedItemRepository m_DroppedItemRepository;
 	DroppedItemRenderer m_DroppedItemsRenderer;
@@ -81,4 +82,6 @@ private:
 
 	bool m_Running = false,
 		m_Done = false;
+
+	std::unique_ptr<Player> loadPlayer();
 };

@@ -140,3 +140,45 @@ void Inventory::ChangeSelectedItem(int indexChange) {
 void Inventory::StackUpdated() {
 
 }
+
+void Inventory::Serialize(std::vector<char>& data) const {
+	QXML::QXMLWriter writer;
+
+	for (int index = 0; index < c_Size; index++) {
+		if (m_Items[index].Empty())
+			continue;
+		QXML::Element itemElement("itemstack");
+		itemElement.AddAttribute(QXML::Attribute("index", index));
+		itemElement.AddAttribute(QXML::Attribute("count", m_Items[index].GetCount()));
+		itemElement.AddData(m_Items[index].GetItemHeld().GetType().GetRawID());
+
+		writer.AddElement(itemElement);
+	}
+
+	data = writer.GetResult();
+}
+
+std::unique_ptr<Inventory> Inventory::Deserialize(const std::vector<char>& data) {
+	QXML::QXMLReader reader(data);
+
+	auto* itemElements = reader.GetBase().GetElementsByTag("itemstack");
+
+	if (itemElements == nullptr)
+		return nullptr;
+
+	std::array<ItemStack, c_Size> items;
+	for (auto& itemElement : *itemElements) {
+		ItemStack& itemStack = items[itemElement.GetAttributeValue("index").m_Value];
+
+		itemStack.SetItemHeld(*Item::GetByType(ItemType(itemElement.GetDataAsString())));
+		itemStack.SetCount(itemElement.GetAttributeValue("count").m_Value);
+	}
+
+	return std::unique_ptr<Inventory>(new Inventory(items));
+}
+
+Inventory::Inventory(std::array<ItemStack, c_Size>& items) :
+	Inventory() {
+	for (int index = 0; index < c_Size; index++)
+		m_Items[index].SwapContents(items[index]);
+}

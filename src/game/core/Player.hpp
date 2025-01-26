@@ -15,6 +15,7 @@ class Player : public ItemUser, public window::KeyboardListener
 {
 public:
 	Player(BlockManager& world, window::Keyboard& keyboard, window::Mouse& mouse, glm::ivec2 windowSize, DroppedItemRepository& droppedItemRepository);
+	Player(BlockManager& world, window::Keyboard& keyboard, window::Mouse& mouse, glm::ivec2 windowSize, DroppedItemRepository& droppedItemRepository, Rigidbody rigidbody);
 	~Player();
 	Player(const Player&) = delete;
 	Player& operator=(const Player&) = delete;
@@ -34,8 +35,8 @@ public:
 
 	void SetEyeCamera(Camera3D* camera) { m_Camera = camera; };
 
-	Inventory& GetInventory() { return m_Inventory; }
-	const Inventory& GetInventory() const { return m_Inventory; }
+	Inventory& GetInventory() { return *m_Inventory; }
+	const Inventory& GetInventory() const { return *m_Inventory; }
 
 	glm::ivec3 GetPointingAt() const;
 	bool IsPointingAtAnything() const;
@@ -46,6 +47,9 @@ public:
 	void ChangeHealth(float healthChange) override;
 	WorldPos GetLookingAt() const override;
 	bool GetPlacingAt(WorldPos& position) const override;
+
+	void Serialize(std::vector<char>& data) const;
+	static std::unique_ptr<Player> Deserialize(const std::vector<char>& data, BlockManager& world, window::Keyboard& keyboard, window::Mouse& mouse, glm::ivec2 windowSize, DroppedItemRepository& droppedItemRepository);
 
 private:
 	static constexpr glm::vec3 c_BodySize = {0.8f, 1.8f, 0.8f};
@@ -72,10 +76,10 @@ private:
 
 	BlockManager& m_World;
 	Camera3D* m_Camera;
-	Inventory m_Inventory;
+	std::unique_ptr<Inventory> m_Inventory;
 
 	DroppedItemRepository& m_DroppedItemRepository;
-	std::vector<std::pair<std::shared_ptr<DroppedItem>, long long>> m_RecentlyDroppedItems;
+	std::vector<std::pair<std::shared_ptr<DroppedItem>, long long>> m_RecentlyDroppedItems; //TODO: Add it to serialization
 
 	window::Keyboard& m_Keyboard;
 	window::Mouse& m_Mouse;
