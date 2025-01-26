@@ -10,7 +10,8 @@
 #include <engine/qxml/QXMLReader.hpp>
 #include <engine/qxml/QXMLWriter.hpp>
 
-/* 
+
+/*
 *	<chunk x= y= z=>
 *		<blockdata raw=SIZE>SERIALIZED DATA</blockdata>
 *		<items>
@@ -40,7 +41,7 @@ public:
 	};
 	class ChunkRecordAccess {
 	public:
-		ChunkRecordAccess(std::map<RawDataType, std::vector<char>>& data, std::mutex &regionMutex);
+		ChunkRecordAccess(std::map<RawDataType, std::vector<char>>& data, std::mutex& regionMutex);
 		ChunkRecordAccess(const ChunkRecordAccess&) = delete;
 		ChunkRecordAccess& operator=(const ChunkRecordAccess&) = delete;
 		ChunkRecordAccess(ChunkRecordAccess&&) = delete;
@@ -54,20 +55,20 @@ public:
 
 		bool IsDataPresent(RawDataType dataType);
 	private:
-		std::map<RawDataType, std::vector<char>> &m_Data;
-		
+		std::map<RawDataType, std::vector<char>>& m_Data;
+
 		std::lock_guard<std::mutex> m_Lock;
 	};
 
 	class ChunkRecord {
 	public:
-		ChunkRecord(InRegionPosition position, std::mutex &regionMutex);
+		ChunkRecord(InRegionPosition position, std::mutex& regionMutex);
 		ChunkRecord(const ChunkRecord&) = delete;
 		ChunkRecord& operator=(const ChunkRecord&) = delete;
 		ChunkRecord(ChunkRecord&&) = delete;
 		ChunkRecord& operator=(ChunkRecord&&) = delete;
 
-		static std::unique_ptr<ChunkRecord> ReadElement(const QXML::Element& record, std::mutex &regionMutex);
+		static std::unique_ptr<ChunkRecord> ReadElement(const QXML::Element& record, std::mutex& regionMutex);
 		bool Empty() const;
 		std::unique_ptr<ChunkRecordAccess> GetAccess();
 		QXML::Element GenerateElement();
@@ -89,7 +90,7 @@ public:
 		RegionFile(const std::string filename);
 		~RegionFile();
 		RegionFile(const RegionFile&) = delete;
-		RegionFile& operator=(const RegionFile&) = delete;		
+		RegionFile& operator=(const RegionFile&) = delete;
 
 		ChunkRecord& GetChunkRecord(const InRegionPosition& position);
 		bool IsChunkPresent(const InRegionPosition& position) const;
@@ -157,50 +158,3 @@ ChunkPos WholeSaveLoader::GetChunkPos(const RegionPosition& regionPosition, cons
 {
 	return regionPosition * RegionFile::c_RegionSize + (glm::ivec3)inRegionPosition;
 }
-
-class BlockDataLoader {
-public:
-	BlockDataLoader(WholeSaveLoader& loader);
-
-	bool LoadChunk(Chunk& chunk);
-	bool IsPresent(const ChunkPos& position);
-	void SaveChunk(const Chunk& chunk);
-
-private:
-	WholeSaveLoader& m_Loader;
-};
-
-class ItemDataLoader {
-public:
-	ItemDataLoader(WholeSaveLoader& loader);
-
-	void GetDroppedItems(const ChunkPos& position, BlockManager& world, std::set<std::shared_ptr<DroppedItem>>& items);
-	void SaveDroppedItems(const ChunkPos& position, const std::set<std::shared_ptr<DroppedItem>>& items);
-
-private:
-	const std::string c_ItemTag = "item";
-
-	WholeSaveLoader& m_Loader;
-
-	void serializeItems(const std::set<std::shared_ptr<DroppedItem>>& items, std::vector<char>& data);
-	void deserializeItems(std::set<std::shared_ptr<DroppedItem>>& items, BlockManager& world, const std::vector<char>& data);
-};
-
-class DroppedItemRepository;
-class Player; //Remove after file seperation 
-#include <engine/window/Input.hpp>
-
-class PlayerDataLoader {
-public:
-	PlayerDataLoader(WholeSaveLoader& loader);
-
-	std::unique_ptr<Player> LoadPlayer(BlockManager& world, window::Keyboard& keyboard, window::Mouse& mouse, glm::ivec2 windowSize, DroppedItemRepository& droppedItemRepository);
-	void SavePlayer(const Player& player);
-
-private:
-	WholeSaveLoader& m_Loader;
-
-};
-
-
-//TODO:  fix chunkfileloader filename

@@ -145,6 +145,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\game\save_loading\BlockDataLoader.cpp" />
+    <ClCompile Include="src\game\save_loading\ItemDataLoader.cpp" />
+    <ClCompile Include="src\game\save_loading\PlayerDataLoader.cpp" />
     <ClCompile Include="src\game\entity\DroppedItemRepository.cpp" />
     <ClCompile Include="src\game\core\AreaLoader.cpp" />
     <ClCompile Include="src\engine\qxml\QXMLWriter.cpp" />
@@ -173,7 +176,6 @@
     <ClCompile Include="src\engine\ui\Button.cpp" />
     <ClCompile Include="src\engine\ui\Canvas.cpp" />
     <ClCompile Include="src\engine\ui\Group.cpp" />
-    <ClCompile Include="src\game\world\ChunkFileLoader.cpp" />
     <ClCompile Include="src\game\entity\Entity.cpp" />
     <ClCompile Include="src\game\world\LoadedChunks.cpp" />
     <ClCompile Include="src\engine\util\Direction.cpp" />
@@ -214,8 +216,12 @@
     <ClCompile Include="src\game\graphics\WorldRenderer.cpp" />
     <ClCompile Include="src\engine\window\WindowsMouse.cpp" />
     <ClCompile Include="src\engine\window\WindowsKeyboard.cpp" />
+    <ClCompile Include="src\game\save_loading\WholeSaveLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\game\save_loading\BlockDataLoader.hpp" />
+    <ClInclude Include="src\game\save_loading\ItemDataLoader.hpp" />
+    <ClInclude Include="src\game\save_loading\PlayerDataLoader.hpp" />
     <ClInclude Include="src\game\entity\DroppedItemRepository.hpp" />
     <ClInclude Include="src\game\core\AreaLoader.hpp" />
     <ClInclude Include="src\engine\qxml\QXMLWriter.hpp" />
@@ -247,7 +253,6 @@
     <ClInclude Include="src\engine\ui\Canvas.hpp" />
     <ClInclude Include="src\engine\ui\Group.hpp" />
     <ClInclude Include="src\engine\window\Input.hpp" />
-    <ClInclude Include="src\game\world\ChunkFileLoader.hpp" />
     <ClInclude Include="src\game\entity\Entity.hpp" />
     <ClInclude Include="src\engine\util\Direction.hpp" />
     <ClInclude Include="src\engine\graphics\CubemapTexture.hpp" />
@@ -290,6 +295,7 @@
     <ClInclude Include="src\game\graphics\WorldRenderer.hpp" />
     <ClInclude Include="src\engine\window\WindowsMouse.hpp" />
     <ClInclude Include="src\engine\window\WindowsKeyboard.hpp" />
+    <ClInclude Include="src\game\save_loading\WholeSaveLoader.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

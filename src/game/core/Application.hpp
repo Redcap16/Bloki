@@ -28,6 +28,7 @@
 #include <game/graphics/ConcreteItemTextureLoader.hpp>
 #include <game/graphics/ConcreteBlockTextureLoader.hpp>
 #include <game/core/AreaLoader.hpp>
+#include <game/save_loading/PlayerDataLoader.hpp>
 
 #include <game/items/FoodItem.hpp>
 #include <game/items/BlockItem.hpp>

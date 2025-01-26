@@ -4,7 +4,7 @@
 #include <game/graphics/ChunkRenderer.hpp>
 #include <game/world/ChunkGenerator.hpp>
 #include <game/world/BlockManager.hpp>
-#include <game/world/ChunkFileLoader.hpp>
+#include <game/save_loading/BlockDataLoader.hpp>
 #include <engine/core/Renderer.hpp>
 #include <engine/util/Event.hpp>
 

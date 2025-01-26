@@ -1,7 +1,7 @@
 #pragma once
 
 #include <game/entity/DroppedItem.hpp>
-#include <game/world/ChunkFileLoader.hpp>
+#include <game/save_loading/ItemDataLoader.hpp>
 #include <unordered_set>
 #include <unordered_map>
 

@@ -1,9 +1,7 @@
-#include <game/world/ChunkFileLoader.hpp>
-
-#include <game/core/Player.hpp> //TODO: Remove after file seperation
+#include <game/save_loading/WholeSaveLoader.hpp>
 
 const std::string WholeSaveLoader::c_SavesPath = "saves/",
-	WholeSaveLoader::c_GeneralFileName = "general.dat", 
+	WholeSaveLoader::c_GeneralFileName = "general.dat",
 	WholeSaveLoader::c_BaseTag = "chunk",
 	WholeSaveLoader::c_BlockdataTag = "blockdata",
 	WholeSaveLoader::c_ItemdataTag = "itemdata";
@@ -13,7 +11,7 @@ WholeSaveLoader::WholeSaveLoader(const std::string& saveName) :
 
 }
 
-WholeSaveLoader::ChunkRecordAccess::ChunkRecordAccess(std::map<RawDataType, std::vector<char>>& data, std::mutex& regionMutex) : 
+WholeSaveLoader::ChunkRecordAccess::ChunkRecordAccess(std::map<RawDataType, std::vector<char>>& data, std::mutex& regionMutex) :
 	m_Data(data),
 	m_Lock(regionMutex) {
 
@@ -32,7 +30,7 @@ bool WholeSaveLoader::ChunkRecordAccess::SaveRawBlockData(std::vector<char>&& da
 	return true;
 }
 
-bool WholeSaveLoader::ChunkRecordAccess::GetRawDroppedItemData(std::vector<char>&data) {
+bool WholeSaveLoader::ChunkRecordAccess::GetRawDroppedItemData(std::vector<char>& data) {
 	if (!IsDataPresent(RawDataType::DroppedItemData))
 		return false;
 
@@ -49,12 +47,12 @@ bool WholeSaveLoader::ChunkRecordAccess::IsDataPresent(RawDataType dataType) {
 	return m_Data.find(dataType) != m_Data.end();
 }
 
-WholeSaveLoader::ChunkRecord::ChunkRecord(InRegionPosition position, std::mutex &regionMutex) :
+WholeSaveLoader::ChunkRecord::ChunkRecord(InRegionPosition position, std::mutex& regionMutex) :
 	m_RegionMutex(regionMutex),
 	m_Position(position) {
 }
 
-std::unique_ptr<WholeSaveLoader::ChunkRecord> WholeSaveLoader::ChunkRecord::ReadElement(const QXML::Element& record, std::mutex &regionMutex) {
+std::unique_ptr<WholeSaveLoader::ChunkRecord> WholeSaveLoader::ChunkRecord::ReadElement(const QXML::Element& record, std::mutex& regionMutex) {
 	if (!record.HasAtribute("x") ||
 		!record.HasAtribute("y") ||
 		!record.HasAtribute("z"))
@@ -77,7 +75,7 @@ std::unique_ptr<WholeSaveLoader::ChunkRecord> WholeSaveLoader::ChunkRecord::Read
 	if (itemdata != nullptr) {
 		if (itemdata->size() == 1)
 			result->m_Data[RawDataType::DroppedItemData] = (*itemdata)[0].GetData();
-		else if(itemdata->size() > 1)
+		else if (itemdata->size() > 1)
 			return nullptr;
 	}
 
@@ -238,128 +236,4 @@ std::shared_ptr<WholeSaveLoader::GeneralFile> WholeSaveLoader::GetGeneral() {
 void WholeSaveLoader::Flush() {
 	m_OpenedRegions.clear();
 	m_GeneralFile = nullptr;
-}
-
-BlockDataLoader::BlockDataLoader(WholeSaveLoader& loader) :
-	m_Loader(loader) {
-	
-}
-
-bool BlockDataLoader::LoadChunk(Chunk& chunk) {
-	std::shared_ptr<WholeSaveLoader::RegionFile> region = m_Loader.GetRegion(WholeSaveLoader::GetRegionPosition(chunk.GetPosition()));
-
-	auto inRegPos = WholeSaveLoader::GetInRegionPosition(chunk.GetPosition());
-	if (!region->IsChunkPresent(inRegPos))
-		return false;
-
-	WholeSaveLoader::ChunkRecord& chunkRecord = region->GetChunkRecord(inRegPos);
-
-	std::vector<char> blockdata;
-	if (!chunkRecord.GetAccess()->GetRawBlockData(blockdata))
-		return false;
-
-	chunk.Deserialize(blockdata);
-	return true;
-}
-
-bool BlockDataLoader::IsPresent(const ChunkPos& position) {
-	std::shared_ptr<WholeSaveLoader::RegionFile> region = m_Loader.GetRegion(WholeSaveLoader::GetRegionPosition(position));
-	return region->IsChunkPresent(WholeSaveLoader::GetInRegionPosition(position));
-}
-
-void BlockDataLoader::SaveChunk(const Chunk& chunk) {
-	std::shared_ptr<WholeSaveLoader::RegionFile> region = m_Loader.GetRegion(WholeSaveLoader::GetRegionPosition(chunk.GetPosition()));
-
-	WholeSaveLoader::ChunkRecord& chunkRecord = region->GetChunkRecord(WholeSaveLoader::GetInRegionPosition(chunk.GetPosition()));
-	std::vector<char> blockdata;
-	chunk.Serialize(blockdata);
-
-	chunkRecord.GetAccess()->SaveRawBlockData(std::move(blockdata));
-}
-
-ItemDataLoader::ItemDataLoader(WholeSaveLoader& loader) : 
-	m_Loader(loader) {
-
-}
-
-void ItemDataLoader::GetDroppedItems(const ChunkPos& position, BlockManager& world, std::set<std::shared_ptr<DroppedItem>>& items) {
-	std::shared_ptr<WholeSaveLoader::RegionFile> region = m_Loader.GetRegion(WholeSaveLoader::GetRegionPosition(position));
-	WholeSaveLoader::ChunkRecord& chunkRecord = region->GetChunkRecord(WholeSaveLoader::GetInRegionPosition(position));
-
-	std::vector<char> itemdata;
-	if (!chunkRecord.GetAccess()->GetRawDroppedItemData(itemdata))
-		return;
-
-	deserializeItems(items, world, itemdata);
-}
-
-void ItemDataLoader::SaveDroppedItems(const ChunkPos& position, const std::set<std::shared_ptr<DroppedItem>>& items) {
-	std::shared_ptr<WholeSaveLoader::RegionFile> region = m_Loader.GetRegion(WholeSaveLoader::GetRegionPosition(position));
-	WholeSaveLoader::ChunkRecord& chunkRecord = region->GetChunkRecord(WholeSaveLoader::GetInRegionPosition(position));
-
-	std::vector<char> itemdata;
-	serializeItems(items, itemdata);
-
-	chunkRecord.GetAccess()->SaveRawDroppedItemData(std::move(itemdata));
-}
-
-void ItemDataLoader::serializeItems(const std::set<std::shared_ptr<DroppedItem>>& items, std::vector<char>& data) {
-	QXML::QXMLWriter writer;
-
-	DroppedItemSerializer serializer;
-	for (auto& item : items) {
-		QXML::Element itemElement(c_ItemTag);
-		std::vector<char> itemData;
-		serializer.Serialize(*item, itemData);
-
-		itemElement.SetAsRaw();
-		itemElement.AddData(itemData);
-		writer.AddElement(itemElement);
-	}
-
-	data = writer.GetResult();
-}
-
-void ItemDataLoader::deserializeItems(std::set<std::shared_ptr<DroppedItem>>& items, BlockManager& world, const std::vector<char>& data) {
-	QXML::QXMLReader reader(data);
-
-	auto* itemElements = reader.GetBase().GetElementsByTag(c_ItemTag);
-	if (itemElements == nullptr)
-		return;
-
-	DroppedItemSerializer serializer;
-	for (auto& item : *itemElements) {
-		std::vector<char> itemData;
-		itemData = item.GetData();
-
-		items.insert(serializer.Deserialize(itemData, world));
-	}
-}
-
-
-PlayerDataLoader::PlayerDataLoader(WholeSaveLoader& loader) :
-	m_Loader(loader) {
-
-}
-
-std::unique_ptr<Player> PlayerDataLoader::LoadPlayer(BlockManager& world, window::Keyboard& keyboard, window::Mouse& mouse, glm::ivec2 windowSize, DroppedItemRepository& droppedItemRepository) {
-	auto generalFile = m_Loader.GetGeneral();
-	if (generalFile == nullptr)
-		return nullptr;
-
-	std::vector<char> playerdata;
-	generalFile->GetRawPlayerData(playerdata);
-	PlayerSerializer playerSerializer;
-	return std::move(playerSerializer.Deserialize(playerdata, world, keyboard, mouse, windowSize, droppedItemRepository));
-}
-
-void PlayerDataLoader::SavePlayer(const Player& player) {
-	auto generalFile = m_Loader.GetGeneral();
-	if (generalFile == nullptr)
-		return;
-
-	std::vector<char> playerdata;
-	PlayerSerializer playerSerializer;
-	playerSerializer.Serialize(player, playerdata);
-	generalFile->SaveRawPlayerData(playerdata);
 }
