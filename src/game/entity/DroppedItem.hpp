@@ -19,25 +19,26 @@ public:
 	DroppedItem(ItemStack&& stack, const Rigidbody& rigidbody);
 
 	void Update(float deltaTime);
-	inline glm::vec3 GetPosition() const;
+	inline glm::vec3 GetPosition() const { return m_Rigidbody.GetPosition(); }
 	void ChangeVelocity(glm::vec3 velocity) { m_Rigidbody.ChangeVelocity(velocity); }
 	
 	ItemStack& GetItemStack() { return m_ItemStack; }
 	const ItemStack& GetItemStack() const { return m_ItemStack; }
 
-	void Serialize(std::vector<char>& data);
-	static std::unique_ptr<DroppedItem> Deserialize(const std::vector<char>& data, BlockManager& world);
-
 private:
-	static const std::string c_RigidbodyTag,
-		c_ItemStackTag,
-		c_CountAttribute;
+	friend class DroppedItemSerializer;
 
 	Rigidbody m_Rigidbody;
 	ItemStack m_ItemStack;
 };
 
-glm::vec3 DroppedItem::GetPosition() const
-{
-	return m_Rigidbody.GetPosition();
-}
+class DroppedItemSerializer {
+public:
+	void Serialize(const DroppedItem& droppedItem, std::vector<char>& data);
+	std::unique_ptr<DroppedItem> Deserialize(const std::vector<char>& data, BlockManager& world);
+
+private:
+	static const std::string c_RigidbodyTag,
+		c_ItemStackTag,
+		c_CountAttribute;
+};

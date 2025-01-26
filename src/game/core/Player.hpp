@@ -48,10 +48,9 @@ public:
 	WorldPos GetLookingAt() const override;
 	bool GetPlacingAt(WorldPos& position) const override;
 
-	void Serialize(std::vector<char>& data) const;
-	static std::unique_ptr<Player> Deserialize(const std::vector<char>& data, BlockManager& world, window::Keyboard& keyboard, window::Mouse& mouse, glm::ivec2 windowSize, DroppedItemRepository& droppedItemRepository);
-
 private:
+	friend class PlayerSerializer;
+
 	static constexpr glm::vec3 c_BodySize = {0.8f, 1.8f, 0.8f};
 	static constexpr glm::vec3 c_BodyCenter = { 0, -0.8f, 0 };
 	static constexpr float c_MouseSensitivity = 0.1f,
@@ -98,4 +97,16 @@ private:
 	void dropItem(int index);
 	bool wasItemDroppedRecently(DroppedItem* item);
 	long long getTimestamp() const;
+};
+
+class PlayerSerializer {
+public:
+	void Serialize(const Player& player, std::vector<char>& data);
+	std::unique_ptr<Player> Deserialize(const std::vector<char>& data, BlockManager& world, window::Keyboard& keyboard, window::Mouse& mouse, glm::ivec2 windowSize, DroppedItemRepository& droppedItemRepository);
+
+private:
+	static const std::string c_RigidbodyTag,
+		c_RotationTag,
+		c_InventoryTag,
+		c_FlyingAttribute;
 };

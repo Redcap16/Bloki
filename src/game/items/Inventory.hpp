@@ -87,12 +87,23 @@ public:
 
 	void StackUpdated() override;
 
-	void Serialize(std::vector<char>& data) const;
-	static std::unique_ptr<Inventory> Deserialize(const std::vector<char>& data);
 private:
+	friend class InventorySerializer;
+
 	Inventory(std::array<ItemStack, c_Size>& items);
 
 	std::array<ItemStack, c_Size> m_Items;
 	int m_SelectedItemIndex = 0;
 	const int c_SelectableItemCount = 9;
+};
+
+class InventorySerializer {
+public:
+	void Serialize(const Inventory& inventory, std::vector<char>& data);
+	std::unique_ptr<Inventory> Deserialize(const std::vector<char>& data);
+
+private:
+	static const std::string c_ItemstackTag,
+		c_IndexAttribute,
+		c_CountAttribute;
 };

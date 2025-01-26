@@ -179,61 +179,6 @@ bool Player::GetPlacingAt(WorldPos& position) const {
 	return getPlacePosition(position);
 }
 
-void Player::Serialize(std::vector<char>& data) const {
-	QXML::QXMLWriter writer;
-
-	QXML::Element rigidbodyElement("rigidbody");
-	rigidbodyElement.SetAsRaw();
-	std::vector<char> rigidbodyData;
-	m_Rigidbody.Serialize(rigidbodyData);
-	rigidbodyElement.AddData(rigidbodyData);
-	rigidbodyElement.AddAttribute(QXML::Attribute("flying", m_Flying));
-	writer.AddElement(rigidbodyElement);
-
-	QXML::Element rotationElement("rotation");
-	rotationElement.SetAsRaw();
-	const char* rotationPtr = reinterpret_cast<const char*>(&m_Rotation);
-	std::vector<char> rotationData(rotationPtr, rotationPtr + sizeof(m_Rotation));
-	rotationElement.AddData(rotationData);
-	writer.AddElement(rotationElement);
-
-	QXML::Element inventoryElement("inventory");
-	inventoryElement.SetAsRaw();
-	std::vector<char> inventoryData;
-	m_Inventory->Serialize(inventoryData);
-	inventoryElement.AddData(inventoryData);
-	writer.AddElement(inventoryElement);
-
-	data = writer.GetResult();
-}
-
-std::unique_ptr<Player> Player::Deserialize(const std::vector<char>& data, BlockManager& world, window::Keyboard& keyboard, window::Mouse& mouse, glm::ivec2 windowSize, DroppedItemRepository& droppedItemRepository) {
-	QXML::QXMLReader reader(data);
-	auto* rigidbodyElement = reader.GetBase().GetElementsByTag("rigidbody"),
-		* rotationElement = reader.GetBase().GetElementsByTag("rotation"),
-		* inventoryElement = reader.GetBase().GetElementsByTag("inventory");
-
-	if (rigidbodyElement == nullptr || 
-		rigidbodyElement->size() != 1 ||
-		rotationElement == nullptr ||
-		rotationElement->size() != 1 ||
-		inventoryElement == nullptr ||
-		inventoryElement->size() != 1)
-		return nullptr;
-
-	auto rigidbodyData = (*rigidbodyElement)[0].GetData(),
-		rotationData = (*rotationElement)[0].GetData(),
-		inventoryData = (*inventoryElement)[0].GetData();
-
-	std::unique_ptr<Player> player = std::make_unique<Player>(world, keyboard, mouse, windowSize, droppedItemRepository, *Rigidbody::Deserialize(rigidbodyData, world));
-	player->m_Flying = (*rigidbodyElement)[0].GetAttributeValue("flying").m_Value;
-	player->m_Rotation = *reinterpret_cast<glm::vec2*>(&rotationData[0]);
-
-	player->m_Inventory = std::move(Inventory::Deserialize(inventoryData));
-
-	return std::move(player);
-}
-
 void Player::setFlying(bool flying)
 {
 	m_Flying = flying;
@@ -305,4 +250,68 @@ bool Player::wasItemDroppedRecently(DroppedItem* item) {
 
 long long Player::getTimestamp() const {
 	return std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+}
+
+const std::string PlayerSerializer::c_RigidbodyTag = "rigidbody",
+	PlayerSerializer::c_RotationTag = "rotation",
+	PlayerSerializer::c_InventoryTag = "inventory",
+	PlayerSerializer::c_FlyingAttribute = "flying";
+
+void PlayerSerializer::Serialize(const Player& player, std::vector<char>& data) {
+	QXML::QXMLWriter writer;
+
+	QXML::Element rigidbodyElement(c_RigidbodyTag);
+	rigidbodyElement.SetAsRaw();
+	std::vector<char> rigidbodyData;
+	RigidbodySerializer rigidbodySerializer;
+	rigidbodySerializer.Serialize(player.m_Rigidbody, rigidbodyData);
+	rigidbodyElement.AddData(rigidbodyData);
+	rigidbodyElement.AddAttribute(QXML::Attribute(c_FlyingAttribute, player.m_Flying));
+	writer.AddElement(rigidbodyElement);
+
+	QXML::Element rotationElement(c_RotationTag);
+	rotationElement.SetAsRaw();
+	const char* rotationPtr = reinterpret_cast<const char*>(&player.m_Rotation);
+	std::vector<char> rotationData(rotationPtr, rotationPtr + sizeof(player.m_Rotation));
+	rotationElement.AddData(rotationData);
+	writer.AddElement(rotationElement);
+
+	QXML::Element inventoryElement(c_InventoryTag);
+	inventoryElement.SetAsRaw();
+	std::vector<char> inventoryData;
+	InventorySerializer inventorySerializer;
+	inventorySerializer.Serialize(*player.m_Inventory, inventoryData);
+	inventoryElement.AddData(inventoryData);
+	writer.AddElement(inventoryElement);
+
+	data = writer.GetResult();
+}
+
+std::unique_ptr<Player> PlayerSerializer::Deserialize(const std::vector<char>& data, BlockManager& world, window::Keyboard& keyboard, window::Mouse& mouse, glm::ivec2 windowSize, DroppedItemRepository& droppedItemRepository) {
+	QXML::QXMLReader reader(data);
+	auto* rigidbodyElement = reader.GetBase().GetElementsByTag(c_RigidbodyTag),
+		* rotationElement = reader.GetBase().GetElementsByTag(c_RotationTag),
+		* inventoryElement = reader.GetBase().GetElementsByTag(c_InventoryTag);
+
+	if (rigidbodyElement == nullptr ||
+		rigidbodyElement->size() != 1 ||
+		rotationElement == nullptr ||
+		rotationElement->size() != 1 ||
+		inventoryElement == nullptr ||
+		inventoryElement->size() != 1)
+		return nullptr;
+
+	auto rigidbodyData = (*rigidbodyElement)[0].GetData(),
+		rotationData = (*rotationElement)[0].GetData(),
+		inventoryData = (*inventoryElement)[0].GetData();
+
+	RigidbodySerializer rigidbodySerializer;
+	std::unique_ptr<Player> player = std::make_unique<Player>(world, keyboard, mouse, windowSize, droppedItemRepository, *rigidbodySerializer.Deserialize(rigidbodyData, world));
+	player->setFlying((*rigidbodyElement)[0].GetAttributeValue(c_FlyingAttribute).m_Value);
+	player->m_Rotation = *reinterpret_cast<glm::vec2*>(&rotationData[0]);
+
+	InventorySerializer inventorySerializer;
+	player->m_Inventory = std::move(inventorySerializer.Deserialize(inventoryData));
+
+	return std::move(player);
 }

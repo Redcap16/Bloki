@@ -306,10 +306,11 @@ void ItemDataLoader::SaveDroppedItems(const ChunkPos& position, const std::set<s
 void ItemDataLoader::serializeItems(const std::set<std::shared_ptr<DroppedItem>>& items, std::vector<char>& data) {
 	QXML::QXMLWriter writer;
 
+	DroppedItemSerializer serializer;
 	for (auto& item : items) {
 		QXML::Element itemElement(c_ItemTag);
 		std::vector<char> itemData;
-		item->Serialize(itemData);
+		serializer.Serialize(*item, itemData);
 
 		itemElement.SetAsRaw();
 		itemElement.AddData(itemData);
@@ -326,11 +327,12 @@ void ItemDataLoader::deserializeItems(std::set<std::shared_ptr<DroppedItem>>& it
 	if (itemElements == nullptr)
 		return;
 
+	DroppedItemSerializer serializer;
 	for (auto& item : *itemElements) {
 		std::vector<char> itemData;
 		itemData = item.GetData();
 
-		items.insert(DroppedItem::Deserialize(itemData, world));
+		items.insert(serializer.Deserialize(itemData, world));
 	}
 }
 
@@ -347,7 +349,8 @@ std::unique_ptr<Player> PlayerDataLoader::LoadPlayer(BlockManager& world, window
 
 	std::vector<char> playerdata;
 	generalFile->GetRawPlayerData(playerdata);
-	return std::move(Player::Deserialize(playerdata, world, keyboard, mouse, windowSize, droppedItemRepository));
+	PlayerSerializer playerSerializer;
+	return std::move(playerSerializer.Deserialize(playerdata, world, keyboard, mouse, windowSize, droppedItemRepository));
 }
 
 void PlayerDataLoader::SavePlayer(const Player& player) {
@@ -356,6 +359,7 @@ void PlayerDataLoader::SavePlayer(const Player& player) {
 		return;
 
 	std::vector<char> playerdata;
-	player.Serialize(playerdata);
+	PlayerSerializer playerSerializer;
+	playerSerializer.Serialize(player, playerdata);
 	generalFile->SaveRawPlayerData(playerdata);
 }

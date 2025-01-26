@@ -29,41 +29,6 @@ void Rigidbody::Update(float deltaTime)
 	if(m_CollisionEnabled) checkCollisions();
 }
 
-void Rigidbody::Serialize(std::vector<char>& data) const {
-	const char* aabbdata = reinterpret_cast<const char*>(&m_Collider);
-	data.insert(data.end(), aabbdata, aabbdata + sizeof(m_Collider));
-
-	const char* velocity = reinterpret_cast<const char*>(&m_Velocity);
-	data.insert(data.end(), velocity, velocity + sizeof(m_Velocity));
-
-	data.push_back(static_cast<char>(m_OnGround));
-	data.push_back(static_cast<char>(m_GravityEnabled));
-	data.push_back(static_cast<char>(m_CollisionEnabled));
-	data.push_back(static_cast<char>(m_DragEnabled));
-}
-
-std::unique_ptr<Rigidbody> Rigidbody::Deserialize(const std::vector<char>& data, const BlockManager& world) {
-	if (data.size() != sizeof(Rigidbody::m_Collider) +
-		sizeof(Rigidbody::m_Velocity) +
-		4 * sizeof(bool))
-		return nullptr;
-
-	size_t currentIndex = 0;
-	AABB collider = *reinterpret_cast<const AABB*>(&data[currentIndex]);
-	currentIndex += sizeof(AABB);
-
-	Rigidbody result(world, collider);
-	result.m_Velocity = *reinterpret_cast<const glm::vec3*>(&data[currentIndex]);
-	currentIndex += sizeof(Rigidbody::m_Velocity);
-
-	result.m_OnGround = static_cast<bool>(data[currentIndex++]);
-	result.m_GravityEnabled = static_cast<bool>(data[currentIndex++]);
-	result.m_CollisionEnabled = static_cast<bool>(data[currentIndex++]);
-	result.m_DragEnabled = static_cast<bool>(data[currentIndex++]);
-
-	return std::make_unique<Rigidbody>(result);
-}
-
 void Rigidbody::checkCollisions()
 {
 	m_OnGround = false;
@@ -142,4 +107,39 @@ void Rigidbody::checkCollisions()
 		m_Collider.Position -= m_Velocity * maxStep * maxDirection * c_CollisionCorrection;
 		m_Velocity -= m_Velocity * maxDirection;
 	} while (maxDirection != glm::vec3(0));
+}
+
+void RigidbodySerializer::Serialize(const Rigidbody& rigidbody, std::vector<char>& data) {
+	const char* aabbdata = reinterpret_cast<const char*>(&rigidbody.m_Collider);
+	data.insert(data.end(), aabbdata, aabbdata + sizeof(rigidbody.m_Collider));
+
+	const char* velocity = reinterpret_cast<const char*>(&rigidbody.m_Velocity);
+	data.insert(data.end(), velocity, velocity + sizeof(rigidbody.m_Velocity));
+
+	data.push_back(static_cast<char>(rigidbody.m_OnGround));
+	data.push_back(static_cast<char>(rigidbody.m_GravityEnabled));
+	data.push_back(static_cast<char>(rigidbody.m_CollisionEnabled));
+	data.push_back(static_cast<char>(rigidbody.m_DragEnabled));
+}
+
+std::unique_ptr<Rigidbody> RigidbodySerializer::Deserialize(const std::vector<char>& data, const BlockManager& world) {
+	if (data.size() != sizeof(Rigidbody::m_Collider) +
+		sizeof(Rigidbody::m_Velocity) +
+		4 * sizeof(bool))
+		return nullptr;
+
+	size_t currentIndex = 0;
+	AABB collider = *reinterpret_cast<const AABB*>(&data[currentIndex]);
+	currentIndex += sizeof(AABB);
+
+	Rigidbody result(world, collider);
+	result.m_Velocity = *reinterpret_cast<const glm::vec3*>(&data[currentIndex]);
+	currentIndex += sizeof(Rigidbody::m_Velocity);
+
+	result.m_OnGround = static_cast<bool>(data[currentIndex++]);
+	result.m_GravityEnabled = static_cast<bool>(data[currentIndex++]);
+	result.m_CollisionEnabled = static_cast<bool>(data[currentIndex++]);
+	result.m_DragEnabled = static_cast<bool>(data[currentIndex++]);
+
+	return std::make_unique<Rigidbody>(result);
 }
