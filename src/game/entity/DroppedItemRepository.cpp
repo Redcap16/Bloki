@@ -72,11 +72,13 @@ void DroppedItemRepository::SetLoadedChunks(std::unordered_set<ChunkPos> loadedC
 void DroppedItemRepository::getRidOfItemsOutsideArea(std::unordered_set<ChunkPos> loadedChunks) {
 	std::unordered_map<ChunkPos, std::set<std::shared_ptr<DroppedItem>>> chunksToUnload;
 
-	for (auto& item : m_Items) {
+	for (auto& chunk : m_LoadedChunks) //Unload every unnecessary chunk, event if it has no items
+		chunksToUnload[chunk] = {};
+	for (auto& item : m_Items) { //Search for items outside loaded or unloaded chunks
 		chunksToUnload[Chunk::GetChunkPosition(item->GetPosition())].insert(item);
 	}
 
-	for (auto it = chunksToUnload.begin(); it != chunksToUnload.end();) {
+	for (auto it = chunksToUnload.begin(); it != chunksToUnload.end();) { //Remove from unloading list chunks that will be used later
 		if (loadedChunks.find(it->first) != loadedChunks.end()) //Its in loaded chunks, dont unload it
 			it = chunksToUnload.erase(it);
 		else
