@@ -33,6 +33,8 @@
 #include <game/items/FoodItem.hpp>
 #include <game/items/BlockItem.hpp>
 
+#include <game/save_loading/SaveManager.hpp>
+
 class Application : public window::KeyboardListener, 
 	public window::WindowListener, 
 	public window::MouseListener
@@ -68,7 +70,8 @@ private:
 
 	TextureProviderSetup m_TPS;
 
-	WholeSaveLoader m_SaveLoader;
+	SaveManager m_SaveManager;
+	std::unique_ptr<WholeSaveLoader> m_SaveLoader;
 	ItemDataLoader m_ItemDataLoader;
 	PlayerDataLoader m_PlayerDataLoader;
 	LoadedChunks m_World;
