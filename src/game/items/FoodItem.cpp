@@ -2,7 +2,7 @@
 #include <game/graphics/ItemTextureProvider.hpp>
 #include <game/graphics/ConcreteItemMesh.hpp>
 
-ItemTypeArray<FoodItem::FoodType> FoodItem::m_ItemTypes;
+const std::string FoodItem::c_ItemClass = "fooditem";
 
 FoodItem::FoodItem(FoodType type) :
 	m_FoodType(type) {
@@ -11,6 +11,19 @@ FoodItem::FoodItem(FoodType type) :
 
 std::unique_ptr<Item> FoodItem::Clone() const {
 	return std::make_unique<FoodItem>(*this);
+}
+
+ItemType FoodItem::GetType() const {
+	switch (m_FoodType) {
+	case FoodType::Apple:
+		return ItemType(c_ItemClass, "apple");
+	case FoodType::Bread:
+		return ItemType(c_ItemClass, "bread");
+	case FoodType::Meat:
+		return ItemType(c_ItemClass, "meat");
+	default:
+		throw std::invalid_argument("Invalid item type");
+	}
 }
 
 std::string FoodItem::GetName() const {
@@ -47,4 +60,10 @@ std::unique_ptr<game::graphics::DroppedItemMesh> FoodItem::GetMesh() const {
 bool FoodItem::Use(ItemUser& user, BlockManager& blockManager) {
 	user.ChangeHealth(0.4f);
 	return true;
+}
+
+void FoodItem::RegisterTypes() {
+	Item::RegisterItem(FoodItem(FoodType::Bread));
+	Item::RegisterItem(FoodItem(FoodType::Apple));
+	Item::RegisterItem(FoodItem(FoodType::Meat));
 }

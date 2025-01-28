@@ -4,7 +4,7 @@
 #include <game/graphics/ChunkRenderer.hpp>
 #include <game/world/ChunkGenerator.hpp>
 #include <game/world/BlockManager.hpp>
-#include <game/world/ChunkFileLoader.hpp>
+#include <game/save_loading/BlockDataLoader.hpp>
 #include <engine/core/Renderer.hpp>
 #include <engine/util/Event.hpp>
 
@@ -25,7 +25,7 @@ public:
 class LoadedChunks : public BlockManager
 {
 public:
-	LoadedChunks(Renderer3D& renderer, const std::string& savePath);
+	LoadedChunks(Renderer3D& renderer, WholeSaveLoader& loader);
 	~LoadedChunks();
 	LoadedChunks(const LoadedChunks&) = delete;
 	LoadedChunks& operator=(const LoadedChunks&) = delete;
@@ -81,7 +81,8 @@ private:
 	std::atomic<bool> m_ManagementThreadDone;
 
 	Renderer3D& m_Renderer;
-	ChunkFileLoader m_FileLoader;
+	WholeSaveLoader& m_FileLoader; //TODO: Other object should be responsible for flushing save
+	BlockDataLoader m_BlockDataLoader;
 	ChunkGenerator m_ChunkGenerator;
 
 	inline glm::ivec3 getArrayIndex(ChunkPos position) const;

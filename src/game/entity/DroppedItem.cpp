@@ -12,103 +12,56 @@ void DroppedItem::Update(float deltaTime)
 	m_Rigidbody.Update(deltaTime);
 }
 
-
-DroppedItemRepository::DroppedItemRepository(BlockManager& blockManager) :
-	m_BlockManager(blockManager),
-	m_CenterChunkPosition(0) {
+DroppedItem::DroppedItem(ItemStack&& stack, const Rigidbody& rigidbody) :
+	m_ItemStack(std::move(stack)),
+	m_Rigidbody(rigidbody) {
 
 }
 
-std::weak_ptr<DroppedItem> DroppedItemRepository::AddDroppedItem(ItemStack&& item, glm::vec3 position, glm::vec3 velocity) {
-	if (item.Empty())
-		return std::weak_ptr<DroppedItem>();
+const std::string DroppedItemSerializer::c_RigidbodyTag = "rigidbody",
+DroppedItemSerializer::c_ItemStackTag = "itemstack",
+DroppedItemSerializer::c_CountAttribute = "count";
 
-	std::shared_ptr<DroppedItem> newDroppedItem = std::make_shared<DroppedItem>(m_BlockManager, std::move(item), position, velocity);
-	std::weak_ptr<DroppedItem> result = newDroppedItem;
-	m_Items.emplace_back(std::move(newDroppedItem));
+void DroppedItemSerializer::Serialize(const DroppedItem& droppedItem, std::vector<char>& data) {
+	DebugProvider::Get().Log("Serializing item");
+	QXML::QXMLWriter writer;
 
-	for (auto listener : m_Listeners)
-		listener->CreatedDroppedItem(*m_Items.back());
+	QXML::Element itemstack(c_ItemStackTag);
+	itemstack.AddAttribute(QXML::Attribute(c_CountAttribute, droppedItem.m_ItemStack.GetCount()));
+	itemstack.AddData(droppedItem.m_ItemStack.GetItemHeld().GetType().GetRawID());
+	writer.AddElement(itemstack);
 
-	return result;
+	QXML::Element rigidbody(c_RigidbodyTag);
+	rigidbody.SetAsRaw();
+	std::vector<char> rigidbodyData;
+	RigidbodySerializer rigidbodySerializer;
+	rigidbodySerializer.Serialize(droppedItem.m_Rigidbody, rigidbodyData);
+	rigidbody.AddData(rigidbodyData);
+	writer.AddElement(rigidbody);
+
+	data = writer.GetResult();
 }
 
-bool DroppedItemRepository::RemoveDroppedItem(const DroppedItem* item) {
-	for (auto it = m_Items.begin(); it != m_Items.end(); ++it)
-		if (it->get() == item) {
-			itemDestroyed(*it->get());
+std::unique_ptr<DroppedItem> DroppedItemSerializer::Deserialize(const std::vector<char>& data, BlockManager& world) {
+	DebugProvider::Get().Log("Deserializing item");
 
-			m_Items.erase(it);
-			return true;
-		}
+	QXML::QXMLReader reader(data);
+	auto* itemstackElement = reader.GetBase().GetElementsByTag(c_ItemStackTag),
+		* rigidbodyElement = reader.GetBase().GetElementsByTag(c_RigidbodyTag);
 
-	return false;
-}
+	if (itemstackElement == nullptr || itemstackElement->size() != 1 ||
+		rigidbodyElement == nullptr || rigidbodyElement->size() != 1)
+		return nullptr;
 
-std::vector<DroppedItem*> DroppedItemRepository::FindsItemNearby(glm::vec3 position, float range) {
-	std::vector<DroppedItem*> result;
-	for (auto& item : m_Items)
-		if (glm::length(item->GetPosition() - position) < range)
-			result.push_back(item.get());
+	std::unique_ptr<Item> itemHeld = Item::GetByType(ItemType((*itemstackElement)[0].GetDataAsString()));
+	if (itemHeld == nullptr)
+		return nullptr;
 
-	return result;
-}
+	ItemStack stack(*itemHeld, (*itemstackElement)[0].GetAttributeValue(c_CountAttribute).m_Value);
+	RigidbodySerializer rigidbodySerializer;
+	std::unique_ptr<Rigidbody> rigidbody = rigidbodySerializer.Deserialize((*rigidbodyElement)[0].GetData(), world);
+	if (rigidbody == nullptr)
+		return nullptr;
 
-void DroppedItemRepository::Update(float deltaTime) {
-	std::set<std::shared_ptr<DroppedItem>> itemsToUnload;
-	for (auto it = m_Items.begin(); it != m_Items.end();) {
-		(*it)->Update(deltaTime);
-		if ((*it)->GetItemStack().Empty()) {
-			itemDestroyed(*it->get());
-
-			it = m_Items.erase(it);
-			continue;
-		}
-		if (!inArea((*it)->GetPosition())) {
-			itemsToUnload.insert(std::move(*it));
-			it = m_Items.erase(it);
-			continue;
-		}
-		
-		++it;
-	}
-
-	for (auto listener : m_Listeners)
-		for(auto& item : itemsToUnload)
-			listener->UnloadedDroppedItem(*item);
-
-	//TODO: Save unloaded items
-}
-
-void DroppedItemRepository::SetCenterChunk(glm::ivec3 chunkPos) {
-	if (chunkPos == m_CenterChunkPosition)
-		return;
-
-	for(int x = chunkPos.x - c_WorkingArea.x; x <= chunkPos.x + c_WorkingArea.x; x++)
-		for(int y = chunkPos.y - c_WorkingArea.y; y <= chunkPos.y + c_WorkingArea.y; y++)
-			for (int z = chunkPos.z - c_WorkingArea.z; z <= chunkPos.z + c_WorkingArea.z; z++) {
-				if (!inArea({ x, y, z }))
-					loadChunk({ x, y, z });
-			}
-	m_CenterChunkPosition = chunkPos;
-}
-
-bool DroppedItemRepository::inArea(glm::ivec3 itemPosition) {
-	glm::ivec3 chunkPosition = Chunk::GetChunkPosition(itemPosition) - m_CenterChunkPosition;
-	return chunkPosition.x >= -c_WorkingArea.x &&
-		chunkPosition.x <= c_WorkingArea.x &&
-		chunkPosition.y >= -c_WorkingArea.y &&
-		chunkPosition.y <= c_WorkingArea.y &&
-		chunkPosition.z >= -c_WorkingArea.z &&
-		chunkPosition.z <= c_WorkingArea.z;
-}
-
-void DroppedItemRepository::loadChunk(glm::ivec3 position) {
-	//TODO: some loading stuff
-	//TODO: Inform listeners about change
-}
-
-void DroppedItemRepository::itemDestroyed(DroppedItem& item) {
-	for (auto listener : m_Listeners)
-		listener->DestroyedDroppedItem(item);
+	return std::make_unique<DroppedItem>(std::move(stack), *rigidbody);
 }

@@ -140,3 +140,49 @@ void Inventory::ChangeSelectedItem(int indexChange) {
 void Inventory::StackUpdated() {
 
 }
+
+Inventory::Inventory(std::array<ItemStack, c_Size>& items) :
+	Inventory() {
+	for (int index = 0; index < c_Size; index++)
+		m_Items[index].SwapContents(items[index]);
+}
+
+const std::string InventorySerializer::c_ItemstackTag = "itemstack",
+	InventorySerializer::c_IndexAttribute = "index",
+	InventorySerializer::c_CountAttribute = "count";
+
+void InventorySerializer::Serialize(const Inventory& inventory, std::vector<char>& data) {
+	QXML::QXMLWriter writer;
+
+	for (int index = 0; index < Inventory::c_Size; index++) {
+		if (inventory.m_Items[index].Empty())
+			continue;
+		QXML::Element itemElement(c_ItemstackTag);
+		itemElement.AddAttribute(QXML::Attribute(c_IndexAttribute, index));
+		itemElement.AddAttribute(QXML::Attribute(c_CountAttribute, inventory.m_Items[index].GetCount()));
+		itemElement.AddData(inventory.m_Items[index].GetItemHeld().GetType().GetRawID());
+
+		writer.AddElement(itemElement);
+	}
+
+	data = writer.GetResult();
+}
+
+std::unique_ptr<Inventory> InventorySerializer::Deserialize(const std::vector<char>& data) {
+	QXML::QXMLReader reader(data);
+
+	auto* itemElements = reader.GetBase().GetElementsByTag(c_ItemstackTag);
+
+	if (itemElements == nullptr)
+		return nullptr;
+
+	std::array<ItemStack, Inventory::c_Size> items;
+	for (auto& itemElement : *itemElements) {
+		ItemStack& itemStack = items[itemElement.GetAttributeValue(c_IndexAttribute).m_Value];
+
+		itemStack.SetItemHeld(*Item::GetByType(ItemType(itemElement.GetDataAsString())));
+		itemStack.SetCount(itemElement.GetAttributeValue(c_CountAttribute).m_Value);
+	}
+
+	return std::unique_ptr<Inventory>(new Inventory(items));
+}

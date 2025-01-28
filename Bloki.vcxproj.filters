@@ -97,6 +97,18 @@
     <Filter Include="Pliki źródłowe\engine\ui">
       <UniqueIdentifier>{0e3940fd-13ff-4cc9-813b-70d52db59433}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Pliki nagłówkowe\engine\qxml">
+      <UniqueIdentifier>{96872601-c250-48cd-bf5f-937eec810f6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pliki źródłowe\engine\qxml">
+      <UniqueIdentifier>{c6273c8e-fab7-4730-8a03-58ef962a70da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pliki źródłowe\game\save loading">
+      <UniqueIdentifier>{3d8e0069-4fa3-4004-b766-9048aab47177}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pliki nagłówkowe\game\save loading">
+      <UniqueIdentifier>{cac7c13a-18f9-4685-8319-c419eda9831a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Bloki.cpp">
@@ -142,9 +154,6 @@
       <Filter>Pliki źródłowe\game\entity</Filter>
     </ClCompile>
     <ClCompile Include="src\game\world\LoadedChunks.cpp">
-      <Filter>Pliki źródłowe\game\world</Filter>
-    </ClCompile>
-    <ClCompile Include="src\game\world\ChunkFileLoader.cpp">
       <Filter>Pliki źródłowe\game\world</Filter>
     </ClCompile>
     <ClCompile Include="src\game\core\Player.cpp">
@@ -291,6 +300,33 @@
     <ClCompile Include="src\game\graphics\ConcreteItemMesh.cpp">
       <Filter>Pliki źródłowe\game\graphics</Filter>
     </ClCompile>
+    <ClCompile Include="src\engine\qxml\QXMLReader.cpp">
+      <Filter>Pliki źródłowe\engine\qxml</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\qxml\Element.cpp">
+      <Filter>Pliki źródłowe\engine\qxml</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\qxml\QXMLWriter.cpp">
+      <Filter>Pliki źródłowe\engine\qxml</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\core\AreaLoader.cpp">
+      <Filter>Pliki źródłowe\game\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\entity\DroppedItemRepository.cpp">
+      <Filter>Pliki źródłowe\game\entity</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\save_loading\WholeSaveLoader.cpp">
+      <Filter>Pliki źródłowe\game\save loading</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\save_loading\BlockDataLoader.cpp">
+      <Filter>Pliki źródłowe\game\save loading</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\save_loading\ItemDataLoader.cpp">
+      <Filter>Pliki źródłowe\game\save loading</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\save_loading\PlayerDataLoader.cpp">
+      <Filter>Pliki źródłowe\game\save loading</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\engine\util\Debug.hpp">
@@ -343,9 +379,6 @@
     </ClInclude>
     <ClInclude Include="src\game\entity\Entity.hpp">
       <Filter>Pliki nagłówkowe\game\entity</Filter>
-    </ClInclude>
-    <ClInclude Include="src\game\world\ChunkFileLoader.hpp">
-      <Filter>Pliki nagłówkowe\game\world</Filter>
     </ClInclude>
     <ClInclude Include="src\game\core\Player.hpp">
       <Filter>Pliki nagłówkowe\game\core</Filter>
@@ -499,6 +532,33 @@
     </ClInclude>
     <ClInclude Include="src\game\graphics\ConcreteItemMesh.hpp">
       <Filter>Pliki nagłówkowe\game\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\qxml\QXMLReader.hpp">
+      <Filter>Pliki nagłówkowe\engine\qxml</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\qxml\Element.hpp">
+      <Filter>Pliki nagłówkowe\engine\qxml</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\qxml\QXMLWriter.hpp">
+      <Filter>Pliki nagłówkowe\engine\qxml</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\core\AreaLoader.hpp">
+      <Filter>Pliki nagłówkowe\game\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\entity\DroppedItemRepository.hpp">
+      <Filter>Pliki nagłówkowe\game\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\save_loading\WholeSaveLoader.hpp">
+      <Filter>Pliki nagłówkowe\game\save loading</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\save_loading\BlockDataLoader.hpp">
+      <Filter>Pliki nagłówkowe\game\save loading</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\save_loading\ItemDataLoader.hpp">
+      <Filter>Pliki nagłówkowe\game\save loading</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\save_loading\PlayerDataLoader.hpp">
+      <Filter>Pliki nagłówkowe\game\save loading</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

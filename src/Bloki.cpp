@@ -12,6 +12,8 @@
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE   hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	Block::SetupBlockData();
+	FoodItem::RegisterTypes();
+	BlockItem::RegisterTypes();
 
 	ConsoleDebugHandler m_DebugHandler;
 	DebugProvider::Set(&m_DebugHandler);

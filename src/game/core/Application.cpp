@@ -13,12 +13,16 @@ Application::Application() :
 	m_Window(glm::ivec2(1280, 720), "Bloki Alpha 2", true),
 	m_Camera(m_Window.GetSize()),
 	m_Renderer(m_Window.GetSize()),
-	m_World(m_Renderer, "saves/first"),
-	m_Player(m_World, m_Window.GetKeyboard(), m_Window.GetMouse(), m_Window.GetSize(), m_DroppedItemRepository),
-	m_WorldRenderer(m_Renderer, m_World, m_Player),
-	m_UIManager(m_Window, m_Player.GetInventory()),
-	m_DroppedItemRepository(m_World),
-	m_DroppedItemsRenderer(m_Renderer, m_DroppedItemRepository)
+	m_SaveLoader("second"),
+	m_World(m_Renderer, m_SaveLoader),
+	m_Player(std::move(loadPlayer())),
+	m_WorldRenderer(m_Renderer, m_World, *m_Player),
+	m_UIManager(m_Window, m_Player->GetInventory()),
+	m_ItemDataLoader(m_SaveLoader),
+	m_PlayerDataLoader(m_SaveLoader),
+	m_DroppedItemRepository(m_World, m_ItemDataLoader),
+	m_DroppedItemsRenderer(m_Renderer, m_DroppedItemRepository),
+	m_AreaLoader(m_WorldRenderer, m_DroppedItemRepository, m_World)
 {
 	m_Window.GetMouse().SetPosition(m_Window.GetSize() / 2);
 	m_Window.GetKeyboard().AddKeyboardListener(*this);
@@ -26,8 +30,7 @@ Application::Application() :
 	m_Window.AddWindowResizeListener(*this);
 
 	m_DroppedItemRepository.AddDroppedItem(ItemStack(FoodItem(FoodItem::FoodType::Apple), 3), { 3, 50, 0 });
-	m_Player.SetPosition(glm::vec3(0, 40, 0));
-	m_Player.SetEyeCamera(&m_Camera);
+	m_Player->SetEyeCamera(&m_Camera);
 	m_Renderer.SetCamera(&m_Camera);
 }
 
@@ -50,7 +53,7 @@ void Application::OnKeyboardEvent(const KeyboardEvent& event)
 void Application::OnWindowResize(glm::ivec2 size)
 {
 	m_Renderer.Resize(size);
-	m_Player.SetWindowSize(size);
+	m_Player->SetWindowSize(size);
 
 	m_UIManager.SetWindowSize(size);
 }
@@ -60,7 +63,7 @@ void Application::OnMouseButtonEvent(const MouseButtonEvent& event)
 	if (event.EventType == MouseButtonEvent::Pressed)
 	{
 		if (!m_UIManager.IsInventoryVisible())
-			m_Player.MouseClicked(glm::ivec2(0), event.ButtonType == Mouse::Button::Left);
+			m_Player->MouseClicked(glm::ivec2(0), event.ButtonType == Mouse::Button::Left);
 
 		m_UIManager.MouseClicked(event.ButtonType == Mouse::Button::Left);
 	}
@@ -73,24 +76,9 @@ void Application::OnMouseButtonEvent(const MouseButtonEvent& event)
 void Application::OnMouseMove(glm::ivec2 position)
 {
 	if (!m_UIManager.IsInventoryVisible())
-		m_Player.MouseMoved(position);
+		m_Player->MouseMoved(position);
 
 	m_UIManager.MouseMoved(position);
-}
-
-void Application::SetChunksToRender() {
-	std::set<Chunk*> chunksToRender;
-	ChunkPos centerChunk = Chunk::GetChunkPosition(m_Player.GetPosition());
-	for (int x = -3; x <= 3; ++x)
-		for(int y = -1; y <= 1; ++y)
-			for (int z = -3; z <= 3; ++z) {
-				Chunk* const chunk = m_World.GetChunk(centerChunk + glm::ivec3(x, y, z));
-				if (chunk != nullptr)
-					chunksToRender.insert(chunk);
-			}
-
-	m_WorldRenderer.SetChunksToRender(chunksToRender);
-	m_DroppedItemRepository.SetCenterChunk(centerChunk);
 }
 
 void Application::Start()
@@ -112,7 +100,7 @@ void Application::Start()
 			{
 				const int parts = ceil(deltaTime / 200.0f); //Max 200ms per update, no more
 				for (int i = 0; i < parts; ++i) {
-					m_Player.Update(deltaTime / 1000.0f / parts);
+					m_Player->Update(deltaTime / 1000.0f / parts);
 					m_DroppedItemRepository.Update(deltaTime / 1000.0f / parts);
 				}
 			}
@@ -139,8 +127,27 @@ void Application::Start()
 
 		m_UIManager.Update();
 		m_World.Update();
-		m_World.SetCenter(m_Player.GetPosition());
-		SetChunksToRender();
+		m_World.SetCenter(m_Player->GetPosition());
+		m_AreaLoader.SetCenterChunk(Chunk::GetChunkPosition(m_Player->GetPosition()));
 		m_WorldRenderer.Update();
 	}
+
+	m_PlayerDataLoader.SavePlayer(*m_Player);
+}
+
+std::unique_ptr<Player> Application::loadPlayer() {
+	std::unique_ptr<Player> player = std::move(m_PlayerDataLoader.LoadPlayer(m_World, m_Window.GetKeyboard(), m_Window.GetMouse(), m_Window.GetSize(), m_DroppedItemRepository));
+	
+	if (player == nullptr) {//Player still not loaded
+		player = std::make_unique<Player>(m_World, m_Window.GetKeyboard(), m_Window.GetMouse(), m_Window.GetSize(), m_DroppedItemRepository);
+		player->SetPosition(glm::vec3(0, 40, 0));
+
+		player->GetInventory().GetItemStack(2).Set(FoodItem(FoodItem::FoodType::Apple), 20);
+		player->GetInventory().GetItemStack(3).Set(FoodItem(FoodItem::FoodType::Apple), 10);
+		player->GetInventory().GetItemStack(5).Set(FoodItem(FoodItem::FoodType::Bread), 3);
+		player->GetInventory().GetItemStack(6).Set(BlockItem(Block::Wood), 15);
+		player->GetInventory().GetItemStack(7).Set(BlockItem(Block::Stone), 15);
+	}
+
+	return std::move(player);
 }

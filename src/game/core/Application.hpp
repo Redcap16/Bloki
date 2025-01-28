@@ -24,8 +24,14 @@
 #include <game/core/UIManager.hpp>
 #include <engine/ui/Button.hpp>
 #include <game/graphics/DroppedItemRenderer.hpp>
+#include <game/entity/DroppedItemRepository.hpp>
 #include <game/graphics/ConcreteItemTextureLoader.hpp>
 #include <game/graphics/ConcreteBlockTextureLoader.hpp>
+#include <game/core/AreaLoader.hpp>
+#include <game/save_loading/PlayerDataLoader.hpp>
+
+#include <game/items/FoodItem.hpp>
+#include <game/items/BlockItem.hpp>
 
 class Application : public window::KeyboardListener, 
 	public window::WindowListener, 
@@ -44,7 +50,6 @@ public:
 	void OnMouseMove(glm::ivec2 position) override;
 	void OnMouseWheelMove(int movement) override {};
 
-	void SetChunksToRender(); //Move to WorldRenderer
 	void Start();
 private:
 	class TextureProviderSetup { //TODO: Remove it please...
@@ -63,15 +68,21 @@ private:
 
 	TextureProviderSetup m_TPS;
 
+	WholeSaveLoader m_SaveLoader;
+	ItemDataLoader m_ItemDataLoader;
+	PlayerDataLoader m_PlayerDataLoader;
 	LoadedChunks m_World;
-	Player m_Player;
+	std::unique_ptr<Player> m_Player;
 	WorldRenderer m_WorldRenderer;
 	DroppedItemRepository m_DroppedItemRepository;
 	DroppedItemRenderer m_DroppedItemsRenderer;
+	AreaLoader m_AreaLoader;
 
 	Camera3D m_Camera;
 	UIManager m_UIManager;
 
 	bool m_Running = false,
 		m_Done = false;
+
+	std::unique_ptr<Player> loadPlayer();
 };

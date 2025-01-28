@@ -5,6 +5,8 @@
 #include <set>
 #include <cassert>
 #include <memory>
+#include <engine/qxml/QXMLReader.hpp>
+#include <engine/qxml/QXMLWriter.hpp>
 
 class StackUpdateListener
 {
@@ -84,8 +86,24 @@ public:
 	ItemStack& GetSelectedItem() { return m_Items[m_SelectedItemIndex]; }
 
 	void StackUpdated() override;
+
 private:
+	friend class InventorySerializer;
+
+	Inventory(std::array<ItemStack, c_Size>& items);
+
 	std::array<ItemStack, c_Size> m_Items;
 	int m_SelectedItemIndex = 0;
 	const int c_SelectableItemCount = 9;
+};
+
+class InventorySerializer {
+public:
+	void Serialize(const Inventory& inventory, std::vector<char>& data);
+	std::unique_ptr<Inventory> Deserialize(const std::vector<char>& data);
+
+private:
+	static const std::string c_ItemstackTag,
+		c_IndexAttribute,
+		c_CountAttribute;
 };
