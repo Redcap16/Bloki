@@ -23,7 +23,7 @@ DroppedItemSerializer::c_ItemStackTag = "itemstack",
 DroppedItemSerializer::c_CountAttribute = "count";
 
 void DroppedItemSerializer::Serialize(const DroppedItem& droppedItem, std::vector<char>& data) {
-	DebugProvider::Get().Log("Serializing item");
+	DEBUG_LOG("Serializing item");
 	QXML::QXMLWriter writer;
 
 	QXML::Element itemstack(c_ItemStackTag);
@@ -43,7 +43,7 @@ void DroppedItemSerializer::Serialize(const DroppedItem& droppedItem, std::vecto
 }
 
 std::unique_ptr<DroppedItem> DroppedItemSerializer::Deserialize(const std::vector<char>& data, BlockManager& world) {
-	DebugProvider::Get().Log("Deserializing item");
+	DEBUG_LOG("Deserializing item");
 
 	QXML::QXMLReader reader(data);
 	auto* itemstackElement = reader.GetBase().GetElementsByTag(c_ItemStackTag),
