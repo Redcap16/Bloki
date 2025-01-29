@@ -145,6 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\game\save_loading\SaveManager.cpp" />
     <ClCompile Include="src\game\save_loading\BlockDataLoader.cpp" />
     <ClCompile Include="src\game\save_loading\ItemDataLoader.cpp" />
     <ClCompile Include="src\game\save_loading\PlayerDataLoader.cpp" />
@@ -219,6 +220,7 @@
     <ClCompile Include="src\game\save_loading\WholeSaveLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\game\save_loading\SaveManager.hpp" />
     <ClInclude Include="src\game\save_loading\BlockDataLoader.hpp" />
     <ClInclude Include="src\game\save_loading\ItemDataLoader.hpp" />
     <ClInclude Include="src\game\save_loading\PlayerDataLoader.hpp" />

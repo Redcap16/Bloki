@@ -327,6 +327,9 @@
     <ClCompile Include="src\game\save_loading\PlayerDataLoader.cpp">
       <Filter>Pliki źródłowe\game\save loading</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\save_loading\SaveManager.cpp">
+      <Filter>Pliki źródłowe\game\save loading</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\engine\util\Debug.hpp">
@@ -558,6 +561,9 @@
       <Filter>Pliki nagłówkowe\game\save loading</Filter>
     </ClInclude>
     <ClInclude Include="src\game\save_loading\PlayerDataLoader.hpp">
+      <Filter>Pliki nagłówkowe\game\save loading</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\save_loading\SaveManager.hpp">
       <Filter>Pliki nagłówkowe\game\save loading</Filter>
     </ClInclude>
   </ItemGroup>

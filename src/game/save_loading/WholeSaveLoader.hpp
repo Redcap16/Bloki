@@ -21,13 +21,14 @@
 */
 
 class WholeSaveLoader {
-public:
+public:	
+	static const std::string c_SavesPath,
+		c_GeneralFileName;
+
 	WholeSaveLoader(const std::string& saveName);
 
 private:
-	static const std::string c_SavesPath,
-		c_GeneralFileName,
-		c_BaseTag,
+	static const std::string c_BaseTag,
 		c_BlockdataTag,
 		c_ItemdataTag;
 

@@ -8,7 +8,6 @@ const std::string WholeSaveLoader::c_SavesPath = "saves/",
 
 WholeSaveLoader::WholeSaveLoader(const std::string& saveName) :
 	m_SavePath(saveName) {
-
 }
 
 WholeSaveLoader::ChunkRecordAccess::ChunkRecordAccess(std::map<RawDataType, std::vector<char>>& data, std::mutex& regionMutex) :
